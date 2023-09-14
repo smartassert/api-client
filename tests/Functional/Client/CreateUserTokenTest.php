@@ -8,9 +8,9 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Model\RefreshableToken;
 
-class CreateUserFrontendTokenTest extends AbstractClientModelCreationTestCase
+class CreateUserTokenTest extends AbstractClientModelCreationTestCase
 {
-    public function testCreateUserFrontendTokenRequestProperties(): void
+    public function testCreateUserTokenRequestProperties(): void
     {
         $token = md5((string) rand());
         $refreshToken = md5((string) rand());
@@ -29,7 +29,7 @@ class CreateUserFrontendTokenTest extends AbstractClientModelCreationTestCase
         $userIdentifier = md5((string) rand());
         $password = md5((string) rand());
 
-        $this->client->createUserFrontendToken($userIdentifier, $password);
+        $this->client->createUserToken($userIdentifier, $password);
 
         $request = $this->getLastRequest();
         self::assertSame('POST', $request->getMethod());
@@ -37,20 +37,20 @@ class CreateUserFrontendTokenTest extends AbstractClientModelCreationTestCase
     }
 
     /**
-     * @dataProvider createApiTokenSuccessDataProvider
+     * @dataProvider createUserTokenSuccessDataProvider
      */
-    public function testCreateUserFrontendTokenSuccess(ResponseInterface $httpFixture, RefreshableToken $expected): void
+    public function testCreateUserTokenSuccess(ResponseInterface $httpFixture, RefreshableToken $expected): void
     {
         $this->mockHandler->append($httpFixture);
 
-        $actual = $this->client->createUserFrontendToken('user identifier', 'password');
+        $actual = $this->client->createUserToken('user identifier', 'password');
         self::assertEquals($expected, $actual);
     }
 
     /**
      * @return array<mixed>
      */
-    public static function createApiTokenSuccessDataProvider(): array
+    public static function createUserTokenSuccessDataProvider(): array
     {
         $token = md5((string) rand());
         $refreshToken = md5((string) rand());
@@ -77,7 +77,7 @@ class CreateUserFrontendTokenTest extends AbstractClientModelCreationTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->createUserFrontendToken('user identifier', 'password');
+            $this->client->createUserToken('user identifier', 'password');
         };
     }
 
