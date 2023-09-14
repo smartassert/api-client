@@ -40,7 +40,7 @@ readonly class Client
      * @throws InvalidResponseDataException
      * @throws InvalidModelDataException
      */
-    public function createUserFrontendToken(string $userIdentifier, string $password): RefreshableToken
+    public function createUserToken(string $userIdentifier, string $password): RefreshableToken
     {
         $response = $this->serviceClient->sendRequest(
             (new Request('POST', $this->createUrl('/user/token/create')))
@@ -87,7 +87,7 @@ readonly class Client
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
      */
-    public function verifyUserFrontendToken(string $token): User
+    public function verifyUserToken(string $token): User
     {
         $response = $this->serviceClient->sendRequest(
             (new Request('GET', $this->createUrl('/user/token/verify')))

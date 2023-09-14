@@ -8,9 +8,9 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Model\User;
 
-class VerifyUserFrontendTokenTest extends AbstractClientModelCreationTestCase
+class VerifyUserTokenTest extends AbstractClientModelCreationTestCase
 {
-    public function testVerifyUserFrontendTokenRequestProperties(): void
+    public function testVerifyUserTokenRequestProperties(): void
     {
         $id = md5((string) rand());
         $userIdentifier = md5((string) rand());
@@ -28,7 +28,7 @@ class VerifyUserFrontendTokenTest extends AbstractClientModelCreationTestCase
 
         $token = md5((string) rand());
 
-        $this->client->verifyUserFrontendToken($token);
+        $this->client->verifyUserToken($token);
 
         $request = $this->getLastRequest();
         self::assertSame('GET', $request->getMethod());
@@ -36,20 +36,20 @@ class VerifyUserFrontendTokenTest extends AbstractClientModelCreationTestCase
     }
 
     /**
-     * @dataProvider verifyFrontendTokenSuccessDataProvider
+     * @dataProvider verifyTokenSuccessDataProvider
      */
-    public function testVerifyUserFrontendTokenSuccess(ResponseInterface $httpFixture, user $expected): void
+    public function testVerifyUserTokenSuccess(ResponseInterface $httpFixture, user $expected): void
     {
         $this->mockHandler->append($httpFixture);
 
-        $actual = $this->client->verifyUserFrontendToken('frontend token');
+        $actual = $this->client->verifyUserToken('token');
         self::assertEquals($expected, $actual);
     }
 
     /**
      * @return array<mixed>
      */
-    public static function verifyFrontendTokenSuccessDataProvider(): array
+    public static function verifyTokenSuccessDataProvider(): array
     {
         $id = md5((string) rand());
         $userIdentifier = md5((string) rand());
@@ -76,7 +76,7 @@ class VerifyUserFrontendTokenTest extends AbstractClientModelCreationTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->verifyUserFrontendToken('frontend token');
+            $this->client->verifyUserToken('token');
         };
     }
 
