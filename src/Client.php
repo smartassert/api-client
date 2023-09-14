@@ -21,6 +21,7 @@ use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
 use SmartAssert\ServiceClient\Request;
 use SmartAssert\ServiceClient\Response\JsonResponse;
+use SmartAssert\ServiceClient\Response\ResponseInterface;
 
 readonly class Client
 {
@@ -53,30 +54,7 @@ readonly class Client
                 )
         );
 
-        if (401 === $response->getStatusCode()) {
-            throw new UnauthorizedException();
-        }
-
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
-
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
-
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $modelData = $responseDataInspector->getArray('refreshable_token');
-
-        $modelDataInspector = new ArrayInspector($modelData);
-        $token = $modelDataInspector->getNonEmptyString('token');
-        $refreshToken = $modelDataInspector->getNonEmptyString('refresh_token');
-
-        if (null === $token || null === $refreshToken) {
-            throw InvalidModelDataException::fromJsonResponse(RefreshableToken::class, $response);
-        }
-
-        return new RefreshableToken($token, $refreshToken);
+        return $this->handleRefreshableTokenResponse($response);
     }
 
     /**
@@ -128,6 +106,29 @@ readonly class Client
     }
 
     /**
+     * @param non-empty-string $refreshToken
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    public function refreshUserToken(string $refreshToken): RefreshableToken
+    {
+        $response = $this->serviceClient->sendRequest(
+            (new Request('POST', $this->createUrl('/user/token/refresh')))
+                ->withAuthentication(new BearerAuthentication($refreshToken))
+        );
+
+        return $this->handleRefreshableTokenResponse($response);
+    }
+
+    /**
      * @param non-empty-string $path
      *
      * @return non-empty-string
@@ -135,5 +136,40 @@ readonly class Client
     private function createUrl(string $path): string
     {
         return rtrim($this->baseUrl, '/') . $path;
+    }
+
+    /**
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NonSuccessResponseException
+     * @throws UnauthorizedException
+     */
+    private function handleRefreshableTokenResponse(ResponseInterface $response): RefreshableToken
+    {
+        if (401 === $response->getStatusCode()) {
+            throw new UnauthorizedException();
+        }
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+
+        if (!$response instanceof JsonResponse) {
+            throw InvalidResponseTypeException::create($response, JsonResponse::class);
+        }
+
+        $responseDataInspector = new ArrayInspector($response->getData());
+        $modelData = $responseDataInspector->getArray('refreshable_token');
+
+        $modelDataInspector = new ArrayInspector($modelData);
+        $token = $modelDataInspector->getNonEmptyString('token');
+        $refreshToken = $modelDataInspector->getNonEmptyString('refresh_token');
+
+        if (null === $token || null === $refreshToken) {
+            throw InvalidModelDataException::fromJsonResponse(RefreshableToken::class, $response);
+        }
+
+        return new RefreshableToken($token, $refreshToken);
     }
 }
