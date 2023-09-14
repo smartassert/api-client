@@ -39,6 +39,7 @@ readonly class Client
      * @throws InvalidResponseTypeException
      * @throws InvalidResponseDataException
      * @throws InvalidModelDataException
+     * @throws UnauthorizedException
      */
     public function createUserToken(string $userIdentifier, string $password): RefreshableToken
     {
@@ -51,6 +52,10 @@ readonly class Client
                     ])
                 )
         );
+
+        if (401 === $response->getStatusCode()) {
+            throw new UnauthorizedException();
+        }
 
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
