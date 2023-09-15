@@ -15,8 +15,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Client;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 use SmartAssert\ServiceClient\Client as ServiceClient;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\ExceptionFactory\CurlExceptionFactory;
@@ -26,8 +24,6 @@ use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 abstract class AbstractClientTestCase extends TestCase
 {
     use CommonNonSuccessResponseDataProviderTrait;
-    use InvalidJsonResponseExceptionDataProviderTrait;
-    use NetworkErrorExceptionDataProviderTrait;
 
     protected MockHandler $mockHandler;
     protected Client $client;
@@ -59,8 +55,7 @@ abstract class AbstractClientTestCase extends TestCase
     }
 
     /**
-     * @dataProvider networkErrorExceptionDataProvider
-     * @dataProvider invalidJsonResponseExceptionDataProvider
+     * @dataProvider clientActionThrowsExceptionDataProvider
      *
      * @param class-string<\Throwable> $expectedExceptionClass
      */
@@ -74,6 +69,11 @@ abstract class AbstractClientTestCase extends TestCase
 
         ($this->createClientActionCallable())();
     }
+
+    /**
+     * @return array<mixed>
+     */
+    abstract public static function clientActionThrowsExceptionDataProvider(): array;
 
     /**
      * @dataProvider commonNonSuccessResponseDataProvider

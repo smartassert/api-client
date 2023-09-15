@@ -7,9 +7,14 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Model\User;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 
 class VerifyUserTokenTest extends AbstractClientModelCreationTestCase
 {
+    use InvalidJsonResponseExceptionDataProviderTrait;
+    use NetworkErrorExceptionDataProviderTrait;
+
     public function testVerifyUserTokenRequestProperties(): void
     {
         $id = md5((string) rand());
@@ -71,6 +76,14 @@ class VerifyUserTokenTest extends AbstractClientModelCreationTestCase
                 'expected' => new User($id, $userIdentifier),
             ],
         ];
+    }
+
+    public static function clientActionThrowsExceptionDataProvider(): array
+    {
+        return array_merge(
+            self::networkErrorExceptionDataProvider(),
+            self::invalidJsonResponseExceptionDataProvider(),
+        );
     }
 
     protected function createClientActionCallable(): callable
