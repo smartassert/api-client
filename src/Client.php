@@ -8,6 +8,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
+use SmartAssert\ApiClient\Exception\UserAlreadyExistsException;
 use SmartAssert\ApiClient\Model\RefreshableToken;
 use SmartAssert\ApiClient\Model\User;
 use SmartAssert\ArrayInspector\ArrayInspector;
@@ -79,30 +80,7 @@ readonly class Client
                 )
         );
 
-        if (401 === $response->getStatusCode()) {
-            throw new UnauthorizedException();
-        }
-
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
-
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
-
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $userData = $responseDataInspector->getArray('user');
-        $userDataInspector = new ArrayInspector($userData);
-
-        $id = $userDataInspector->getNonEmptyString('id');
-        $userIdentifier = $userDataInspector->getNonEmptyString('user-identifier');
-
-        if (null === $id || null === $userIdentifier) {
-            throw InvalidModelDataException::fromJsonResponse(User::class, $response);
-        }
-
-        return new User($id, $userIdentifier);
+        return $this->handleUserResponse($response);
     }
 
     /**
@@ -126,6 +104,37 @@ readonly class Client
         );
 
         return $this->handleRefreshableTokenResponse($response);
+    }
+
+    /**
+     * @param non-empty-string $adminToken
+     * @param non-empty-string $userIdentifier
+     * @param non-empty-string $password
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     * @throws UserAlreadyExistsException
+     */
+    public function createUser(string $adminToken, string $userIdentifier, string $password): User
+    {
+        $response = $this->serviceClient->sendRequest(
+            (new Request('POST', $this->createUrl('/user/create')))
+                ->withAuthentication(new BearerAuthentication($adminToken))
+                ->withPayload(new UrlEncodedPayload(['user-identifier' => $userIdentifier, 'password' => $password]))
+        );
+
+        if (409 === $response->getStatusCode()) {
+            throw new UserAlreadyExistsException($userIdentifier, $response->getHttpResponse());
+        }
+
+        return $this->handleUserResponse($response);
     }
 
     /**
@@ -171,5 +180,40 @@ readonly class Client
         }
 
         return new RefreshableToken($token, $refreshToken);
+    }
+
+    /**
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NonSuccessResponseException
+     * @throws UnauthorizedException
+     */
+    private function handleUserResponse(ResponseInterface $response): User
+    {
+        if (401 === $response->getStatusCode()) {
+            throw new UnauthorizedException();
+        }
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+
+        if (!$response instanceof JsonResponse) {
+            throw InvalidResponseTypeException::create($response, JsonResponse::class);
+        }
+
+        $responseDataInspector = new ArrayInspector($response->getData());
+        $userData = $responseDataInspector->getArray('user');
+        $userDataInspector = new ArrayInspector($userData);
+
+        $id = $userDataInspector->getNonEmptyString('id');
+        $userIdentifier = $userDataInspector->getNonEmptyString('user-identifier');
+
+        if (null === $id || null === $userIdentifier) {
+            throw InvalidModelDataException::fromJsonResponse(User::class, $response);
+        }
+
+        return new User($id, $userIdentifier);
     }
 }
