@@ -138,6 +138,34 @@ readonly class Client
     }
 
     /**
+     * @param non-empty-string $adminToken
+     * @param non-empty-string $userId
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    public function revokeRefreshToken(string $adminToken, string $userId): void
+    {
+        $response = $this->serviceClient->sendRequest(
+            (new Request('POST', $this->createUrl('/refresh_token/revoke')))
+                ->withAuthentication(new BearerAuthentication($adminToken))
+                ->withPayload(new UrlEncodedPayload(['id' => $userId]))
+        );
+
+        if (401 === $response->getStatusCode()) {
+            throw new UnauthorizedException();
+        }
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+    }
+
+    /**
      * @param non-empty-string $path
      *
      * @return non-empty-string
