@@ -125,7 +125,7 @@ readonly class Client
     public function createUser(string $adminToken, string $userIdentifier, string $password): User
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->createUrl('/admin/user/create')))
+            (new Request('POST', $this->createUrl('/user/create')))
                 ->withAuthentication(new BearerAuthentication($adminToken))
                 ->withPayload(new UrlEncodedPayload(['user-identifier' => $userIdentifier, 'password' => $password]))
         );
