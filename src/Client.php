@@ -152,7 +152,7 @@ readonly class Client
     public function revokeRefreshToken(string $adminToken, string $userId): void
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->createUrl('/refresh_token/revoke')))
+            (new Request('POST', $this->createUrl('/user/refresh_token/revoke')))
                 ->withAuthentication(new BearerAuthentication($adminToken))
                 ->withPayload(new UrlEncodedPayload(['id' => $userId]))
         );
