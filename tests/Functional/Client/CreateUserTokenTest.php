@@ -8,11 +8,29 @@ use GuzzleHttp\Psr7\Response;
 use SmartAssert\ApiClient\Model\RefreshableToken;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
+use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
-class CreateUserTokenTest extends AbstractClientModelCreationTestCase
+class CreateUserTokenTest extends AbstractClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
+
+    public function testCreateUserTokenThrowsInvalidModelDataException(): void
+    {
+        $responsePayload = ['key' => 'value'];
+        $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
+
+        $this->mockHandler->append($response);
+
+        try {
+            $this->client->createUserToken('user identifier', 'password');
+            self::fail(InvalidModelDataException::class . ' not thrown');
+        } catch (InvalidModelDataException $e) {
+            self::assertSame(RefreshableToken::class, $e->class);
+            self::assertSame($response, $e->response);
+            self::assertSame($responsePayload, $e->payload);
+        }
+    }
 
     public function testCreateUserTokenRequestProperties(): void
     {
@@ -53,10 +71,5 @@ class CreateUserTokenTest extends AbstractClientModelCreationTestCase
         return function () {
             $this->client->createUserToken('user identifier', 'password');
         };
-    }
-
-    protected function getExpectedModelClass(): string
-    {
-        return RefreshableToken::class;
     }
 }

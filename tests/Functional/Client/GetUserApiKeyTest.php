@@ -6,14 +6,32 @@ namespace Functional\Client;
 
 use GuzzleHttp\Psr7\Response;
 use SmartAssert\ApiClient\Model\ApiKey;
-use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientModelCreationTestCase;
+use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
+use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
-class GetUserApiKeyTest extends AbstractClientModelCreationTestCase
+class GetUserApiKeyTest extends AbstractClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
+
+    public function testGetUserApiKeyThrowsInvalidModelDataException(): void
+    {
+        $responsePayload = ['key' => 'value'];
+        $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
+
+        $this->mockHandler->append($response);
+
+        try {
+            $this->client->getUserApiKey('token');
+            self::fail(InvalidModelDataException::class . ' not thrown');
+        } catch (InvalidModelDataException $e) {
+            self::assertSame(ApiKey::class, $e->class);
+            self::assertSame($response, $e->response);
+            self::assertSame($responsePayload, $e->payload);
+        }
+    }
 
     public function testGetUserApiKeyRequestProperties(): void
     {
@@ -53,10 +71,5 @@ class GetUserApiKeyTest extends AbstractClientModelCreationTestCase
         return function () {
             $this->client->getUserApiKey('token');
         };
-    }
-
-    protected function getExpectedModelClass(): string
-    {
-        return ApiKey::class;
     }
 }
