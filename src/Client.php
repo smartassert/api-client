@@ -9,6 +9,7 @@ use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\UserAlreadyExistsException;
+use SmartAssert\ApiClient\Model\ApiKey;
 use SmartAssert\ApiClient\Model\RefreshableToken;
 use SmartAssert\ApiClient\Model\User;
 use SmartAssert\ArrayInspector\ArrayInspector;
@@ -163,6 +164,52 @@ readonly class Client
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
+    }
+
+    /**
+     * @param non-empty-string $token
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    public function getUserApiKey(string $token): ApiKey
+    {
+        $response = $this->serviceClient->sendRequest(
+            (new Request('GET', $this->createUrl('/user/apikey/')))
+                ->withAuthentication(new BearerAuthentication($token))
+        );
+
+        if (401 === $response->getStatusCode()) {
+            throw new UnauthorizedException();
+        }
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+
+        if (!$response instanceof JsonResponse) {
+            throw InvalidResponseTypeException::create($response, JsonResponse::class);
+        }
+
+        $responseDataInspector = new ArrayInspector($response->getData());
+        $modelData = $responseDataInspector->getArray('api_key');
+
+        $modelDataInspector = new ArrayInspector($modelData);
+        $label = $modelDataInspector->getNonEmptyString('label');
+        $key = $modelDataInspector->getNonEmptyString('key');
+
+        if (null === $key) {
+            throw InvalidModelDataException::fromJsonResponse(ApiKey::class, $response);
+        }
+
+        return new ApiKey($label, $key);
     }
 
     /**
