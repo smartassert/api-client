@@ -10,12 +10,12 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExcep
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
-class CreateUserTokenTest extends AbstractUsersClientTestCase
+class CreateTokenTest extends AbstractUsersClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
 
-    public function testCreateUserTokenThrowsInvalidModelDataException(): void
+    public function testCreateTokenThrowsInvalidModelDataException(): void
     {
         $responsePayload = ['key' => 'value'];
         $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
@@ -23,7 +23,7 @@ class CreateUserTokenTest extends AbstractUsersClientTestCase
         $this->mockHandler->append($response);
 
         try {
-            $this->client->createUserToken('user identifier', 'password');
+            $this->client->createToken('user identifier', 'password');
             self::fail(InvalidModelDataException::class . ' not thrown');
         } catch (InvalidModelDataException $e) {
             self::assertSame(RefreshableToken::class, $e->class);
@@ -32,7 +32,7 @@ class CreateUserTokenTest extends AbstractUsersClientTestCase
         }
     }
 
-    public function testCreateUserTokenRequestProperties(): void
+    public function testCreateTokenRequestProperties(): void
     {
         $token = md5((string) rand());
         $refreshToken = md5((string) rand());
@@ -51,7 +51,7 @@ class CreateUserTokenTest extends AbstractUsersClientTestCase
         $userIdentifier = md5((string) rand());
         $password = md5((string) rand());
 
-        $this->client->createUserToken($userIdentifier, $password);
+        $this->client->createToken($userIdentifier, $password);
 
         $request = $this->getLastRequest();
         self::assertSame('POST', $request->getMethod());
@@ -69,7 +69,7 @@ class CreateUserTokenTest extends AbstractUsersClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->createUserToken('user identifier', 'password');
+            $this->client->createToken('user identifier', 'password');
         };
     }
 }

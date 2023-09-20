@@ -11,14 +11,14 @@ class RevokeRefreshTokenTest extends AbstractIntegrationTestCase
 {
     public function testRefreshSuccess(): void
     {
-        $refreshableToken = self::$client->createUserToken(self::USER1_EMAIL, self::USER1_PASSWORD);
-        $user = self::$client->verifyUserToken($refreshableToken->token);
+        $refreshableToken = self::$client->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $user = self::$client->verifyToken($refreshableToken->token);
 
-        $refreshedToken = self::$client->refreshUserToken($refreshableToken->refreshToken);
+        $refreshedToken = self::$client->refreshToken($refreshableToken->refreshToken);
 
         self::$client->revokeRefreshToken('primary_admin_token', $user->id);
 
         self::expectException(UnauthorizedException::class);
-        self::$client->refreshUserToken($refreshedToken->refreshToken);
+        self::$client->refreshToken($refreshedToken->refreshToken);
     }
 }

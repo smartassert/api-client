@@ -5,52 +5,35 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
-use SmartAssert\ApiClient\Model\User;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
-class VerifyUserTokenTest extends AbstractUsersClientTestCase
+class GetApiKeysTest extends AbstractUsersClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
 
-    public function testVerifyUserTokenThrowsInvalidModelDataException(): void
+    public function testGetApiKeysRequestProperties(): void
     {
-        $responsePayload = ['key' => 'value'];
-        $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
-
-        $this->mockHandler->append($response);
-
-        try {
-            $this->client->verifyUserToken('token');
-            self::fail(InvalidModelDataException::class . ' not thrown');
-        } catch (InvalidModelDataException $e) {
-            self::assertSame(User::class, $e->class);
-            self::assertSame($response, $e->response);
-            self::assertSame($responsePayload, $e->payload);
-        }
-    }
-
-    public function testVerifyUserTokenRequestProperties(): void
-    {
-        $id = md5((string) rand());
-        $userIdentifier = md5((string) rand());
+        $label = null;
+        $key = md5((string) rand());
 
         $this->mockHandler->append(new Response(
             200,
             ['content-type' => 'application/json'],
             (string) json_encode([
-                'user' => [
-                    'id' => $id,
-                    'user-identifier' => $userIdentifier,
+                'api_keys' => [
+                    [
+                        'label' => $label,
+                        'key' => $key,
+                    ],
                 ],
             ])
         ));
 
         $token = md5((string) rand());
 
-        $this->client->verifyUserToken($token);
+        $this->client->getApiKeys($token);
 
         $request = $this->getLastRequest();
         self::assertSame('GET', $request->getMethod());
@@ -68,7 +51,7 @@ class VerifyUserTokenTest extends AbstractUsersClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->verifyUserToken('token');
+            $this->client->getApiKeys('token');
         };
     }
 }

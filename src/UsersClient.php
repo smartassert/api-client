@@ -44,7 +44,7 @@ readonly class UsersClient
      * @throws InvalidModelDataException
      * @throws UnauthorizedException
      */
-    public function createUserToken(string $userIdentifier, string $password): RefreshableToken
+    public function createToken(string $userIdentifier, string $password): RefreshableToken
     {
         $response = $this->serviceClient->sendRequest(
             (new Request('POST', $this->createUrl('/user/token/create')))
@@ -72,7 +72,7 @@ readonly class UsersClient
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
      */
-    public function verifyUserToken(string $token): User
+    public function verifyToken(string $token): User
     {
         $response = $this->serviceClient->sendRequest(
             (new Request('GET', $this->createUrl('/user/token/verify')))
@@ -97,7 +97,7 @@ readonly class UsersClient
      * @throws RequestExceptionInterface
      * @throws UnauthorizedException
      */
-    public function refreshUserToken(string $refreshToken): RefreshableToken
+    public function refreshToken(string $refreshToken): RefreshableToken
     {
         $response = $this->serviceClient->sendRequest(
             (new Request('POST', $this->createUrl('/user/token/refresh')))
@@ -123,7 +123,7 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws UserAlreadyExistsException
      */
-    public function createUser(string $adminToken, string $userIdentifier, string $password): User
+    public function create(string $adminToken, string $userIdentifier, string $password): User
     {
         $response = $this->serviceClient->sendRequest(
             (new Request('POST', $this->createUrl('/user/create')))
@@ -179,7 +179,7 @@ readonly class UsersClient
      * @throws RequestExceptionInterface
      * @throws UnauthorizedException
      */
-    public function getUserApiKey(string $token): ApiKey
+    public function getApiKey(string $token): ApiKey
     {
         $response = $this->serviceClient->sendRequest(
             (new Request('GET', $this->createUrl('/user/apikey/')))
@@ -223,7 +223,7 @@ readonly class UsersClient
      * @throws RequestExceptionInterface
      * @throws UnauthorizedException
      */
-    public function getUserApiKeys(string $token): array
+    public function getApiKeys(string $token): array
     {
         $response = $this->serviceClient->sendRequest(
             (new Request('GET', $this->createUrl('/user/apikey/list')))

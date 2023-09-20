@@ -13,13 +13,13 @@ class RefreshUserTokenTest extends AbstractIntegrationTestCase
     {
         self::expectException(UnauthorizedException::class);
 
-        self::$client->refreshUserToken(md5((string) rand()));
+        self::$client->refreshToken(md5((string) rand()));
     }
 
     public function testRefreshSuccess(): void
     {
-        $refreshableToken = self::$client->createUserToken(self::USER1_EMAIL, self::USER1_PASSWORD);
-        $refreshedToken = self::$client->refreshUserToken($refreshableToken->refreshToken);
+        $refreshableToken = self::$client->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $refreshedToken = self::$client->refreshToken($refreshableToken->refreshToken);
 
         self::assertInstanceOf(RefreshableToken::class, $refreshedToken);
     }

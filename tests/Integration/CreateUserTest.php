@@ -13,14 +13,14 @@ class CreateUserTest extends AbstractIntegrationTestCase
     {
         self::expectException(UnauthorizedException::class);
 
-        self::$client->createUser(md5((string) rand()), md5((string) rand()), md5((string) rand()));
+        self::$client->create(md5((string) rand()), md5((string) rand()), md5((string) rand()));
     }
 
     public function testCreateUserAlreadyExists(): void
     {
         self::expectException(UserAlreadyExistsException::class);
 
-        self::$client->createUser('primary_admin_token', self::USER1_EMAIL, md5((string) rand()));
+        self::$client->create('primary_admin_token', self::USER1_EMAIL, md5((string) rand()));
     }
 
     public function testCreateUserSuccess(): void
@@ -28,7 +28,7 @@ class CreateUserTest extends AbstractIntegrationTestCase
         $userIdentifier = md5((string) rand());
         $password = md5((string) rand());
 
-        $user = self::$client->createUser('primary_admin_token', $userIdentifier, $password);
+        $user = self::$client->create('primary_admin_token', $userIdentifier, $password);
 
         self::assertSame($userIdentifier, $user->userIdentifier);
     }

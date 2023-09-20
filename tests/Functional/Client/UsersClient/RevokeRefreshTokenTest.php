@@ -11,7 +11,7 @@ class RevokeRefreshTokenTest extends AbstractUsersClientTestCase
 {
     use NetworkErrorExceptionDataProviderTrait;
 
-    public function testRefreshUserTokenRequestProperties(): void
+    public function testRevokeRefreshTokenRequestProperties(): void
     {
         $this->mockHandler->append(new Response(
             200,
