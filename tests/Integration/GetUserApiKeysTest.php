@@ -14,13 +14,13 @@ class GetUserApiKeysTest extends AbstractIntegrationTestCase
     {
         self::expectException(UnauthorizedException::class);
 
-        self::$client->getUserApiKeys(md5((string) rand()));
+        self::$client->getApiKeys(md5((string) rand()));
     }
 
     public function testGetUserApiKeysSuccess(): void
     {
-        $refreshableToken = self::$client->createUserToken(self::USER1_EMAIL, self::USER1_PASSWORD);
-        $apiKeys = self::$client->getUserApiKeys($refreshableToken->token);
+        $refreshableToken = self::$client->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKeys = self::$client->getApiKeys($refreshableToken->token);
 
         self::assertInstanceOf(ApiKey::class, $apiKeys[0]);
     }

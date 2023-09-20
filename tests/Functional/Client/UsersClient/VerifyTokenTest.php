@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Tests\Functional\Client;
+namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use SmartAssert\ApiClient\Model\User;
@@ -10,12 +10,12 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExcep
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
-class VerifyUserTokenTest extends AbstractClientTestCase
+class VerifyTokenTest extends AbstractUsersClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
 
-    public function testVerifyUserTokenThrowsInvalidModelDataException(): void
+    public function testVerifyTokenThrowsInvalidModelDataException(): void
     {
         $responsePayload = ['key' => 'value'];
         $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
@@ -23,7 +23,7 @@ class VerifyUserTokenTest extends AbstractClientTestCase
         $this->mockHandler->append($response);
 
         try {
-            $this->client->verifyUserToken('token');
+            $this->client->verifyToken('token');
             self::fail(InvalidModelDataException::class . ' not thrown');
         } catch (InvalidModelDataException $e) {
             self::assertSame(User::class, $e->class);
@@ -32,7 +32,7 @@ class VerifyUserTokenTest extends AbstractClientTestCase
         }
     }
 
-    public function testVerifyUserTokenRequestProperties(): void
+    public function testVerifyTokenRequestProperties(): void
     {
         $id = md5((string) rand());
         $userIdentifier = md5((string) rand());
@@ -50,7 +50,7 @@ class VerifyUserTokenTest extends AbstractClientTestCase
 
         $token = md5((string) rand());
 
-        $this->client->verifyUserToken($token);
+        $this->client->verifyToken($token);
 
         $request = $this->getLastRequest();
         self::assertSame('GET', $request->getMethod());
@@ -68,7 +68,7 @@ class VerifyUserTokenTest extends AbstractClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->verifyUserToken('token');
+            $this->client->verifyToken('token');
         };
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Tests\Functional\Client;
+namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use SmartAssert\ApiClient\Model\User;
@@ -10,12 +10,12 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExcep
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
-class CreateUserTest extends AbstractClientTestCase
+class CreateTest extends AbstractUsersClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
 
-    public function testCreateUserThrowsInvalidModelDataException(): void
+    public function testCreateThrowsInvalidModelDataException(): void
     {
         $responsePayload = ['key' => 'value'];
         $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
@@ -23,7 +23,7 @@ class CreateUserTest extends AbstractClientTestCase
         $this->mockHandler->append($response);
 
         try {
-            $this->client->createUser('admin token', 'user identifier', 'password');
+            $this->client->create('admin token', 'user identifier', 'password');
             self::fail(InvalidModelDataException::class . ' not thrown');
         } catch (InvalidModelDataException $e) {
             self::assertSame(User::class, $e->class);
@@ -32,7 +32,7 @@ class CreateUserTest extends AbstractClientTestCase
         }
     }
 
-    public function testCreateUserRequestProperties(): void
+    public function testCreateRequestProperties(): void
     {
         $id = md5((string) rand());
         $userIdentifier = md5((string) rand());
@@ -51,7 +51,7 @@ class CreateUserTest extends AbstractClientTestCase
         $adminToken = md5((string) rand());
         $password = md5((string) rand());
 
-        $this->client->createUser($adminToken, $userIdentifier, $password);
+        $this->client->create($adminToken, $userIdentifier, $password);
 
         $request = $this->getLastRequest();
         self::assertSame('POST', $request->getMethod());
@@ -69,7 +69,7 @@ class CreateUserTest extends AbstractClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->createUser('admin token', 'user identifier', 'password');
+            $this->client->create('admin token', 'user identifier', 'password');
         };
     }
 }
