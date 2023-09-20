@@ -201,15 +201,62 @@ readonly class Client
         $responseDataInspector = new ArrayInspector($response->getData());
         $modelData = $responseDataInspector->getArray('api_key');
 
-        $modelDataInspector = new ArrayInspector($modelData);
-        $label = $modelDataInspector->getNonEmptyString('label');
-        $key = $modelDataInspector->getNonEmptyString('key');
-
-        if (null === $key) {
+        $apiKey = $this->createApiKey(new ArrayInspector($modelData));
+        if (null === $apiKey) {
             throw InvalidModelDataException::fromJsonResponse(ApiKey::class, $response);
         }
 
-        return new ApiKey($label, $key);
+        return $apiKey;
+    }
+
+    /**
+     * @param non-empty-string $token
+     *
+     * @return ApiKey[]
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    public function getUserApiKeys(string $token): array
+    {
+        $response = $this->serviceClient->sendRequest(
+            (new Request('GET', $this->createUrl('/user/apikey/list')))
+                ->withAuthentication(new BearerAuthentication($token))
+        );
+
+        if (401 === $response->getStatusCode()) {
+            throw new UnauthorizedException();
+        }
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+
+        if (!$response instanceof JsonResponse) {
+            throw InvalidResponseTypeException::create($response, JsonResponse::class);
+        }
+
+        $responseDataInspector = new ArrayInspector($response->getData());
+        $collectionData = $responseDataInspector->getArray('api_keys');
+
+        $apiKeys = [];
+
+        foreach ($collectionData as $modelData) {
+            if (is_array($modelData)) {
+                $apiKey = $this->createApiKey(new ArrayInspector($modelData));
+                if (null !== $apiKey) {
+                    $apiKeys[] = $apiKey;
+                }
+            }
+        }
+
+        return $apiKeys;
     }
 
     /**
@@ -290,5 +337,17 @@ readonly class Client
         }
 
         return new User($id, $userIdentifier);
+    }
+
+    private function createApiKey(ArrayInspector $data): ?ApiKey
+    {
+        $label = $data->getNonEmptyString('label');
+        $key = $data->getNonEmptyString('key');
+
+        if (null === $key) {
+            return null;
+        }
+
+        return new ApiKey($label, $key);
     }
 }
