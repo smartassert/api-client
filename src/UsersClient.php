@@ -25,7 +25,7 @@ use SmartAssert\ServiceClient\Request;
 use SmartAssert\ServiceClient\Response\JsonResponse;
 use SmartAssert\ServiceClient\Response\ResponseInterface;
 
-readonly class Client
+readonly class UsersClient
 {
     public function __construct(
         private string $baseUrl,

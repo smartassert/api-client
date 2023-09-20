@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Client;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
+use SmartAssert\ApiClient\UsersClient;
 use SmartAssert\ServiceClient\Client as ServiceClient;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\ExceptionFactory\CurlExceptionFactory;
@@ -26,7 +26,7 @@ abstract class AbstractClientTestCase extends TestCase
     use CommonNonSuccessResponseDataProviderTrait;
 
     protected MockHandler $mockHandler;
-    protected Client $client;
+    protected UsersClient $client;
     private HttpHistoryContainer $httpHistoryContainer;
 
     protected function setUp(): void
@@ -42,7 +42,7 @@ abstract class AbstractClientTestCase extends TestCase
         $this->httpHistoryContainer = new HttpHistoryContainer();
         $handlerStack->push(Middleware::history($this->httpHistoryContainer));
 
-        $this->client = new Client(
+        $this->client = new UsersClient(
             'https://users.example.com',
             new ServiceClient(
                 $httpFactory,
