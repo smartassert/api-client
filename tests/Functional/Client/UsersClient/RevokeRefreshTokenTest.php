@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Functional\Client;
+namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
-use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 
-class RevokeRefreshTokenTest extends AbstractClientTestCase
+class RevokeRefreshTokenTest extends AbstractUsersClientTestCase
 {
     use NetworkErrorExceptionDataProviderTrait;
 

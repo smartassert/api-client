@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Functional\Client;
+namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
-use SmartAssert\ApiClient\Model\ApiKey;
-use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
+use SmartAssert\ApiClient\Model\User;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
-class GetUserApiKeyTest extends AbstractClientTestCase
+class VerifyUserTokenTest extends AbstractUsersClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
 
-    public function testGetUserApiKeyThrowsInvalidModelDataException(): void
+    public function testVerifyUserTokenThrowsInvalidModelDataException(): void
     {
         $responsePayload = ['key' => 'value'];
         $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
@@ -24,34 +23,34 @@ class GetUserApiKeyTest extends AbstractClientTestCase
         $this->mockHandler->append($response);
 
         try {
-            $this->client->getUserApiKey('token');
+            $this->client->verifyUserToken('token');
             self::fail(InvalidModelDataException::class . ' not thrown');
         } catch (InvalidModelDataException $e) {
-            self::assertSame(ApiKey::class, $e->class);
+            self::assertSame(User::class, $e->class);
             self::assertSame($response, $e->response);
             self::assertSame($responsePayload, $e->payload);
         }
     }
 
-    public function testGetUserApiKeyRequestProperties(): void
+    public function testVerifyUserTokenRequestProperties(): void
     {
-        $label = null;
-        $key = md5((string) rand());
+        $id = md5((string) rand());
+        $userIdentifier = md5((string) rand());
 
         $this->mockHandler->append(new Response(
             200,
             ['content-type' => 'application/json'],
             (string) json_encode([
-                'api_key' => [
-                    'label' => $label,
-                    'key' => $key,
+                'user' => [
+                    'id' => $id,
+                    'user-identifier' => $userIdentifier,
                 ],
             ])
         ));
 
         $token = md5((string) rand());
 
-        $this->client->getUserApiKey($token);
+        $this->client->verifyUserToken($token);
 
         $request = $this->getLastRequest();
         self::assertSame('GET', $request->getMethod());
@@ -69,7 +68,7 @@ class GetUserApiKeyTest extends AbstractClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->getUserApiKey('token');
+            $this->client->verifyUserToken('token');
         };
     }
 }

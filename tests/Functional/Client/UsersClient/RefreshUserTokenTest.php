@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Tests\Functional\Client;
+namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
-use SmartAssert\ApiClient\Model\User;
+use SmartAssert\ApiClient\Model\RefreshableToken;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
-class VerifyUserTokenTest extends AbstractClientTestCase
+class RefreshUserTokenTest extends AbstractUsersClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
 
-    public function testVerifyUserTokenThrowsInvalidModelDataException(): void
+    public function testRefreshUserTokenThrowsInvalidModelDataException(): void
     {
         $responsePayload = ['key' => 'value'];
         $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
@@ -23,38 +23,36 @@ class VerifyUserTokenTest extends AbstractClientTestCase
         $this->mockHandler->append($response);
 
         try {
-            $this->client->verifyUserToken('token');
+            $this->client->refreshUserToken('refresh token');
             self::fail(InvalidModelDataException::class . ' not thrown');
         } catch (InvalidModelDataException $e) {
-            self::assertSame(User::class, $e->class);
+            self::assertSame(RefreshableToken::class, $e->class);
             self::assertSame($response, $e->response);
             self::assertSame($responsePayload, $e->payload);
         }
     }
 
-    public function testVerifyUserTokenRequestProperties(): void
+    public function testRefreshUserTokenRequestProperties(): void
     {
-        $id = md5((string) rand());
-        $userIdentifier = md5((string) rand());
+        $token = md5((string) rand());
+        $refreshToken = md5((string) rand());
 
         $this->mockHandler->append(new Response(
             200,
             ['content-type' => 'application/json'],
             (string) json_encode([
-                'user' => [
-                    'id' => $id,
-                    'user-identifier' => $userIdentifier,
+                'refreshable_token' => [
+                    'token' => $token,
+                    'refresh_token' => $refreshToken,
                 ],
             ])
         ));
 
-        $token = md5((string) rand());
-
-        $this->client->verifyUserToken($token);
+        $this->client->refreshUserToken($refreshToken);
 
         $request = $this->getLastRequest();
-        self::assertSame('GET', $request->getMethod());
-        self::assertSame('Bearer ' . $token, $request->getHeaderLine('authorization'));
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('Bearer ' . $refreshToken, $request->getHeaderLine('authorization'));
     }
 
     public static function clientActionThrowsExceptionDataProvider(): array
@@ -68,7 +66,7 @@ class VerifyUserTokenTest extends AbstractClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->verifyUserToken('token');
+            $this->client->refreshUserToken('refresh token');
         };
     }
 }

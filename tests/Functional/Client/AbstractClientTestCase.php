@@ -8,17 +8,12 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
-use SmartAssert\ApiClient\UsersClient;
-use SmartAssert\ServiceClient\Client as ServiceClient;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
-use SmartAssert\ServiceClient\ExceptionFactory\CurlExceptionFactory;
-use SmartAssert\ServiceClient\ResponseFactory\ResponseFactory;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 abstract class AbstractClientTestCase extends TestCase
@@ -26,7 +21,7 @@ abstract class AbstractClientTestCase extends TestCase
     use CommonNonSuccessResponseDataProviderTrait;
 
     protected MockHandler $mockHandler;
-    protected UsersClient $client;
+    protected HttpClient $httpClient;
     private HttpHistoryContainer $httpHistoryContainer;
 
     protected function setUp(): void
@@ -35,23 +30,12 @@ abstract class AbstractClientTestCase extends TestCase
 
         $this->mockHandler = new MockHandler();
 
-        $httpFactory = new HttpFactory();
-
         $handlerStack = HandlerStack::create($this->mockHandler);
 
         $this->httpHistoryContainer = new HttpHistoryContainer();
         $handlerStack->push(Middleware::history($this->httpHistoryContainer));
 
-        $this->client = new UsersClient(
-            'https://users.example.com',
-            new ServiceClient(
-                $httpFactory,
-                $httpFactory,
-                new HttpClient(['handler' => $handlerStack]),
-                ResponseFactory::createFactory(),
-                new CurlExceptionFactory(),
-            ),
-        );
+        $this->httpClient = new HttpClient(['handler' => $handlerStack]);
     }
 
     /**
