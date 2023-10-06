@@ -7,7 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 use GuzzleHttp\Psr7\Response;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 
-class RevokeRefreshTokenTest extends AbstractUsersClientTestCase
+class RevokeAllRefreshTokensForUserTest extends AbstractUsersClientTestCase
 {
     use NetworkErrorExceptionDataProviderTrait;
 
@@ -22,7 +22,7 @@ class RevokeRefreshTokenTest extends AbstractUsersClientTestCase
         $adminToken = md5((string) rand());
         $userId = md5((string) rand());
 
-        $this->client->revokeRefreshToken($adminToken, $userId);
+        $this->client->revokeAllRefreshTokensForUser($adminToken, $userId);
 
         $request = $this->getLastRequest();
         self::assertSame('POST', $request->getMethod());
@@ -37,7 +37,7 @@ class RevokeRefreshTokenTest extends AbstractUsersClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->revokeRefreshToken('admin token', 'user id');
+            $this->client->revokeAllRefreshTokensForUser('admin token', 'user id');
         };
     }
 }

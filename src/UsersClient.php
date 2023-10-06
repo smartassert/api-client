@@ -149,10 +149,10 @@ readonly class UsersClient
      * @throws RequestExceptionInterface
      * @throws UnauthorizedException
      */
-    public function revokeRefreshToken(string $adminToken, string $userId): void
+    public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->createUrl('/user/refresh_token/revoke')))
+            (new Request('POST', $this->createUrl('/user/refresh_token/revoke-all')))
                 ->withAuthentication(new BearerAuthentication($adminToken))
                 ->withPayload(new UrlEncodedPayload(['id' => $userId]))
         );
