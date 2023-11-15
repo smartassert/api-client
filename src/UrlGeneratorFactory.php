@@ -40,6 +40,7 @@ readonly class UrlGeneratorFactory
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('file-source_create', new Route('/file-source'));
+        $routeCollection->add('file-source', new Route('/file-source/{sourceId}'));
 
         return $routeCollection;
     }
