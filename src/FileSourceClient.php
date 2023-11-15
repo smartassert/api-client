@@ -118,6 +118,32 @@ readonly class FileSourceClient
     }
 
     /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $id
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    public function delete(string $apiKey, string $id): FileSource
+    {
+        $response = $this->serviceClient->sendRequest(
+            (new Request('DELETE', $this->urlGenerator->generate('file-source', ['sourceId' => $id])))
+                ->withAuthentication(
+                    new BearerAuthentication($apiKey)
+                )
+        );
+
+        return $this->handleFileSourceResponse($response);
+    }
+
+    /**
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
      * @throws InvalidResponseTypeException
@@ -139,11 +165,12 @@ readonly class FileSourceClient
         $modelDataInspector = new ArrayInspector($modelData);
         $id = $modelDataInspector->getNonEmptyString('id');
         $label = $modelDataInspector->getNonEmptyString('label');
+        $deletedAt = $modelDataInspector->getPositiveInteger('deleted_at');
 
         if (null === $id || null === $label) {
             throw InvalidModelDataException::fromJsonResponse(FileSource::class, $response);
         }
 
-        return new FileSource($id, $label);
+        return new FileSource($id, $label, $deletedAt);
     }
 }
