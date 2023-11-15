@@ -157,10 +157,6 @@ readonly class UsersClient
                 ->withPayload(new UrlEncodedPayload(['id' => $userId]))
         );
 
-        if (401 === $response->getStatusCode()) {
-            throw new UnauthorizedException();
-        }
-
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
@@ -184,10 +180,6 @@ readonly class UsersClient
                 ->withAuthentication(new BearerAuthentication($token))
                 ->withPayload(new UrlEncodedPayload(['refresh_token' => $refreshToken]))
         );
-
-        if (401 === $response->getStatusCode()) {
-            throw new UnauthorizedException();
-        }
 
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
@@ -213,10 +205,6 @@ readonly class UsersClient
             (new Request('GET', $this->createUrl('/user/apikey/')))
                 ->withAuthentication(new BearerAuthentication($token))
         );
-
-        if (401 === $response->getStatusCode()) {
-            throw new UnauthorizedException();
-        }
 
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
@@ -258,10 +246,6 @@ readonly class UsersClient
                 ->withAuthentication(new BearerAuthentication($token))
         );
 
-        if (401 === $response->getStatusCode()) {
-            throw new UnauthorizedException();
-        }
-
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
@@ -302,14 +286,9 @@ readonly class UsersClient
      * @throws InvalidResponseDataException
      * @throws InvalidResponseTypeException
      * @throws NonSuccessResponseException
-     * @throws UnauthorizedException
      */
     private function handleRefreshableTokenResponse(ResponseInterface $response): RefreshableToken
     {
-        if (401 === $response->getStatusCode()) {
-            throw new UnauthorizedException();
-        }
-
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
@@ -337,14 +316,9 @@ readonly class UsersClient
      * @throws InvalidResponseDataException
      * @throws InvalidResponseTypeException
      * @throws NonSuccessResponseException
-     * @throws UnauthorizedException
      */
     private function handleUserResponse(ResponseInterface $response): User
     {
-        if (401 === $response->getStatusCode()) {
-            throw new UnauthorizedException();
-        }
-
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
