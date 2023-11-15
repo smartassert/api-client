@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\User;
 
-use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 
-class RevokeAllRefreshTokensForUserTest extends AbstractIntegrationTestCase
+class RevokeAllRefreshTokensForUserTest extends AbstractUserTestCase
 {
     public function testRefreshSuccess(): void
     {
