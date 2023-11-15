@@ -86,6 +86,38 @@ readonly class FileSourceClient
     }
 
     /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $id
+     * @param non-empty-string $label
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    public function update(string $apiKey, string $id, string $label): FileSource
+    {
+        $response = $this->serviceClient->sendRequest(
+            (new Request('PUT', $this->urlGenerator->generate('file-source', ['sourceId' => $id])))
+                ->withAuthentication(
+                    new BearerAuthentication($apiKey)
+                )
+                ->withPayload(
+                    new UrlEncodedPayload([
+                        'label' => $label,
+                    ])
+                )
+        );
+
+        return $this->handleFileSourceResponse($response);
+    }
+
+    /**
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
      * @throws InvalidResponseTypeException
