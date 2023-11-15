@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Tests\Integration;
+namespace SmartAssert\ApiClient\Tests\Integration\User;
 
-class VerifyUserTokenTest extends AbstractIntegrationTestCase
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
+
+class VerifyTokenTest extends AbstractIntegrationTestCase
 {
     public function testVerifySuccess(): void
     {

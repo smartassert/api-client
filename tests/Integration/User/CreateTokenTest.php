@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Tests\Integration;
+namespace SmartAssert\ApiClient\Tests\Integration\User;
 
 use SmartAssert\ApiClient\Model\RefreshableToken;
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 
-class CreateUserTokenTest extends AbstractIntegrationTestCase
+class CreateTokenTest extends AbstractIntegrationTestCase
 {
     public function testCreateUnauthorized(): void
     {

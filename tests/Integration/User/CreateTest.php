@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Tests\Integration;
+namespace SmartAssert\ApiClient\Tests\Integration\User;
 
 use SmartAssert\ApiClient\Exception\UserAlreadyExistsException;
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 
-class CreateUserTest extends AbstractIntegrationTestCase
+class CreateTest extends AbstractIntegrationTestCase
 {
     public function testCreateUnauthorized(): void
     {
