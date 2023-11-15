@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Integration;
+namespace SmartAssert\ApiClient\Tests\Integration\User;
 
 use SmartAssert\ApiClient\Model\ApiKey;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 
-class GetUserApiKeyTest extends AbstractIntegrationTestCase
+class GetApiKeyTest extends AbstractIntegrationTestCase
 {
     public function testGetUserApiKeyInvalidToken(): void
     {
