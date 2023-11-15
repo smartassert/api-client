@@ -8,6 +8,16 @@ services:
     ports:
       - "5432:5432"
 
+  s3-mock:
+    image: adobe/s3mock:2.4.14
+    container_name: s3-mock
+    ports:
+      - "9090:9090"
+    environment:
+      - validKmsKeys=remote_storage_key_id
+      - initialBuckets=file_source_bucket,serialized_suite_bucket
+    restart: unless-stopped
+
   users-service:
     image: ghcr.io/smartassert/users:3.1
     container_name: users-service
