@@ -20,6 +20,7 @@ use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
 use SmartAssert\ServiceClient\Request;
 use SmartAssert\ServiceClient\Response\JsonResponse;
+use SmartAssert\ServiceClient\Response\ResponseInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileSourceClient
@@ -55,6 +56,43 @@ readonly class FileSourceClient
                 )
         );
 
+        return $this->handleFileSourceResponse($response);
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $id
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    public function get(string $apiKey, string $id): FileSource
+    {
+        $response = $this->serviceClient->sendRequest(
+            (new Request('GET', $this->urlGenerator->generate('file-source', ['sourceId' => $id])))
+                ->withAuthentication(
+                    new BearerAuthentication($apiKey)
+                )
+        );
+
+        return $this->handleFileSourceResponse($response);
+    }
+
+    /**
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NonSuccessResponseException
+     */
+    private function handleFileSourceResponse(ResponseInterface $response): FileSource
+    {
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
