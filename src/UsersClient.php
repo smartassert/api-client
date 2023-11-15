@@ -24,11 +24,12 @@ use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
 use SmartAssert\ServiceClient\Request;
 use SmartAssert\ServiceClient\Response\JsonResponse;
 use SmartAssert\ServiceClient\Response\ResponseInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class UsersClient
 {
     public function __construct(
-        private string $baseUrl,
+        private UrlGeneratorInterface $urlGenerator,
         private ServiceClient $serviceClient,
     ) {
     }
@@ -47,7 +48,7 @@ readonly class UsersClient
     public function createToken(string $userIdentifier, string $password): RefreshableToken
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->createUrl('/user/token/create')))
+            (new Request('POST', $this->urlGenerator->generate('user_token_create')))
                 ->withPayload(
                     new UrlEncodedPayload([
                         'user-identifier' => $userIdentifier,
@@ -75,7 +76,7 @@ readonly class UsersClient
     public function verifyToken(string $token): User
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('GET', $this->createUrl('/user/token/verify')))
+            (new Request('GET', $this->urlGenerator->generate('user_token_verify')))
                 ->withAuthentication(
                     new BearerAuthentication($token)
                 )
@@ -100,7 +101,7 @@ readonly class UsersClient
     public function refreshToken(string $refreshToken): RefreshableToken
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->createUrl('/user/token/refresh')))
+            (new Request('POST', $this->urlGenerator->generate('user_token_refresh')))
                 ->withAuthentication(new BearerAuthentication($refreshToken))
         );
 
@@ -126,7 +127,7 @@ readonly class UsersClient
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->createUrl('/user/create')))
+            (new Request('POST', $this->urlGenerator->generate('user_create')))
                 ->withAuthentication(new BearerAuthentication($adminToken))
                 ->withPayload(new UrlEncodedPayload(['user-identifier' => $userIdentifier, 'password' => $password]))
         );
@@ -152,7 +153,7 @@ readonly class UsersClient
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->createUrl('/user/refresh_token/revoke-all')))
+            (new Request('POST', $this->urlGenerator->generate('user_refresh-token_revoke-all')))
                 ->withAuthentication(new BearerAuthentication($adminToken))
                 ->withPayload(new UrlEncodedPayload(['id' => $userId]))
         );
@@ -176,7 +177,7 @@ readonly class UsersClient
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->createUrl('/user/refresh_token/revoke')))
+            (new Request('POST', $this->urlGenerator->generate('user_refresh-token_revoke')))
                 ->withAuthentication(new BearerAuthentication($token))
                 ->withPayload(new UrlEncodedPayload(['refresh_token' => $refreshToken]))
         );
@@ -202,7 +203,7 @@ readonly class UsersClient
     public function getApiKey(string $token): ApiKey
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('GET', $this->createUrl('/user/apikey/')))
+            (new Request('GET', $this->urlGenerator->generate('user_apikey')))
                 ->withAuthentication(new BearerAuthentication($token))
         );
 
@@ -242,7 +243,7 @@ readonly class UsersClient
     public function getApiKeys(string $token): array
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('GET', $this->createUrl('/user/apikey/list')))
+            (new Request('GET', $this->urlGenerator->generate('user_apikey_list')))
                 ->withAuthentication(new BearerAuthentication($token))
         );
 
@@ -269,16 +270,6 @@ readonly class UsersClient
         }
 
         return $apiKeys;
-    }
-
-    /**
-     * @param non-empty-string $path
-     *
-     * @return non-empty-string
-     */
-    private function createUrl(string $path): string
-    {
-        return rtrim($this->baseUrl, '/') . $path;
     }
 
     /**

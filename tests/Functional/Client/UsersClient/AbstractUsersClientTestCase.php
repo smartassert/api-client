@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
+use SmartAssert\ApiClient\UrlGeneratorFactory;
 use SmartAssert\ApiClient\UsersClient;
 use SmartAssert\ServiceClient\Client as ServiceClient;
 use SmartAssert\ServiceClient\ExceptionFactory\CurlExceptionFactory;
@@ -25,7 +26,7 @@ abstract class AbstractUsersClientTestCase extends AbstractClientTestCase
         $httpFactory = new HttpFactory();
 
         $this->client = new UsersClient(
-            'https://users.example.com',
+            UrlGeneratorFactory::create('https://api.example.com'),
             new ServiceClient(
                 $httpFactory,
                 $httpFactory,
