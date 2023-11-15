@@ -20,11 +20,12 @@ use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
 use SmartAssert\ServiceClient\Request;
 use SmartAssert\ServiceClient\Response\JsonResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileSourceClient
 {
     public function __construct(
-        private string $baseUrl,
+        private UrlGeneratorInterface $urlGenerator,
         private ServiceClient $serviceClient,
     ) {
     }
@@ -43,7 +44,7 @@ readonly class FileSourceClient
     public function create(string $apiKey, string $label): FileSource
     {
         $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->createUrl('/file-source')))
+            (new Request('POST', $this->urlGenerator->generate('file-source_create')))
                 ->withAuthentication(
                     new BearerAuthentication($apiKey)
                 )
@@ -74,15 +75,5 @@ readonly class FileSourceClient
         }
 
         return new FileSource($id, $label);
-    }
-
-    /**
-     * @param non-empty-string $path
-     *
-     * @return non-empty-string
-     */
-    private function createUrl(string $path): string
-    {
-        return rtrim($this->baseUrl, '/') . $path;
     }
 }

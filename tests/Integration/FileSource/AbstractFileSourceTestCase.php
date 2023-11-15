@@ -15,9 +15,6 @@ abstract class AbstractFileSourceTestCase extends AbstractIntegrationTestCase
     {
         parent::setUpBeforeClass();
 
-        self::$fileSourceClient = new FileSourceClient(
-            'http://localhost:9089',
-            self::createServiceClient(),
-        );
+        self::$fileSourceClient = new FileSourceClient(self::$urlGenerator, self::createServiceClient());
     }
 }
