@@ -75,14 +75,7 @@ readonly class FileSourceClient
      */
     public function get(string $apiKey, string $id): FileSource
     {
-        $response = $this->serviceClient->sendRequest(
-            (new Request('GET', $this->urlGenerator->generate('file-source', ['sourceId' => $id])))
-                ->withAuthentication(
-                    new BearerAuthentication($apiKey)
-                )
-        );
-
-        return $this->handleFileSourceResponse($response);
+        return $this->handleRequest($apiKey, 'GET', $id);
     }
 
     /**
@@ -102,19 +95,7 @@ readonly class FileSourceClient
      */
     public function update(string $apiKey, string $id, string $label): FileSource
     {
-        $response = $this->serviceClient->sendRequest(
-            (new Request('PUT', $this->urlGenerator->generate('file-source', ['sourceId' => $id])))
-                ->withAuthentication(
-                    new BearerAuthentication($apiKey)
-                )
-                ->withPayload(
-                    new UrlEncodedPayload([
-                        'label' => $label,
-                    ])
-                )
-        );
-
-        return $this->handleFileSourceResponse($response);
+        return $this->handleRequest($apiKey, 'PUT', $id, $label);
     }
 
     /**
@@ -133,12 +114,35 @@ readonly class FileSourceClient
      */
     public function delete(string $apiKey, string $id): FileSource
     {
-        $response = $this->serviceClient->sendRequest(
-            (new Request('DELETE', $this->urlGenerator->generate('file-source', ['sourceId' => $id])))
-                ->withAuthentication(
-                    new BearerAuthentication($apiKey)
-                )
-        );
+        return $this->handleRequest($apiKey, 'DELETE', $id);
+    }
+
+    /**
+     * @param non-empty-string  $apiKey
+     * @param non-empty-string  $method
+     * @param non-empty-string  $id
+     * @param ?non-empty-string $label
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws InvalidModelDataException
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    private function handleRequest(string $apiKey, string $method, string $id, ?string $label = null): FileSource
+    {
+        $request = new Request($method, $this->urlGenerator->generate('file-source', ['sourceId' => $id]));
+        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
+
+        if (null !== $label) {
+            $request = $request->withPayload(new UrlEncodedPayload(['label' => $label]));
+        }
+
+        $response = $this->serviceClient->sendRequest($request);
 
         return $this->handleFileSourceResponse($response);
     }
