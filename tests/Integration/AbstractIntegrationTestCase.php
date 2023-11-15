@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Integration;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
+use SmartAssert\ApiClient\UsersClient;
 use SmartAssert\ServiceClient\Client as ServiceClient;
 use SmartAssert\ServiceClient\ExceptionFactory\CurlExceptionFactory;
 use SmartAssert\ServiceClient\ResponseFactory\ResponseFactory;
@@ -17,6 +18,16 @@ abstract class AbstractIntegrationTestCase extends TestCase
     protected const USER1_PASSWORD = 'password';
     protected const USER2_EMAIL = 'user1@example.com';
     protected const USER2_PASSWORD = 'password';
+
+    protected static UsersClient $usersClient;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$usersClient = new UsersClient(
+            'http://localhost:9089',
+            self::createServiceClient(),
+        );
+    }
 
     protected static function createServiceClient(): ServiceClient
     {
