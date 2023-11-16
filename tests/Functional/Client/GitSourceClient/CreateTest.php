@@ -42,6 +42,7 @@ class CreateTest extends AbstractSourceClientTestCase
         $request = $this->getLastRequest();
         self::assertSame('POST', $request->getMethod());
         self::assertSame('Bearer ' . $apiKey, $request->getHeaderLine('authorization'));
+        self::assertStringEndsWith('/git-source', (string) $request->getUri());
     }
 
     public static function clientActionThrowsExceptionDataProvider(): array

@@ -36,6 +36,7 @@ class UpdateTest extends AbstractFileSourceClientTestCase
         $request = $this->getLastRequest();
         self::assertSame('PUT', $request->getMethod());
         self::assertSame('Bearer ' . $apiKey, $request->getHeaderLine('authorization'));
+        self::assertStringEndsWith('/file-source/' . $id, (string) $request->getUri());
     }
 
     public static function clientActionThrowsExceptionDataProvider(): array

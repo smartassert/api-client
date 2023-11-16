@@ -36,6 +36,7 @@ class CreateTest extends AbstractFileSourceClientTestCase
         $request = $this->getLastRequest();
         self::assertSame('POST', $request->getMethod());
         self::assertSame('Bearer ' . $apiKey, $request->getHeaderLine('authorization'));
+        self::assertStringEndsWith('/file-source', (string) $request->getUri());
     }
 
     public static function clientActionThrowsExceptionDataProvider(): array
