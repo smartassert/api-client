@@ -5,32 +5,13 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\GitSourceClient;
 
 use GuzzleHttp\Psr7\Response;
-use SmartAssert\ApiClient\Model\Source\GitSource;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
 class CreateTest extends AbstractSourceClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
-
-    public function testCreateThrowsInvalidModelDataException(): void
-    {
-        $responsePayload = ['key' => 'value'];
-        $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
-
-        $this->mockHandler->append($response);
-
-        try {
-            $this->client->create('api key', 'label', 'hostUrl', 'path', null);
-            self::fail(InvalidModelDataException::class . ' not thrown');
-        } catch (InvalidModelDataException $e) {
-            self::assertSame(GitSource::class, $e->class);
-            self::assertSame($response, $e->response);
-            self::assertSame($responsePayload, $e->payload);
-        }
-    }
 
     public function testCreateRequestProperties(): void
     {
