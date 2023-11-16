@@ -6,7 +6,9 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\GitSourceClient;
 
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\GitSourceClient;
+use SmartAssert\ApiClient\Model\Source\GitSource;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsInvalidModelDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
 use SmartAssert\ServiceClient\Client as ServiceClient;
@@ -16,6 +18,7 @@ use SmartAssert\ServiceClient\ResponseFactory\ResponseFactory;
 abstract class AbstractSourceClientTestCase extends AbstractClientTestCase
 {
     use CommonNonSuccessResponseDataProviderTrait;
+    use ClientActionThrowsInvalidModelDataExceptionTestTrait;
 
     protected GitSourceClient $client;
 
@@ -35,5 +38,10 @@ abstract class AbstractSourceClientTestCase extends AbstractClientTestCase
                 new CurlExceptionFactory(),
             ),
         );
+    }
+
+    protected function getExpectedModelClass(): string
+    {
+        return GitSource::class;
     }
 }
