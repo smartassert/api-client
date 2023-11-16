@@ -20,6 +20,8 @@ abstract class AbstractClientTestCase extends TestCase
 {
     use CommonNonSuccessResponseDataProviderTrait;
 
+    protected const API_KEY = 'api-key';
+
     protected MockHandler $mockHandler;
     protected HttpClient $httpClient;
     private HttpHistoryContainer $httpHistoryContainer;
@@ -84,4 +86,14 @@ abstract class AbstractClientTestCase extends TestCase
     }
 
     abstract protected function createClientActionCallable(): callable;
+
+    protected function getApiKey(): string
+    {
+        return self::API_KEY;
+    }
+
+    protected function getMockHandler(): MockHandler
+    {
+        return $this->mockHandler;
+    }
 }

@@ -20,6 +20,9 @@ abstract class AbstractFileSourceClientTestCase extends AbstractClientTestCase
     use CommonNonSuccessResponseDataProviderTrait;
     use ClientActionThrowsInvalidModelDataExceptionTestTrait;
 
+    protected const ID = 'id';
+    protected const LABEL = 'label';
+
     protected FileSourceClient $client;
 
     protected function setUp(): void
