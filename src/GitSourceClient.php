@@ -70,6 +70,32 @@ readonly class GitSourceClient
     }
 
     /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $id
+     *
+     * @throws ClientExceptionInterface
+     * @throws NetworkExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws RequestExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws InvalidResponseTypeException
+     * @throws InvalidResponseDataException
+     * @throws InvalidModelDataException
+     * @throws UnauthorizedException
+     */
+    public function get(string $apiKey, string $id): GitSource
+    {
+        $response = $this->serviceClient->sendRequest(
+            (new Request('GET', $this->urlGenerator->generate('git-source', ['sourceId' => $id])))
+                ->withAuthentication(
+                    new BearerAuthentication($apiKey)
+                )
+        );
+
+        return $this->handleGitSourceResponse($response);
+    }
+
+    /**
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
      * @throws InvalidResponseTypeException

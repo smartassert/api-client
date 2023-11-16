@@ -50,6 +50,7 @@ readonly class UrlGeneratorFactory
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('git-source_create', new Route('/git-source'));
+        $routeCollection->add('git-source', new Route('/git-source/{sourceId}'));
 
         return $routeCollection;
     }
