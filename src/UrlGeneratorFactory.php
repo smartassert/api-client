@@ -17,6 +17,7 @@ readonly class UrlGeneratorFactory
         $routeCollection = new RouteCollection();
         $routeCollection->addCollection(self::createUserRoutes());
         $routeCollection->addCollection(self::createFileSourceRoutes());
+        $routeCollection->addCollection(self::createGitSourceRoutes());
 
         return new UrlGenerator($routeCollection, new RequestContext($baseUrl));
     }
@@ -41,6 +42,14 @@ readonly class UrlGeneratorFactory
         $routeCollection = new RouteCollection();
         $routeCollection->add('file-source_create', new Route('/file-source'));
         $routeCollection->add('file-source', new Route('/file-source/{sourceId}'));
+
+        return $routeCollection;
+    }
+
+    private static function createGitSourceRoutes(): RouteCollection
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('git-source_create', new Route('/git-source'));
 
         return $routeCollection;
     }
