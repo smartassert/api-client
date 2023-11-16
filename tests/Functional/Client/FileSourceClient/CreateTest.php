@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Functional\Client\FileSourceClient;
 
-use GuzzleHttp\Psr7\Response;
+use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
+use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 
@@ -12,32 +13,7 @@ class CreateTest extends AbstractFileSourceClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
-
-    public function testCreateRequestProperties(): void
-    {
-        $id = md5((string) rand());
-        $label = md5((string) rand());
-
-        $this->mockHandler->append(new Response(
-            200,
-            ['content-type' => 'application/json'],
-            (string) json_encode([
-                'file_source' => [
-                    'id' => $id,
-                    'label' => $label,
-                ],
-            ])
-        ));
-
-        $apiKey = md5((string) rand());
-
-        $this->client->create($apiKey, $label);
-
-        $request = $this->getLastRequest();
-        self::assertSame('POST', $request->getMethod());
-        self::assertSame('Bearer ' . $apiKey, $request->getHeaderLine('authorization'));
-        self::assertStringEndsWith('/file-source', (string) $request->getUri());
-    }
+    use RequestPropertiesTestTrait;
 
     public static function clientActionThrowsExceptionDataProvider(): array
     {
@@ -50,7 +26,25 @@ class CreateTest extends AbstractFileSourceClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->create('api key', 'label');
+            $this->client->create(self::API_KEY, self::LABEL);
         };
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    protected function getResponsePayload(): array
+    {
+        return [
+            'file_source' => [
+                'id' => self::ID,
+                'label' => self::LABEL,
+            ],
+        ];
+    }
+
+    protected function getExpectedRequestProperties(): ExpectedRequestProperties
+    {
+        return new ExpectedRequestProperties('POST', '/file-source');
     }
 }

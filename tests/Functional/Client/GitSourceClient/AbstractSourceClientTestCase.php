@@ -20,6 +20,12 @@ abstract class AbstractSourceClientTestCase extends AbstractClientTestCase
     use CommonNonSuccessResponseDataProviderTrait;
     use ClientActionThrowsInvalidModelDataExceptionTestTrait;
 
+    protected const ID = 'id';
+    protected const LABEL = 'label';
+    protected const HOST_URL = 'api key';
+    protected const PATH = 'api key';
+    protected const HAS_CREDENTIALS = false;
+
     protected GitSourceClient $client;
 
     protected function setUp(): void
@@ -43,5 +49,21 @@ abstract class AbstractSourceClientTestCase extends AbstractClientTestCase
     protected function getExpectedModelClass(): string
     {
         return GitSource::class;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    protected function getResponsePayload(): array
+    {
+        return [
+            'git_source' => [
+                'id' => self::ID,
+                'label' => self::LABEL,
+                'host_url' => self::HOST_URL,
+                'path' => self::PATH,
+                'has_credentials' => self::HAS_CREDENTIALS,
+            ],
+        ];
     }
 }
