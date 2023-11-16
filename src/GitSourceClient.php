@@ -32,6 +32,8 @@ readonly class GitSourceClient
     }
 
     /**
+     * @param non-empty-string $apiKey
+     *
      * @throws ClientExceptionInterface
      * @throws NetworkExceptionInterface
      * @throws CurlExceptionInterface

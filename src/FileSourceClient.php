@@ -32,6 +32,8 @@ readonly class FileSourceClient
     }
 
     /**
+     * @param non-empty-string $apiKey
+     *
      * @throws ClientExceptionInterface
      * @throws NetworkExceptionInterface
      * @throws CurlExceptionInterface
