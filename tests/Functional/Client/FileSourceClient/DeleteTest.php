@@ -38,6 +38,7 @@ class DeleteTest extends AbstractFileSourceClientTestCase
         $request = $this->getLastRequest();
         self::assertSame('DELETE', $request->getMethod());
         self::assertSame('Bearer ' . $apiKey, $request->getHeaderLine('authorization'));
+        self::assertStringEndsWith('/file-source/' . $id, (string) $request->getUri());
     }
 
     public static function clientActionThrowsExceptionDataProvider(): array
