@@ -34,27 +34,19 @@ class GetApiKeysTest extends AbstractUsersClientTestCase
         };
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
-    {
-        return [
-            'api_keys' => [
-                [
-                    'label' => 'label',
-                    'key' => 'key',
-                ],
-            ],
-        ];
-    }
-
     protected function getResponseFixture(): ResponseInterface
     {
         return new Response(
             200,
             ['content-type' => 'application/json'],
-            (string) json_encode($this->getResponsePayload())
+            (string) json_encode([
+                'api_keys' => [
+                    [
+                        'label' => 'label',
+                        'key' => 'key',
+                    ],
+                ],
+            ])
         );
     }
 

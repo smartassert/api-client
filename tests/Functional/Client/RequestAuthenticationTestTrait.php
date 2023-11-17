@@ -5,19 +5,15 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client;
 
 use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 trait RequestAuthenticationTestTrait
 {
     public function testRequestAuthentication(): void
     {
-        $this->getMockHandler()->append(new Response(
-            200,
-            ['content-type' => 'application/json'],
-            (string) json_encode($this->getResponsePayload())
-        ));
+        $this->getMockHandler()->append($this->getResponseFixture());
 
         ($this->createClientActionCallable())();
 
@@ -25,10 +21,7 @@ trait RequestAuthenticationTestTrait
         Assert::assertSame('Bearer ' . $this->getExpectedBearer(), $request->getHeaderLine('authorization'));
     }
 
-    /**
-     * @return array<mixed>
-     */
-    abstract protected function getResponsePayload(): array;
+    abstract protected function getResponseFixture(): ResponseInterface|\Throwable;
 
     abstract protected function getExpectedRequestProperties(): ExpectedRequestProperties;
 

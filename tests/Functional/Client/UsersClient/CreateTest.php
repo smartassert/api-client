@@ -47,25 +47,17 @@ class CreateTest extends AbstractUsersClientTestCase
         return User::class;
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
-    {
-        return [
-            'user' => [
-                'id' => self::ID,
-                'user-identifier' => self::IDENTIFIER,
-            ],
-        ];
-    }
-
     protected function getResponseFixture(): ResponseInterface
     {
         return new Response(
             200,
             ['content-type' => 'application/json'],
-            (string) json_encode($this->getResponsePayload())
+            (string) json_encode([
+                'user' => [
+                    'id' => self::ID,
+                    'user-identifier' => self::IDENTIFIER,
+                ],
+            ])
         );
     }
 

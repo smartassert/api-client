@@ -36,26 +36,18 @@ class DeleteTest extends AbstractFileSourceClientTestCase
         };
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
-    {
-        return [
-            'file_source' => [
-                'id' => self::ID,
-                'label' => self::LABEL,
-                'deleted_at' => self::DELETED_AT,
-            ],
-        ];
-    }
-
     protected function getResponseFixture(): ResponseInterface
     {
         return new Response(
             200,
             ['content-type' => 'application/json'],
-            (string) json_encode($this->getResponsePayload())
+            (string) json_encode([
+                'file_source' => [
+                    'id' => self::ID,
+                    'label' => self::LABEL,
+                    'deleted_at' => self::DELETED_AT,
+                ],
+            ])
         );
     }
 

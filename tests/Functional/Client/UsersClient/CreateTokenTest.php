@@ -69,25 +69,17 @@ class CreateTokenTest extends AbstractUsersClientTestCase
         return RefreshableToken::class;
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
-    {
-        return [
-            'refreshable_token' => [
-                'token' => self::TOKEN,
-                'refresh_token' => self::REFRESHABLE_TOKEN,
-            ],
-        ];
-    }
-
     protected function getResponseFixture(): ResponseInterface
     {
         return new Response(
             200,
             ['content-type' => 'application/json'],
-            (string) json_encode($this->getResponsePayload())
+            (string) json_encode([
+                'refreshable_token' => [
+                    'token' => self::TOKEN,
+                    'refresh_token' => self::REFRESHABLE_TOKEN,
+                ],
+            ])
         );
     }
 

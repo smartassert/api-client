@@ -34,21 +34,9 @@ class RevokeRefreshTokenTest extends AbstractUsersClientTestCase
         return 'frontend token';
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
-    {
-        return [];
-    }
-
     protected function getResponseFixture(): ResponseInterface
     {
-        return new Response(
-            200,
-            ['content-type' => 'application/json'],
-            (string) json_encode($this->getResponsePayload())
-        );
+        return new Response(200);
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties

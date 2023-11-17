@@ -53,28 +53,20 @@ abstract class AbstractSourceClientTestCase extends AbstractClientTestCase
         return GitSource::class;
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
-    {
-        return [
-            'git_source' => [
-                'id' => self::ID,
-                'label' => self::LABEL,
-                'host_url' => self::HOST_URL,
-                'path' => self::PATH,
-                'has_credentials' => self::HAS_CREDENTIALS,
-            ],
-        ];
-    }
-
     protected function getResponseFixture(): ResponseInterface
     {
         return new Response(
             200,
             ['content-type' => 'application/json'],
-            (string) json_encode($this->getResponsePayload())
+            (string) json_encode([
+                'git_source' => [
+                    'id' => self::ID,
+                    'label' => self::LABEL,
+                    'host_url' => self::HOST_URL,
+                    'path' => self::PATH,
+                    'has_credentials' => self::HAS_CREDENTIALS,
+                ],
+            ])
         );
     }
 }
