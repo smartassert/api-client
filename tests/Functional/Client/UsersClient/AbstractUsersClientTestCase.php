@@ -17,6 +17,9 @@ abstract class AbstractUsersClientTestCase extends AbstractClientTestCase
 {
     use CommonNonSuccessResponseDataProviderTrait;
 
+    protected const ID = 'id';
+    protected const IDENTIFIER = 'identifier';
+
     protected UsersClient $client;
 
     protected function setUp(): void

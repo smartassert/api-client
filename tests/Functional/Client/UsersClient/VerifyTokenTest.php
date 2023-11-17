@@ -4,58 +4,21 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
-use GuzzleHttp\Psr7\Response;
 use SmartAssert\ApiClient\Model\User;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsInvalidModelDataExceptionTestTrait;
+use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
+use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
+use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
 class VerifyTokenTest extends AbstractUsersClientTestCase
 {
+    use ClientActionThrowsInvalidModelDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
-
-    public function testVerifyTokenThrowsInvalidModelDataException(): void
-    {
-        $responsePayload = ['key' => 'value'];
-        $response = new Response(200, ['content-type' => 'application/json'], (string) json_encode($responsePayload));
-
-        $this->mockHandler->append($response);
-
-        try {
-            $this->client->verifyToken('token');
-            self::fail(InvalidModelDataException::class . ' not thrown');
-        } catch (InvalidModelDataException $e) {
-            self::assertSame(User::class, $e->class);
-            self::assertSame($response, $e->response);
-            self::assertSame($responsePayload, $e->payload);
-        }
-    }
-
-    public function testVerifyTokenRequestProperties(): void
-    {
-        $id = md5((string) rand());
-        $userIdentifier = md5((string) rand());
-
-        $this->mockHandler->append(new Response(
-            200,
-            ['content-type' => 'application/json'],
-            (string) json_encode([
-                'user' => [
-                    'id' => $id,
-                    'user-identifier' => $userIdentifier,
-                ],
-            ])
-        ));
-
-        $token = md5((string) rand());
-
-        $this->client->verifyToken($token);
-
-        $request = $this->getLastRequest();
-        self::assertSame('GET', $request->getMethod());
-        self::assertSame('Bearer ' . $token, $request->getHeaderLine('authorization'));
-    }
+    use RequestPropertiesTestTrait;
+    use RequestAuthenticationTestTrait;
 
     public static function clientActionThrowsExceptionDataProvider(): array
     {
@@ -68,7 +31,35 @@ class VerifyTokenTest extends AbstractUsersClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->verifyToken('token');
+            $this->client->verifyToken('frontend token');
         };
+    }
+
+    protected function getExpectedBearer(): string
+    {
+        return 'frontend token';
+    }
+
+    protected function getExpectedModelClass(): string
+    {
+        return User::class;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    protected function getResponsePayload(): array
+    {
+        return [
+            'user' => [
+                'id' => 'id',
+                'user-identifier' => 'identifier',
+            ],
+        ];
+    }
+
+    protected function getExpectedRequestProperties(): ExpectedRequestProperties
+    {
+        return new ExpectedRequestProperties('GET', '/user/token/verify');
     }
 }

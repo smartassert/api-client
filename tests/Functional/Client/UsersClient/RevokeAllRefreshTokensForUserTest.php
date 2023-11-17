@@ -4,30 +4,16 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
-use GuzzleHttp\Psr7\Response;
+use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
+use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
+use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 
 class RevokeAllRefreshTokensForUserTest extends AbstractUsersClientTestCase
 {
     use NetworkErrorExceptionDataProviderTrait;
-
-    public function testRevokeRefreshTokenRequestProperties(): void
-    {
-        $this->mockHandler->append(new Response(
-            200,
-            ['content-type' => 'application/json'],
-            ''
-        ));
-
-        $adminToken = md5((string) rand());
-        $userId = md5((string) rand());
-
-        $this->client->revokeAllRefreshTokensForUser($adminToken, $userId);
-
-        $request = $this->getLastRequest();
-        self::assertSame('POST', $request->getMethod());
-        self::assertSame('Bearer ' . $adminToken, $request->getHeaderLine('authorization'));
-    }
+    use RequestPropertiesTestTrait;
+    use RequestAuthenticationTestTrait;
 
     public static function clientActionThrowsExceptionDataProvider(): array
     {
@@ -39,5 +25,23 @@ class RevokeAllRefreshTokensForUserTest extends AbstractUsersClientTestCase
         return function () {
             $this->client->revokeAllRefreshTokensForUser('admin token', 'user id');
         };
+    }
+
+    protected function getExpectedBearer(): string
+    {
+        return 'admin token';
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    protected function getResponsePayload(): array
+    {
+        return [];
+    }
+
+    protected function getExpectedRequestProperties(): ExpectedRequestProperties
+    {
+        return new ExpectedRequestProperties('POST', '/user/refresh_token/revoke-all');
     }
 }
