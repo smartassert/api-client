@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Model\User;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsInvalidModelDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
@@ -45,17 +47,18 @@ class CreateTest extends AbstractUsersClientTestCase
         return User::class;
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
+    protected function getResponseFixture(): ResponseInterface
     {
-        return [
-            'user' => [
-                'id' => self::ID,
-                'user-identifier' => self::IDENTIFIER,
-            ],
-        ];
+        return new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode([
+                'user' => [
+                    'id' => self::ID,
+                    'user-identifier' => self::IDENTIFIER,
+                ],
+            ])
+        );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties

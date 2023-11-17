@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Model\ApiKey;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsInvalidModelDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
@@ -40,17 +42,18 @@ class GetApiKeyTest extends AbstractUsersClientTestCase
         return ApiKey::class;
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
+    protected function getResponseFixture(): ResponseInterface
     {
-        return [
-            'api_key' => [
-                'label' => 'label',
-                'key' => 'key',
-            ],
-        ];
+        return new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode([
+                'api_key' => [
+                    'label' => 'label',
+                    'key' => 'key',
+                ],
+            ])
+        );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties

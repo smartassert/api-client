@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Model\RefreshableToken;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsInvalidModelDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
@@ -68,17 +69,18 @@ class CreateTokenTest extends AbstractUsersClientTestCase
         return RefreshableToken::class;
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
+    protected function getResponseFixture(): ResponseInterface
     {
-        return [
-            'refreshable_token' => [
-                'token' => self::TOKEN,
-                'refresh_token' => self::REFRESHABLE_TOKEN,
-            ],
-        ];
+        return new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode([
+                'refreshable_token' => [
+                    'token' => self::TOKEN,
+                    'refresh_token' => self::REFRESHABLE_TOKEN,
+                ],
+            ])
+        );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties

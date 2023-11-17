@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Functional\Client\FileSourceClient;
 
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -34,18 +36,19 @@ class DeleteTest extends AbstractFileSourceClientTestCase
         };
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
+    protected function getResponseFixture(): ResponseInterface
     {
-        return [
-            'file_source' => [
-                'id' => self::ID,
-                'label' => self::LABEL,
-                'deleted_at' => self::DELETED_AT,
-            ],
-        ];
+        return new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode([
+                'file_source' => [
+                    'id' => self::ID,
+                    'label' => self::LABEL,
+                    'deleted_at' => self::DELETED_AT,
+                ],
+            ])
+        );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties

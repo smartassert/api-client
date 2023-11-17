@@ -32,22 +32,6 @@ class GetTest extends AbstractSourceClientTestCase
         };
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
-    {
-        return [
-            'git_source' => [
-                'id' => self::ID,
-                'label' => self::LABEL,
-                'host_url' => self::HOST_URL,
-                'path' => self::PATH,
-                'has_credentials' => self::HAS_CREDENTIALS,
-            ],
-        ];
-    }
-
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
         return new ExpectedRequestProperties('GET', '/git-source/' . self::ID);

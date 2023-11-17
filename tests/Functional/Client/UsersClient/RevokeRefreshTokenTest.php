@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -32,12 +34,9 @@ class RevokeRefreshTokenTest extends AbstractUsersClientTestCase
         return 'frontend token';
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
+    protected function getResponseFixture(): ResponseInterface
     {
-        return [];
+        return new Response(200);
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
