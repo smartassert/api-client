@@ -9,9 +9,9 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 
-trait RequestPropertiesTestTrait
+trait RequestAuthenticationTestTrait
 {
-    public function testRequestProperties(): void
+    public function testRequestAuthentication(): void
     {
         $this->getMockHandler()->append(new Response(
             200,
@@ -22,8 +22,7 @@ trait RequestPropertiesTestTrait
         ($this->createClientActionCallable())();
 
         $request = $this->getLastRequest();
-        Assert::assertSame($this->getExpectedRequestProperties()->method, $request->getMethod());
-        Assert::assertStringEndsWith($this->getExpectedRequestProperties()->url, (string) $request->getUri());
+        Assert::assertSame('Bearer ' . $this->getApiKey(), $request->getHeaderLine('authorization'));
     }
 
     /**
