@@ -16,8 +16,8 @@ readonly class UrlGeneratorFactory
     {
         $routeCollection = new RouteCollection();
         $routeCollection->addCollection(self::createUserRoutes());
-        $routeCollection->addCollection(self::createFileSourceRoutes());
-        $routeCollection->addCollection(self::createGitSourceRoutes());
+        $routeCollection->add('file-source', new Route('/file-source/{sourceId}', ['sourceId' => null]));
+        $routeCollection->add('git-source', new Route('/git-source/{sourceId}', ['sourceId' => null]));
 
         return new UrlGenerator($routeCollection, new RequestContext($baseUrl));
     }
@@ -33,22 +33,6 @@ readonly class UrlGeneratorFactory
         $routeCollection->add('user_refresh-token_revoke', new Route('/user/refresh_token/revoke'));
         $routeCollection->add('user_apikey', new Route('/user/apikey/'));
         $routeCollection->add('user_apikey_list', new Route('/user/apikey/list'));
-
-        return $routeCollection;
-    }
-
-    private static function createFileSourceRoutes(): RouteCollection
-    {
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('file-source', new Route('/file-source/{sourceId}', ['sourceId' => null]));
-
-        return $routeCollection;
-    }
-
-    private static function createGitSourceRoutes(): RouteCollection
-    {
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('git-source', new Route('/git-source/{sourceId}', ['sourceId' => null]));
 
         return $routeCollection;
     }
