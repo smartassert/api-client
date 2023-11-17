@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use Symfony\Component\Uid\Ulid;
 
-class DeleteTest extends AbstractFileSourceTestCase
+class DeleteTest extends AbstractIntegrationTestCase
 {
     public function testDeleteUnauthorized(): void
     {
