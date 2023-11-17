@@ -34,19 +34,6 @@ class CreateTest extends AbstractFileClientTestCase
         };
     }
 
-    /**
-     * @return array<mixed>
-     */
-    protected function getResponsePayload(): array
-    {
-        return [
-            'file_source' => [
-                'id' => self::ID,
-                'label' => self::LABEL,
-            ],
-        ];
-    }
-
     protected function getResponseFixture(): ResponseInterface
     {
         return new Response(200);
