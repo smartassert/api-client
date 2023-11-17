@@ -87,7 +87,7 @@ abstract class AbstractClientTestCase extends TestCase
 
     abstract protected function createClientActionCallable(): callable;
 
-    protected function getApiKey(): string
+    protected function getExpectedBearer(): string
     {
         return self::API_KEY;
     }
