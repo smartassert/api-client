@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\GitSourceClient;
 
 use GuzzleHttp\Psr7\HttpFactory;
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\Model\Source\GitSource;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
@@ -65,5 +67,14 @@ abstract class AbstractSourceClientTestCase extends AbstractClientTestCase
                 'has_credentials' => self::HAS_CREDENTIALS,
             ],
         ];
+    }
+
+    protected function getResponseFixture(): ResponseInterface
+    {
+        return new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode($this->getResponsePayload())
+        );
     }
 }

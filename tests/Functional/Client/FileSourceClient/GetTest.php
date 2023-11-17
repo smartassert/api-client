@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Functional\Client\FileSourceClient;
 
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -43,6 +45,15 @@ class GetTest extends AbstractFileSourceClientTestCase
                 'label' => self::LABEL,
             ],
         ];
+    }
+
+    protected function getResponseFixture(): ResponseInterface
+    {
+        return new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode($this->getResponsePayload())
+        );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
