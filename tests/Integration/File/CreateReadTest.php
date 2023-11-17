@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\File;
 
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 
-class CreateTest extends AbstractFileTestCase
+class CreateReadTest extends AbstractFileTestCase
 {
     public function testCreateUnauthorized(): void
     {
@@ -23,7 +23,21 @@ class CreateTest extends AbstractFileTestCase
         }
     }
 
-    public function testCreateSuccess(): void
+    public function testReadUnauthorized(): void
+    {
+        try {
+            self::$fileClient->read(
+                md5((string) rand()),
+                md5((string) rand()),
+                md5((string) rand()) . '.yaml'
+            );
+            self::fail(NonSuccessResponseException::class . ' not thrown');
+        } catch (NonSuccessResponseException $e) {
+            self::assertSame(404, $e->getStatusCode());
+        }
+    }
+
+    public function testCreateReadSuccess(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
@@ -35,8 +49,10 @@ class CreateTest extends AbstractFileTestCase
         $filename = md5((string) rand()) . '.yaml';
         $content = md5((string) rand());
 
-        self::expectNotToPerformAssertions();
-
         self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
+
+        $readContent = self::$fileClient->read($apiKey->key, $fileSource->id, $filename);
+
+        self::assertSame($content, $readContent);
     }
 }
