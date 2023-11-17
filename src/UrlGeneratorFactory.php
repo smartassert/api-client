@@ -48,8 +48,7 @@ readonly class UrlGeneratorFactory
     private static function createGitSourceRoutes(): RouteCollection
     {
         $routeCollection = new RouteCollection();
-        $routeCollection->add('git-source_create', new Route('/git-source'));
-        $routeCollection->add('git-source', new Route('/git-source/{sourceId}'));
+        $routeCollection->add('git-source', new Route('/git-source/{sourceId}', ['sourceId' => null]));
 
         return $routeCollection;
     }

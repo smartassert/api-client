@@ -37,6 +37,11 @@ class GetTest extends AbstractGitSourceTestCase
 
     /**
      * @dataProvider createDataProvider
+     *
+     * @param non-empty-string  $label
+     * @param non-empty-string  $hostUrl
+     * @param non-empty-string  $path
+     * @param ?non-empty-string $credentials
      */
     public function testGetSuccess(
         string $label,

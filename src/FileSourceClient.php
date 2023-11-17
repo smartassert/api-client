@@ -111,7 +111,7 @@ readonly class FileSourceClient
     /**
      * @param non-empty-string  $apiKey
      * @param non-empty-string  $method
-     * @param ?non-empty-string  $id
+     * @param ?non-empty-string $id
      * @param ?non-empty-string $label
      *
      * @throws ClientExceptionInterface
