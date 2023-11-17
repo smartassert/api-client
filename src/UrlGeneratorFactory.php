@@ -40,8 +40,7 @@ readonly class UrlGeneratorFactory
     private static function createFileSourceRoutes(): RouteCollection
     {
         $routeCollection = new RouteCollection();
-        $routeCollection->add('file-source_create', new Route('/file-source'));
-        $routeCollection->add('file-source', new Route('/file-source/{sourceId}'));
+        $routeCollection->add('file-source', new Route('/file-source/{sourceId}', ['sourceId' => null]));
 
         return $routeCollection;
     }
