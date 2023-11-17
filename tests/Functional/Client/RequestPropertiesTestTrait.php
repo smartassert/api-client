@@ -35,11 +35,6 @@ trait RequestPropertiesTestTrait
 
     abstract protected function createClientActionCallable(): callable;
 
-    /**
-     * @return non-empty-string
-     */
-    abstract protected function getApiKey(): string;
-
     abstract protected function getLastRequest(): RequestInterface;
 
     abstract protected function getMockHandler(): MockHandler;

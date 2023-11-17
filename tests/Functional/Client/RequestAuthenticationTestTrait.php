@@ -22,7 +22,7 @@ trait RequestAuthenticationTestTrait
         ($this->createClientActionCallable())();
 
         $request = $this->getLastRequest();
-        Assert::assertSame('Bearer ' . $this->getApiKey(), $request->getHeaderLine('authorization'));
+        Assert::assertSame('Bearer ' . $this->getExpectedBearer(), $request->getHeaderLine('authorization'));
     }
 
     /**
@@ -34,12 +34,9 @@ trait RequestAuthenticationTestTrait
 
     abstract protected function createClientActionCallable(): callable;
 
-    /**
-     * @return non-empty-string
-     */
-    abstract protected function getApiKey(): string;
-
     abstract protected function getLastRequest(): RequestInterface;
 
     abstract protected function getMockHandler(): MockHandler;
+
+    abstract protected function getExpectedBearer(): string;
 }
