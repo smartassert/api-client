@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use Symfony\Component\Uid\Ulid;
 
-class UpdateTest extends AbstractFileSourceTestCase
+class UpdateTest extends AbstractIntegrationTestCase
 {
     public function testUpdateUnauthorized(): void
     {
