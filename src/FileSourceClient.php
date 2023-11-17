@@ -33,6 +33,7 @@ readonly class FileSourceClient
 
     /**
      * @param non-empty-string $apiKey
+     * @param non-empty-string $label
      *
      * @throws ClientExceptionInterface
      * @throws NetworkExceptionInterface
@@ -46,19 +47,7 @@ readonly class FileSourceClient
      */
     public function create(string $apiKey, string $label): FileSource
     {
-        $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->urlGenerator->generate('file-source_create')))
-                ->withAuthentication(
-                    new BearerAuthentication($apiKey)
-                )
-                ->withPayload(
-                    new UrlEncodedPayload([
-                        'label' => $label,
-                    ])
-                )
-        );
-
-        return $this->handleFileSourceResponse($response);
+        return $this->handleRequest($apiKey, 'POST', null, $label);
     }
 
     /**
@@ -122,7 +111,7 @@ readonly class FileSourceClient
     /**
      * @param non-empty-string  $apiKey
      * @param non-empty-string  $method
-     * @param non-empty-string  $id
+     * @param ?non-empty-string $id
      * @param ?non-empty-string $label
      *
      * @throws ClientExceptionInterface
@@ -135,7 +124,7 @@ readonly class FileSourceClient
      * @throws RequestExceptionInterface
      * @throws UnauthorizedException
      */
-    private function handleRequest(string $apiKey, string $method, string $id, ?string $label = null): FileSource
+    private function handleRequest(string $apiKey, string $method, ?string $id, ?string $label = null): FileSource
     {
         $request = new Request($method, $this->urlGenerator->generate('file-source', ['sourceId' => $id]));
         $request = $request->withAuthentication(new BearerAuthentication($apiKey));

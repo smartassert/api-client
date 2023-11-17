@@ -32,7 +32,11 @@ readonly class GitSourceClient
     }
 
     /**
-     * @param non-empty-string $apiKey
+     * @param non-empty-string  $apiKey
+     * @param non-empty-string  $label
+     * @param non-empty-string  $hostUrl
+     * @param non-empty-string  $path
+     * @param ?non-empty-string $credentials
      *
      * @throws ClientExceptionInterface
      * @throws NetworkExceptionInterface
@@ -51,22 +55,7 @@ readonly class GitSourceClient
         string $path,
         ?string $credentials,
     ): GitSource {
-        $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->urlGenerator->generate('git-source_create')))
-                ->withAuthentication(
-                    new BearerAuthentication($apiKey)
-                )
-                ->withPayload(
-                    new UrlEncodedPayload([
-                        'label' => $label,
-                        'host-url' => $hostUrl,
-                        'path' => $path,
-                        'credentials' => $credentials,
-                    ])
-                )
-        );
-
-        return $this->handleGitSourceResponse($response);
+        return $this->handleRequest($apiKey, 'POST', null, $label, $hostUrl, $path, $credentials);
     }
 
     /**
@@ -139,7 +128,7 @@ readonly class GitSourceClient
     /**
      * @param non-empty-string  $apiKey
      * @param non-empty-string  $method
-     * @param non-empty-string  $id
+     * @param ?non-empty-string $id
      * @param ?non-empty-string $label
      * @param ?non-empty-string $hostUrl
      * @param ?non-empty-string $path
@@ -158,7 +147,7 @@ readonly class GitSourceClient
     private function handleRequest(
         string $apiKey,
         string $method,
-        string $id,
+        ?string $id,
         ?string $label = null,
         ?string $hostUrl = null,
         ?string $path = null,
