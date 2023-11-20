@@ -107,6 +107,42 @@ readonly class FileClient
     }
 
     /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $sourceId
+     *
+     * @throws ClientExceptionInterface
+     * @throws NetworkExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws RequestExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws UnauthorizedException
+     * @throws InvalidResponseDataException
+     * @throws NonSuccessResponseException
+     * @throws DuplicateFileException
+     */
+    public function update(string $apiKey, string $sourceId, string $filename, string $content): void
+    {
+        $request = (new Request(
+            'PUT',
+            $this->urlGenerator->generate(
+                'file-source-file',
+                [
+                    'sourceId' => $sourceId,
+                    'filename' => $filename
+                ]
+            )
+        ))->withPayload(new Payload('application/yaml', $content));
+
+        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
+
+        $response = $this->serviceClient->sendRequest($request);
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+    }
+
+    /**
      * @throws InvalidResponseDataException
      */
     private function createDuplicateFileExceptionFromResponse(JsonResponse $response): ?DuplicateFileException
