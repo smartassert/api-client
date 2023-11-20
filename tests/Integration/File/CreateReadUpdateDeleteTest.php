@@ -83,7 +83,7 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
         self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
     }
 
-    public function testCreateReadUpdateSuccess(): void
+    public function testCreateReadUpdateDeleteSuccess(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
@@ -111,7 +111,6 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
         self::$fileClient->delete($apiKey->key, $fileSource->id, $filename);
 
         self::expectException(NotFoundException::class);
-        //        self::expectExceptionCode(404);
         self::$fileClient->read($apiKey->key, $fileSource->id, $filename);
     }
 }
