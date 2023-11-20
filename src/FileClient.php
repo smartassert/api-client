@@ -56,4 +56,39 @@ readonly class FileClient
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
     }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $sourceId
+     *
+     * @throws ClientExceptionInterface
+     * @throws NetworkExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws RequestExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws UnauthorizedException
+     */
+    public function read(string $apiKey, string $sourceId, string $filename): string
+    {
+        $request = new Request(
+            'GET',
+            $this->urlGenerator->generate(
+                'file-source-file',
+                [
+                    'sourceId' => $sourceId,
+                    'filename' => $filename
+                ]
+            )
+        );
+
+        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
+
+        $response = $this->serviceClient->sendRequest($request);
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+
+        return $response->getHttpResponse()->getBody()->getContents();
+    }
 }
