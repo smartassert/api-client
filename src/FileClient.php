@@ -116,9 +116,7 @@ readonly class FileClient
      * @throws RequestExceptionInterface
      * @throws NonSuccessResponseException
      * @throws UnauthorizedException
-     * @throws InvalidResponseDataException
      * @throws NonSuccessResponseException
-     * @throws DuplicateFileException
      */
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
