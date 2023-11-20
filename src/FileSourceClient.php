@@ -47,7 +47,7 @@ readonly class FileSourceClient
      */
     public function create(string $apiKey, string $label): FileSource
     {
-        return $this->handleRequest($apiKey, 'POST', null, $label);
+        return $this->handleFileSourceRequest($apiKey, 'POST', null, $label);
     }
 
     /**
@@ -66,7 +66,7 @@ readonly class FileSourceClient
      */
     public function get(string $apiKey, string $id): FileSource
     {
-        return $this->handleRequest($apiKey, 'GET', $id);
+        return $this->handleFileSourceRequest($apiKey, 'GET', $id);
     }
 
     /**
@@ -86,7 +86,7 @@ readonly class FileSourceClient
      */
     public function update(string $apiKey, string $id, string $label): FileSource
     {
-        return $this->handleRequest($apiKey, 'PUT', $id, $label);
+        return $this->handleFileSourceRequest($apiKey, 'PUT', $id, $label);
     }
 
     /**
@@ -105,7 +105,50 @@ readonly class FileSourceClient
      */
     public function delete(string $apiKey, string $id): FileSource
     {
-        return $this->handleRequest($apiKey, 'DELETE', $id);
+        return $this->handleFileSourceRequest($apiKey, 'DELETE', $id);
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $id
+     *
+     * @return non-empty-string[]
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws InvalidResponseDataException
+     * @throws InvalidResponseTypeException
+     * @throws NetworkExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    public function list(string $apiKey, string $id): array
+    {
+        $request = new Request('GET', $this->urlGenerator->generate('file-source-list', ['sourceId' => $id]));
+        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
+
+        $response = $this->serviceClient->sendRequest($request);
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+
+        if (!$response instanceof JsonResponse) {
+            throw InvalidResponseTypeException::create($response, JsonResponse::class);
+        }
+
+        $responseDataInspector = new ArrayInspector($response->getData());
+        $filenamesData = $responseDataInspector->getArray('files');
+
+        $filenames = [];
+        foreach ($filenamesData as $filename) {
+            if (is_string($filename) && '' !== $filename) {
+                $filenames[] = $filename;
+            }
+        }
+
+        return $filenames;
     }
 
     /**
@@ -124,8 +167,12 @@ readonly class FileSourceClient
      * @throws RequestExceptionInterface
      * @throws UnauthorizedException
      */
-    private function handleRequest(string $apiKey, string $method, ?string $id, ?string $label = null): FileSource
-    {
+    private function handleFileSourceRequest(
+        string $apiKey,
+        string $method,
+        ?string $id,
+        ?string $label = null
+    ): FileSource {
         $request = new Request($method, $this->urlGenerator->generate('file-source', ['sourceId' => $id]));
         $request = $request->withAuthentication(new BearerAuthentication($apiKey));
 
