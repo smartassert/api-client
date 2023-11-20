@@ -7,7 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\File;
 use SmartAssert\ApiClient\Exception\DuplicateFileException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 
-class CreateReadTest extends AbstractFileTestCase
+class CreateReadUpdateTest extends AbstractFileTestCase
 {
     public function testCreateUnauthorized(): void
     {
@@ -38,6 +38,21 @@ class CreateReadTest extends AbstractFileTestCase
         }
     }
 
+    public function testUpdateUnauthorized(): void
+    {
+        try {
+            self::$fileClient->update(
+                md5((string) rand()),
+                md5((string) rand()),
+                md5((string) rand()) . '.yaml',
+                md5((string) rand())
+            );
+            self::fail(NonSuccessResponseException::class . ' not thrown');
+        } catch (NonSuccessResponseException $e) {
+            self::assertSame(404, $e->getStatusCode());
+        }
+    }
+
     public function testCreateDuplicateFilename(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
@@ -56,7 +71,7 @@ class CreateReadTest extends AbstractFileTestCase
         self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
     }
 
-    public function testCreateReadSuccess(): void
+    public function testCreateReadUpdateSuccess(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
@@ -71,7 +86,14 @@ class CreateReadTest extends AbstractFileTestCase
         self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
 
         $readContent = self::$fileClient->read($apiKey->key, $fileSource->id, $filename);
-
         self::assertSame($content, $readContent);
+
+        $updatedContent = md5((string) rand());
+        self::assertNotSame($content, $updatedContent);
+
+        self::$fileClient->update($apiKey->key, $fileSource->id, $filename, $updatedContent);
+
+        $readUpdatedContent = self::$fileClient->read($apiKey->key, $fileSource->id, $filename);
+        self::assertSame($updatedContent, $readUpdatedContent);
     }
 }
