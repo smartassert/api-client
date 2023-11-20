@@ -7,13 +7,16 @@ namespace SmartAssert\ApiClient;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
+use SmartAssert\ApiClient\Exception\DuplicateFileException;
 use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
 use SmartAssert\ServiceClient\Client as ServiceClient;
 use SmartAssert\ServiceClient\Exception\CurlExceptionInterface;
+use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceClient\Payload\Payload;
 use SmartAssert\ServiceClient\Request;
+use SmartAssert\ServiceClient\Response\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileClient
@@ -34,6 +37,9 @@ readonly class FileClient
      * @throws RequestExceptionInterface
      * @throws NonSuccessResponseException
      * @throws UnauthorizedException
+     * @throws InvalidResponseDataException
+     * @throws NonSuccessResponseException
+     * @throws DuplicateFileException
      */
     public function create(string $apiKey, string $sourceId, string $filename, string $content): void
     {
@@ -53,6 +59,14 @@ readonly class FileClient
         $response = $this->serviceClient->sendRequest($request);
 
         if (!$response->isSuccessful()) {
+            if ($response instanceof JsonResponse) {
+                $duplicateFileException = $this->createDuplicateFileExceptionFromResponse($response);
+
+                if ($duplicateFileException instanceof DuplicateFileException) {
+                    throw $duplicateFileException;
+                }
+            }
+
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
     }
@@ -90,5 +104,32 @@ readonly class FileClient
         }
 
         return $response->getHttpResponse()->getBody()->getContents();
+    }
+
+    /**
+     * @throws InvalidResponseDataException
+     */
+    private function createDuplicateFileExceptionFromResponse(JsonResponse $response): ?DuplicateFileException
+    {
+        $data = $response->getData();
+        $type = $data['type'] ?? null;
+        $type = is_string($type) ? $type : null;
+
+        if (!is_string($type)) {
+            return null;
+        }
+
+        $context = $data['context'];
+        if (!is_array($context)) {
+            return null;
+        }
+
+        if ('duplicate-file-path' === $type) {
+            $path = $context['path'] ?? null;
+
+            return new DuplicateFileException(is_string($path) ? $path : null);
+        }
+
+        return null;
     }
 }
