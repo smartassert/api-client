@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
+use SmartAssert\ApiClient\Exception\DuplicateFileException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 
 class CreateReadTest extends AbstractFileTestCase
@@ -35,6 +36,24 @@ class CreateReadTest extends AbstractFileTestCase
         } catch (NonSuccessResponseException $e) {
             self::assertSame(404, $e->getStatusCode());
         }
+    }
+
+    public function testCreateDuplicateFilename(): void
+    {
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $label = md5((string) rand());
+
+        $fileSource = self::$fileSourceClient->create($apiKey->key, $label);
+
+        $filename = md5((string) rand()) . '.yaml';
+        $content = md5((string) rand());
+
+        self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
+
+        self::expectException(DuplicateFileException::class);
+        self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
     }
 
     public function testCreateReadSuccess(): void
