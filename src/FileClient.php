@@ -7,7 +7,8 @@ namespace SmartAssert\ApiClient;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
-use SmartAssert\ApiClient\Exception\DuplicateFileException;
+use SmartAssert\ApiClient\Exception\File\DuplicateFileException;
+use SmartAssert\ApiClient\Exception\File\NotFoundException;
 use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
 use SmartAssert\ServiceClient\Client as ServiceClient;
 use SmartAssert\ServiceClient\Exception\CurlExceptionInterface;
@@ -17,6 +18,7 @@ use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceClient\Payload\Payload;
 use SmartAssert\ServiceClient\Request;
 use SmartAssert\ServiceClient\Response\JsonResponse;
+use SmartAssert\ServiceClient\Response\ResponseInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileClient
@@ -30,6 +32,7 @@ readonly class FileClient
     /**
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
+     * @param non-empty-string $filename
      *
      * @throws ClientExceptionInterface
      * @throws NetworkExceptionInterface
@@ -43,20 +46,7 @@ readonly class FileClient
      */
     public function create(string $apiKey, string $sourceId, string $filename, string $content): void
     {
-        $request = (new Request(
-            'POST',
-            $this->urlGenerator->generate(
-                'file-source-file',
-                [
-                    'sourceId' => $sourceId,
-                    'filename' => $filename
-                ]
-            )
-        ))->withPayload(new Payload('application/yaml', $content));
-
-        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
-
-        $response = $this->serviceClient->sendRequest($request);
+        $response = $this->handleRequest($apiKey, 'POST', $sourceId, $filename, $content);
 
         if (!$response->isSuccessful()) {
             if ($response instanceof JsonResponse) {
@@ -74,6 +64,7 @@ readonly class FileClient
     /**
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
+     * @param non-empty-string $filename
      *
      * @throws ClientExceptionInterface
      * @throws NetworkExceptionInterface
@@ -81,25 +72,17 @@ readonly class FileClient
      * @throws RequestExceptionInterface
      * @throws NonSuccessResponseException
      * @throws UnauthorizedException
+     * @throws NotFoundException
      */
     public function read(string $apiKey, string $sourceId, string $filename): string
     {
-        $request = new Request(
-            'GET',
-            $this->urlGenerator->generate(
-                'file-source-file',
-                [
-                    'sourceId' => $sourceId,
-                    'filename' => $filename
-                ]
-            )
-        );
-
-        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
-
-        $response = $this->serviceClient->sendRequest($request);
+        $response = $this->handleRequest($apiKey, 'GET', $sourceId, $filename);
 
         if (!$response->isSuccessful()) {
+            if (404 === $response->getStatusCode()) {
+                throw new NotFoundException($filename);
+            }
+
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
 
@@ -109,6 +92,7 @@ readonly class FileClient
     /**
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
+     * @param non-empty-string $filename
      *
      * @throws ClientExceptionInterface
      * @throws NetworkExceptionInterface
@@ -120,8 +104,57 @@ readonly class FileClient
      */
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
-        $request = (new Request(
-            'PUT',
+        $response = $this->handleRequest($apiKey, 'PUT', $sourceId, $filename, $content);
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $sourceId
+     * @param non-empty-string $filename
+     *
+     * @throws ClientExceptionInterface
+     * @throws NetworkExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws RequestExceptionInterface
+     * @throws NonSuccessResponseException
+     * @throws UnauthorizedException
+     */
+    public function delete(string $apiKey, string $sourceId, string $filename): string
+    {
+        $response = $this->handleRequest($apiKey, 'DELETE', $sourceId, $filename);
+
+        if (!$response->isSuccessful()) {
+            throw new NonSuccessResponseException($response->getHttpResponse());
+        }
+
+        return $response->getHttpResponse()->getBody()->getContents();
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $method
+     * @param non-empty-string $sourceId
+     * @param non-empty-string $filename
+     *
+     * @throws ClientExceptionInterface
+     * @throws CurlExceptionInterface
+     * @throws NetworkExceptionInterface
+     * @throws RequestExceptionInterface
+     * @throws UnauthorizedException
+     */
+    private function handleRequest(
+        string $apiKey,
+        string $method,
+        string $sourceId,
+        string $filename,
+        ?string $content = null
+    ): ResponseInterface {
+        $request = new Request(
+            $method,
             $this->urlGenerator->generate(
                 'file-source-file',
                 [
@@ -129,15 +162,15 @@ readonly class FileClient
                     'filename' => $filename
                 ]
             )
-        ))->withPayload(new Payload('application/yaml', $content));
+        );
+
+        if (is_string($content)) {
+            $request = $request->withPayload(new Payload('application/yaml', $content));
+        }
 
         $request = $request->withAuthentication(new BearerAuthentication($apiKey));
 
-        $response = $this->serviceClient->sendRequest($request);
-
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
+        return $this->serviceClient->sendRequest($request);
     }
 
     /**

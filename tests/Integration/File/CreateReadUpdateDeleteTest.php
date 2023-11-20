@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
-use SmartAssert\ApiClient\Exception\DuplicateFileException;
+use SmartAssert\ApiClient\Exception\File\DuplicateFileException;
+use SmartAssert\ApiClient\Exception\File\NotFoundException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 
-class CreateReadUpdateTest extends AbstractFileTestCase
+class CreateReadUpdateDeleteTest extends AbstractFileTestCase
 {
     public function testCreateUnauthorized(): void
     {
@@ -26,16 +27,13 @@ class CreateReadUpdateTest extends AbstractFileTestCase
 
     public function testReadUnauthorized(): void
     {
-        try {
-            self::$fileClient->read(
-                md5((string) rand()),
-                md5((string) rand()),
-                md5((string) rand()) . '.yaml'
-            );
-            self::fail(NonSuccessResponseException::class . ' not thrown');
-        } catch (NonSuccessResponseException $e) {
-            self::assertSame(404, $e->getStatusCode());
-        }
+        self::expectException(NotFoundException::class);
+
+        self::$fileClient->read(
+            md5((string) rand()),
+            md5((string) rand()),
+            md5((string) rand()) . '.yaml'
+        );
     }
 
     public function testUpdateUnauthorized(): void
@@ -46,6 +44,20 @@ class CreateReadUpdateTest extends AbstractFileTestCase
                 md5((string) rand()),
                 md5((string) rand()) . '.yaml',
                 md5((string) rand())
+            );
+            self::fail(NonSuccessResponseException::class . ' not thrown');
+        } catch (NonSuccessResponseException $e) {
+            self::assertSame(404, $e->getStatusCode());
+        }
+    }
+
+    public function testDeleteUnauthorized(): void
+    {
+        try {
+            self::$fileClient->delete(
+                md5((string) rand()),
+                md5((string) rand()),
+                md5((string) rand()) . '.yaml'
             );
             self::fail(NonSuccessResponseException::class . ' not thrown');
         } catch (NonSuccessResponseException $e) {
@@ -71,7 +83,7 @@ class CreateReadUpdateTest extends AbstractFileTestCase
         self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
     }
 
-    public function testCreateReadUpdateSuccess(): void
+    public function testCreateReadUpdateDeleteSuccess(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
@@ -95,5 +107,10 @@ class CreateReadUpdateTest extends AbstractFileTestCase
 
         $readUpdatedContent = self::$fileClient->read($apiKey->key, $fileSource->id, $filename);
         self::assertSame($updatedContent, $readUpdatedContent);
+
+        self::$fileClient->delete($apiKey->key, $fileSource->id, $filename);
+
+        self::expectException(NotFoundException::class);
+        self::$fileClient->read($apiKey->key, $fileSource->id, $filename);
     }
 }
