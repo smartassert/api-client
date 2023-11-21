@@ -123,15 +123,13 @@ readonly class FileClient
      * @throws NonSuccessResponseException
      * @throws UnauthorizedException
      */
-    public function delete(string $apiKey, string $sourceId, string $filename): string
+    public function delete(string $apiKey, string $sourceId, string $filename): void
     {
         $response = $this->handleRequest($apiKey, 'DELETE', $sourceId, $filename);
 
         if (!$response->isSuccessful()) {
             throw new NonSuccessResponseException($response->getHttpResponse());
         }
-
-        return $response->getHttpResponse()->getBody()->getContents();
     }
 
     /**
