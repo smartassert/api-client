@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\FileSourceClient;
 
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Factory\Source\FileSourceFactory;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
@@ -37,6 +38,7 @@ abstract class AbstractFileSourceClientTestCase extends AbstractClientTestCase
                 ResponseFactory::createFactory(),
                 new CurlExceptionFactory(),
             ),
+            new FileSourceFactory(),
         );
     }
 }

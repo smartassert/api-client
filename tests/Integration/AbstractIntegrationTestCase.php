@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Integration;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
+use SmartAssert\ApiClient\Factory\Source\FileSourceFactory;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
 use SmartAssert\ApiClient\UsersClient;
@@ -31,7 +32,11 @@ abstract class AbstractIntegrationTestCase extends TestCase
         self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9089');
 
         self::$usersClient = new UsersClient(self::$urlGenerator, self::createServiceClient());
-        self::$fileSourceClient = new FileSourceClient(self::$urlGenerator, self::createServiceClient());
+        self::$fileSourceClient = new FileSourceClient(
+            self::$urlGenerator,
+            self::createServiceClient(),
+            new FileSourceFactory()
+        );
     }
 
     protected static function createServiceClient(): ServiceClient

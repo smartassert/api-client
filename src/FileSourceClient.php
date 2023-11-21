@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
+use SmartAssert\ApiClient\Factory\Source\FileSourceFactory;
 use SmartAssert\ApiClient\Model\Source\FileSource;
 use SmartAssert\ArrayInspector\ArrayInspector;
 use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
@@ -28,6 +29,7 @@ readonly class FileSourceClient
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
         private ServiceClient $serviceClient,
+        private FileSourceFactory $fileSourceFactory,
     ) {
     }
 
@@ -204,15 +206,11 @@ readonly class FileSourceClient
         $responseDataInspector = new ArrayInspector($response->getData());
         $modelData = $responseDataInspector->getArray('file_source');
 
-        $modelDataInspector = new ArrayInspector($modelData);
-        $id = $modelDataInspector->getNonEmptyString('id');
-        $label = $modelDataInspector->getNonEmptyString('label');
-        $deletedAt = $modelDataInspector->getPositiveInteger('deleted_at');
-
-        if (null === $id || null === $label) {
+        $source = $this->fileSourceFactory->create($modelData);
+        if (null === $source) {
             throw InvalidModelDataException::fromJsonResponse(FileSource::class, $response);
         }
 
-        return new FileSource($id, $label, $deletedAt);
+        return $source;
     }
 }
