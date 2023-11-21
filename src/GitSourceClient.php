@@ -7,7 +7,7 @@ namespace SmartAssert\ApiClient;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
-use SmartAssert\ApiClient\Factory\Source\GitSourceFactory;
+use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Model\Source\GitSource;
 use SmartAssert\ArrayInspector\ArrayInspector;
 use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
@@ -29,7 +29,7 @@ readonly class GitSourceClient
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
         private ServiceClient $serviceClient,
-        private GitSourceFactory $gitSourceFactory,
+        private SourceFactory $sourceFactory,
     ) {
     }
 
@@ -204,8 +204,8 @@ readonly class GitSourceClient
         $responseDataInspector = new ArrayInspector($response->getData());
         $modelData = $responseDataInspector->getArray('git_source');
 
-        $source = $this->gitSourceFactory->create($modelData);
-        if (null === $source) {
+        $source = $this->sourceFactory->create($modelData);
+        if (!$source instanceof GitSource) {
             throw InvalidModelDataException::fromJsonResponse(GitSource::class, $response);
         }
 

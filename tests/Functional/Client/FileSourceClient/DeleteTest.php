@@ -43,6 +43,7 @@ class DeleteTest extends AbstractFileSourceClientTestCase
             ['content-type' => 'application/json'],
             (string) json_encode([
                 'file_source' => [
+                    'type' => 'file',
                     'id' => self::ID,
                     'label' => self::LABEL,
                     'deleted_at' => self::DELETED_AT,

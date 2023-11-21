@@ -41,6 +41,7 @@ class UpdateTest extends AbstractFileSourceClientTestCase
             ['content-type' => 'application/json'],
             (string) json_encode([
                 'file_source' => [
+                    'type' => 'file',
                     'id' => self::ID,
                     'label' => self::LABEL,
                 ],
