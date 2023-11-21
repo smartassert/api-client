@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
+use SmartAssert\ApiClient\Factory\Source\GitSourceFactory;
 use SmartAssert\ApiClient\Model\Source\GitSource;
 use SmartAssert\ArrayInspector\ArrayInspector;
 use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
@@ -28,6 +29,7 @@ readonly class GitSourceClient
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
         private ServiceClient $serviceClient,
+        private GitSourceFactory $gitSourceFactory,
     ) {
     }
 
@@ -202,23 +204,11 @@ readonly class GitSourceClient
         $responseDataInspector = new ArrayInspector($response->getData());
         $modelData = $responseDataInspector->getArray('git_source');
 
-        $modelDataInspector = new ArrayInspector($modelData);
-        $id = $modelDataInspector->getNonEmptyString('id');
-        $label = $modelDataInspector->getNonEmptyString('label');
-        $hostUrl = $modelDataInspector->getNonEmptyString('host_url');
-        $path = $modelDataInspector->getNonEmptyString('path');
-
-        if (null === $id || null === $label || null === $hostUrl || null === $path) {
+        $source = $this->gitSourceFactory->create($modelData);
+        if (null === $source) {
             throw InvalidModelDataException::fromJsonResponse(GitSource::class, $response);
         }
 
-        $hasCredentials = $modelDataInspector->getBoolean('has_credentials');
-        if (true !== $hasCredentials) {
-            $hasCredentials = false;
-        }
-
-        $deletedAt = $modelDataInspector->getPositiveInteger('deleted_at');
-
-        return new GitSource($id, $label, $hostUrl, $path, $hasCredentials, $deletedAt);
+        return $source;
     }
 }
