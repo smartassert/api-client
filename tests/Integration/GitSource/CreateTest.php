@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 
-class CreateTest extends AbstractGitSourceTestCase
+class CreateTest extends AbstractIntegrationTestCase
 {
     use CreateDataProviderTrait;
 

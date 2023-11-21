@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\FileSourceClient;
+use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
 use SmartAssert\ApiClient\UsersClient;
 use SmartAssert\ServiceClient\Client as ServiceClient;
@@ -26,6 +27,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
     protected static UrlGeneratorInterface $urlGenerator;
     protected static UsersClient $usersClient;
     protected static FileSourceClient $fileSourceClient;
+    protected static GitSourceClient $gitSourceClient;
 
     public static function setUpBeforeClass(): void
     {
@@ -33,6 +35,11 @@ abstract class AbstractIntegrationTestCase extends TestCase
 
         self::$usersClient = new UsersClient(self::$urlGenerator, self::createServiceClient());
         self::$fileSourceClient = new FileSourceClient(
+            self::$urlGenerator,
+            self::createServiceClient(),
+            new SourceFactory()
+        );
+        self::$gitSourceClient = new GitSourceClient(
             self::$urlGenerator,
             self::createServiceClient(),
             new SourceFactory()

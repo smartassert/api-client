@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use Symfony\Component\Uid\Ulid;
 
-class DeleteTest extends AbstractGitSourceTestCase
+class DeleteTest extends AbstractIntegrationTestCase
 {
     public function testDeleteUnauthorized(): void
     {
