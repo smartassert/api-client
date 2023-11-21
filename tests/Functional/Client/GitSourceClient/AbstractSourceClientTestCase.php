@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\GitSourceClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\Model\Source\GitSource;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
@@ -45,6 +46,7 @@ abstract class AbstractSourceClientTestCase extends AbstractClientTestCase
                 ResponseFactory::createFactory(),
                 new CurlExceptionFactory(),
             ),
+            new SourceFactory(),
         );
     }
 
@@ -60,6 +62,7 @@ abstract class AbstractSourceClientTestCase extends AbstractClientTestCase
             ['content-type' => 'application/json'],
             (string) json_encode([
                 'git_source' => [
+                    'type' => 'git',
                     'id' => self::ID,
                     'label' => self::LABEL,
                     'host_url' => self::HOST_URL,
