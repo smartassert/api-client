@@ -189,14 +189,9 @@ readonly class GitSourceClient
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
      * @throws InvalidResponseTypeException
-     * @throws NonSuccessResponseException
      */
     private function handleGitSourceResponse(ResponseInterface $response): GitSource
     {
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
-
         if (!$response instanceof JsonResponse) {
             throw InvalidResponseTypeException::create($response, JsonResponse::class);
         }
