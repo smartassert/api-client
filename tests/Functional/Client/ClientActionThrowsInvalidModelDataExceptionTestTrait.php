@@ -22,7 +22,7 @@ trait ClientActionThrowsInvalidModelDataExceptionTestTrait
             Assert::fail(InvalidModelDataException::class . ' not thrown');
         } catch (InvalidModelDataException $e) {
             Assert::assertSame($this->getExpectedModelClass(), $e->class);
-            Assert::assertSame($response, $e->response);
+            Assert::assertSame($response, $e->getHttpResponse());
             Assert::assertSame($responsePayload, $e->payload);
         }
     }
