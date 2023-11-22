@@ -130,7 +130,9 @@ readonly class UsersClient
             $response = $this->serviceClient->sendRequest(
                 (new Request('POST', $this->urlGenerator->generate('user_create')))
                     ->withAuthentication(new BearerAuthentication($adminToken))
-                    ->withPayload(new UrlEncodedPayload(['user-identifier' => $userIdentifier, 'password' => $password]))
+                    ->withPayload(
+                        new UrlEncodedPayload(['user-identifier' => $userIdentifier, 'password' => $password])
+                    )
             );
         } catch (NonSuccessResponseException $e) {
             if (409 === $e->getStatusCode()) {
