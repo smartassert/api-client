@@ -132,10 +132,6 @@ readonly class FileSourceClient
 
         $response = $this->serviceClient->sendRequest($request);
 
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
-
         if (!$response instanceof JsonResponse) {
             throw InvalidResponseTypeException::create($response, JsonResponse::class);
         }
@@ -191,14 +187,9 @@ readonly class FileSourceClient
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
      * @throws InvalidResponseTypeException
-     * @throws NonSuccessResponseException
      */
     private function handleFileSourceResponse(ResponseInterface $response): FileSource
     {
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
-
         if (!$response instanceof JsonResponse) {
             throw InvalidResponseTypeException::create($response, JsonResponse::class);
         }
