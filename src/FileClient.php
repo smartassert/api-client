@@ -46,9 +46,10 @@ readonly class FileClient
      */
     public function create(string $apiKey, string $sourceId, string $filename, string $content): void
     {
-        $response = $this->handleRequest($apiKey, 'POST', $sourceId, $filename, $content);
-
-        if (!$response->isSuccessful()) {
+        try {
+            $this->handleRequest($apiKey, 'POST', $sourceId, $filename, $content);
+        } catch (NonSuccessResponseException $e) {
+            $response = $e->getResponse();
             if ($response instanceof JsonResponse) {
                 $duplicateFileException = $this->createDuplicateFileExceptionFromResponse($response);
 
@@ -57,7 +58,7 @@ readonly class FileClient
                 }
             }
 
-            throw new NonSuccessResponseException($response->getHttpResponse());
+            throw $e;
         }
     }
 
@@ -76,14 +77,16 @@ readonly class FileClient
      */
     public function read(string $apiKey, string $sourceId, string $filename): string
     {
-        $response = $this->handleRequest($apiKey, 'GET', $sourceId, $filename);
+        try {
+            $response = $this->handleRequest($apiKey, 'GET', $sourceId, $filename);
+        } catch (NonSuccessResponseException $e) {
+            $response = $e->getResponse();
 
-        if (!$response->isSuccessful()) {
             if (404 === $response->getStatusCode()) {
                 throw new NotFoundException($filename);
             }
 
-            throw new NonSuccessResponseException($response->getHttpResponse());
+            throw $e;
         }
 
         return $response->getHttpResponse()->getBody()->getContents();
@@ -104,11 +107,7 @@ readonly class FileClient
      */
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
-        $response = $this->handleRequest($apiKey, 'PUT', $sourceId, $filename, $content);
-
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
+        $this->handleRequest($apiKey, 'PUT', $sourceId, $filename, $content);
     }
 
     /**
@@ -125,11 +124,7 @@ readonly class FileClient
      */
     public function delete(string $apiKey, string $sourceId, string $filename): void
     {
-        $response = $this->handleRequest($apiKey, 'DELETE', $sourceId, $filename);
-
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
+        $this->handleRequest($apiKey, 'DELETE', $sourceId, $filename);
     }
 
     /**
@@ -143,6 +138,7 @@ readonly class FileClient
      * @throws NetworkExceptionInterface
      * @throws RequestExceptionInterface
      * @throws UnauthorizedException
+     * @throws NonSuccessResponseException
      */
     private function handleRequest(
         string $apiKey,

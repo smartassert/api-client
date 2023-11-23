@@ -51,10 +51,6 @@ readonly class SourceClient
 
         $response = $this->serviceClient->sendRequest($request);
 
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
-
         if (!$response instanceof JsonResponse) {
             throw InvalidResponseTypeException::create($response, JsonResponse::class);
         }

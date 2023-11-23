@@ -126,14 +126,20 @@ readonly class UsersClient
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
-        $response = $this->serviceClient->sendRequest(
-            (new Request('POST', $this->urlGenerator->generate('user_create')))
-                ->withAuthentication(new BearerAuthentication($adminToken))
-                ->withPayload(new UrlEncodedPayload(['user-identifier' => $userIdentifier, 'password' => $password]))
-        );
+        try {
+            $response = $this->serviceClient->sendRequest(
+                (new Request('POST', $this->urlGenerator->generate('user_create')))
+                    ->withAuthentication(new BearerAuthentication($adminToken))
+                    ->withPayload(
+                        new UrlEncodedPayload(['user-identifier' => $userIdentifier, 'password' => $password])
+                    )
+            );
+        } catch (NonSuccessResponseException $e) {
+            if (409 === $e->getStatusCode()) {
+                throw new UserAlreadyExistsException($userIdentifier, $e->getHttpResponse());
+            }
 
-        if (409 === $response->getStatusCode()) {
-            throw new UserAlreadyExistsException($userIdentifier, $response->getHttpResponse());
+            throw $e;
         }
 
         return $this->handleUserResponse($response);
@@ -152,15 +158,11 @@ readonly class UsersClient
      */
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
-        $response = $this->serviceClient->sendRequest(
+        $this->serviceClient->sendRequest(
             (new Request('POST', $this->urlGenerator->generate('user_refresh-token_revoke-all')))
                 ->withAuthentication(new BearerAuthentication($adminToken))
                 ->withPayload(new UrlEncodedPayload(['id' => $userId]))
         );
-
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
     }
 
     /**
@@ -176,15 +178,11 @@ readonly class UsersClient
      */
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
-        $response = $this->serviceClient->sendRequest(
+        $this->serviceClient->sendRequest(
             (new Request('POST', $this->urlGenerator->generate('user_refresh-token_revoke')))
                 ->withAuthentication(new BearerAuthentication($token))
                 ->withPayload(new UrlEncodedPayload(['refresh_token' => $refreshToken]))
         );
-
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
     }
 
     /**
@@ -206,10 +204,6 @@ readonly class UsersClient
             (new Request('GET', $this->urlGenerator->generate('user_apikey')))
                 ->withAuthentication(new BearerAuthentication($token))
         );
-
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
 
         if (!$response instanceof JsonResponse) {
             throw InvalidResponseTypeException::create($response, JsonResponse::class);
@@ -247,10 +241,6 @@ readonly class UsersClient
                 ->withAuthentication(new BearerAuthentication($token))
         );
 
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
-
         if (!$response instanceof JsonResponse) {
             throw InvalidResponseTypeException::create($response, JsonResponse::class);
         }
@@ -276,14 +266,9 @@ readonly class UsersClient
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
      * @throws InvalidResponseTypeException
-     * @throws NonSuccessResponseException
      */
     private function handleRefreshableTokenResponse(ResponseInterface $response): RefreshableToken
     {
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
-
         if (!$response instanceof JsonResponse) {
             throw InvalidResponseTypeException::create($response, JsonResponse::class);
         }
@@ -306,14 +291,9 @@ readonly class UsersClient
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
      * @throws InvalidResponseTypeException
-     * @throws NonSuccessResponseException
      */
     private function handleUserResponse(ResponseInterface $response): User
     {
-        if (!$response->isSuccessful()) {
-            throw new NonSuccessResponseException($response->getHttpResponse());
-        }
-
         if (!$response instanceof JsonResponse) {
             throw InvalidResponseTypeException::create($response, JsonResponse::class);
         }
