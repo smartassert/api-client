@@ -23,7 +23,6 @@ use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
 use SmartAssert\ServiceClient\Request;
 use SmartAssert\ServiceClient\Response\JsonResponse;
-use SmartAssert\ServiceClient\Response\ResponseInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class UsersClient
@@ -47,7 +46,7 @@ readonly class UsersClient
      */
     public function createToken(string $userIdentifier, string $password): RefreshableToken
     {
-        $response = $this->serviceClient->sendRequest(
+        $response = $this->serviceClient->sendRequestForJson(
             (new Request('POST', $this->urlGenerator->generate('user_token_create')))
                 ->withPayload(
                     new UrlEncodedPayload([
@@ -75,7 +74,7 @@ readonly class UsersClient
      */
     public function verifyToken(string $token): User
     {
-        $response = $this->serviceClient->sendRequest(
+        $response = $this->serviceClient->sendRequestForJson(
             (new Request('GET', $this->urlGenerator->generate('user_token_verify')))
                 ->withAuthentication(
                     new BearerAuthentication($token)
@@ -100,7 +99,7 @@ readonly class UsersClient
      */
     public function refreshToken(string $refreshToken): RefreshableToken
     {
-        $response = $this->serviceClient->sendRequest(
+        $response = $this->serviceClient->sendRequestForJson(
             (new Request('POST', $this->urlGenerator->generate('user_token_refresh')))
                 ->withAuthentication(new BearerAuthentication($refreshToken))
         );
@@ -127,7 +126,7 @@ readonly class UsersClient
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
         try {
-            $response = $this->serviceClient->sendRequest(
+            $response = $this->serviceClient->sendRequestForJson(
                 (new Request('POST', $this->urlGenerator->generate('user_create')))
                     ->withAuthentication(new BearerAuthentication($adminToken))
                     ->withPayload(
@@ -200,14 +199,10 @@ readonly class UsersClient
      */
     public function getApiKey(string $token): ApiKey
     {
-        $response = $this->serviceClient->sendRequest(
+        $response = $this->serviceClient->sendRequestForJson(
             (new Request('GET', $this->urlGenerator->generate('user_apikey')))
                 ->withAuthentication(new BearerAuthentication($token))
         );
-
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
 
         $responseDataInspector = new ArrayInspector($response->getData());
         $modelData = $responseDataInspector->getArray('api_key');
@@ -236,14 +231,10 @@ readonly class UsersClient
      */
     public function getApiKeys(string $token): array
     {
-        $response = $this->serviceClient->sendRequest(
+        $response = $this->serviceClient->sendRequestForJson(
             (new Request('GET', $this->urlGenerator->generate('user_apikey_list')))
                 ->withAuthentication(new BearerAuthentication($token))
         );
-
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
 
         $responseDataInspector = new ArrayInspector($response->getData());
         $collectionData = $responseDataInspector->getArray('api_keys');
@@ -265,14 +256,9 @@ readonly class UsersClient
     /**
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
      */
-    private function handleRefreshableTokenResponse(ResponseInterface $response): RefreshableToken
+    private function handleRefreshableTokenResponse(JsonResponse $response): RefreshableToken
     {
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
-
         $responseDataInspector = new ArrayInspector($response->getData());
         $modelData = $responseDataInspector->getArray('refreshable_token');
 
@@ -290,14 +276,9 @@ readonly class UsersClient
     /**
      * @throws InvalidModelDataException
      * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
      */
-    private function handleUserResponse(ResponseInterface $response): User
+    private function handleUserResponse(JsonResponse $response): User
     {
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
-
         $responseDataInspector = new ArrayInspector($response->getData());
         $userData = $responseDataInspector->getArray('user');
         $userDataInspector = new ArrayInspector($userData);

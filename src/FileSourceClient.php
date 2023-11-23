@@ -20,8 +20,6 @@ use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
 use SmartAssert\ServiceClient\Request;
-use SmartAssert\ServiceClient\Response\JsonResponse;
-use SmartAssert\ServiceClient\Response\ResponseInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileSourceClient
@@ -130,11 +128,7 @@ readonly class FileSourceClient
         $request = new Request('GET', $this->urlGenerator->generate('file-source-list', ['sourceId' => $id]));
         $request = $request->withAuthentication(new BearerAuthentication($apiKey));
 
-        $response = $this->serviceClient->sendRequest($request);
-
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
+        $response = $this->serviceClient->sendRequestForJson($request);
 
         $responseDataInspector = new ArrayInspector($response->getData());
         $filenamesData = $responseDataInspector->getArray('files');
@@ -178,21 +172,7 @@ readonly class FileSourceClient
             $request = $request->withPayload(new UrlEncodedPayload(['label' => $label]));
         }
 
-        $response = $this->serviceClient->sendRequest($request);
-
-        return $this->handleFileSourceResponse($response);
-    }
-
-    /**
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     */
-    private function handleFileSourceResponse(ResponseInterface $response): FileSource
-    {
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
+        $response = $this->serviceClient->sendRequestForJson($request);
 
         $responseDataInspector = new ArrayInspector($response->getData());
         $modelData = $responseDataInspector->getArray('file_source');
