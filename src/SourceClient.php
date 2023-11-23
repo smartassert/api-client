@@ -18,7 +18,6 @@ use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceClient\Request;
-use SmartAssert\ServiceClient\Response\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class SourceClient
@@ -49,11 +48,7 @@ readonly class SourceClient
         $request = new Request('GET', $this->urlGenerator->generate('sources'));
         $request = $request->withAuthentication(new BearerAuthentication($apiKey));
 
-        $response = $this->serviceClient->sendRequest($request);
-
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
+        $response = $this->serviceClient->sendRequestForJson($request);
 
         $responseDataInspector = new ArrayInspector($response->getData());
         $sourcesData = $responseDataInspector->getArray('sources');

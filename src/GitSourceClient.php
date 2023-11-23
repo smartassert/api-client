@@ -20,8 +20,6 @@ use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
 use SmartAssert\ServiceClient\Request;
-use SmartAssert\ServiceClient\Response\JsonResponse;
-use SmartAssert\ServiceClient\Response\ResponseInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class GitSourceClient
@@ -180,21 +178,7 @@ readonly class GitSourceClient
             $request = $request->withPayload(new UrlEncodedPayload($payload));
         }
 
-        $response = $this->serviceClient->sendRequest($request);
-
-        return $this->handleGitSourceResponse($response);
-    }
-
-    /**
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     */
-    private function handleGitSourceResponse(ResponseInterface $response): GitSource
-    {
-        if (!$response instanceof JsonResponse) {
-            throw InvalidResponseTypeException::create($response, JsonResponse::class);
-        }
+        $response = $this->serviceClient->sendRequestForJson($request);
 
         $responseDataInspector = new ArrayInspector($response->getData());
         $modelData = $responseDataInspector->getArray('git_source');
