@@ -20,4 +20,9 @@ interface SourceInterface
      * @return ?positive-int
      */
     public function getDeletedAt(): ?int;
+
+    /**
+     * @return non-empty-string
+     */
+    public function getType(): string;
 }

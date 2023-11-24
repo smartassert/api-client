@@ -23,4 +23,9 @@ readonly class GitSource extends AbstractSource
     ) {
         parent::__construct($id, $label, $deletedAt);
     }
+
+    public function getType(): string
+    {
+        return 'git';
+    }
 }
