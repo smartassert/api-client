@@ -87,3 +87,73 @@ services:
     volumes:
       - ./http-config/caddy/index.php:/app/public/index.php
       - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  users-service-60:
+    image: ghcr.io/smartassert/users:6.0
+    container_name: users-service-60
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users?serverVersion=12&charset=utf8
+      JWT_PASSPHRASE: non-empty-string
+      PRIMARY_ADMIN_TOKEN: primary_admin_token
+      SECONDARY_ADMIN_TOKEN: secondary_admin_token
+      IS_READY: 1
+    depends_on:
+      - postgres
+
+  users-http-60:
+    image: caddy:2.4.5-alpine
+    container_name: users-http-60
+    restart: unless-stopped
+    ports:
+      - "9091:80"
+    links:
+      - users-service-60:app
+    volumes:
+      - ./http-config/caddy/index.php:/app/public/index.php
+      - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  sources-service-10:
+    image: ghcr.io/smartassert/sources:10.0
+    container_name: sources-service-10
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/sources?serverVersion=12&charset=utf8
+      AUTHENTICATION_BASE_URL: http://users-http-60
+      REMOTE_STORAGE_ENDPOINT: http://s3-mock:9090
+      REMOTE_STORAGE_KEY_ID: remote_storage_key_id
+      IS_READY: 1
+    depends_on:
+      - postgres
+
+  sources-http-10:
+    image: caddy:2.4.5-alpine
+    container_name: sources-http-10
+    restart: unless-stopped
+    ports:
+      - "9092:80"
+    links:
+      - sources-service-10:app
+    volumes:
+      - ./http-config/caddy/index.php:/app/public/index.php
+      - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  api-gateway-service-80:
+    image: ghcr.io/smartassert/api-gateway:8.0
+    container_name: api-gateway-service-80
+    environment:
+      AUTHENTICATION_BASE_URL: http://users-http-60
+      SOURCES_BASE_URL: http://sources-http-10
+      IS_READY: 1
+    depends_on:
+      - postgres
+
+  api-gateway-http-80:
+    image: caddy:2.4.5-alpine
+    container_name: api-gateway-http-80
+    restart: unless-stopped
+    ports:
+      - "9093:80"
+    links:
+      - api-gateway-service-80:app
+    volumes:
+      - ./http-config/caddy/index.php:/app/public/index.php
+      - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
