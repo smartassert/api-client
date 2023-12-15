@@ -9,11 +9,11 @@ use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooNetworkErrorExceptionDataProviderTrait;
 
 class RevokeAllRefreshTokensForUserTest extends AbstractUsersClientTestCase
 {
-    use NetworkErrorExceptionDataProviderTrait;
+    use FooNetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
     use RequestAuthenticationTestTrait;
 
@@ -29,7 +29,7 @@ class RevokeAllRefreshTokensForUserTest extends AbstractUsersClientTestCase
         };
     }
 
-    protected function getExpectedBearer(): string
+    protected function getExpectedAuthorizationHeader(): string
     {
         return 'admin token';
     }
@@ -41,6 +41,6 @@ class RevokeAllRefreshTokensForUserTest extends AbstractUsersClientTestCase
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('POST', '/user/refresh_token/revoke-all');
+        return new ExpectedRequestProperties('POST', '/user/refresh-token/revoke-all-for-user');
     }
 }

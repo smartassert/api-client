@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\FooException\Http\HttpException;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
 use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
@@ -74,6 +75,8 @@ abstract class AbstractClientTestCase extends TestCase
             self::fail(NonSuccessResponseException::class . ' not thrown');
         } catch (NonSuccessResponseException $e) {
             self::assertSame($httpFixture, $e->getHttpResponse());
+        } catch (HttpException $e) {
+            self::assertSame($httpFixture, $e->response);
         }
     }
 
@@ -86,11 +89,6 @@ abstract class AbstractClientTestCase extends TestCase
     }
 
     abstract protected function createClientActionCallable(): callable;
-
-    protected function getExpectedBearer(): string
-    {
-        return self::API_KEY;
-    }
 
     protected function getMockHandler(): MockHandler
     {
