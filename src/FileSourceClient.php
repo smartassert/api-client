@@ -4,30 +4,25 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
+use GuzzleHttp\Psr7\Request as HttpRequest;
+use SmartAssert\ApiClient\Data\Source\FileSource;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
-use SmartAssert\ApiClient\Model\Source\FileSource;
-use SmartAssert\ArrayInspector\ArrayInspector;
-use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
-use SmartAssert\ServiceClient\Client as ServiceClient;
-use SmartAssert\ServiceClient\Exception\CurlExceptionInterface;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
-use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
-use SmartAssert\ServiceClient\Request;
+use SmartAssert\ApiClient\FooException\Http\HttpClientException;
+use SmartAssert\ApiClient\FooException\Http\HttpException;
+use SmartAssert\ApiClient\FooException\Http\NotFoundException;
+use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
+use SmartAssert\ApiClient\FooException\Http\UnexpectedContentTypeException;
+use SmartAssert\ApiClient\FooException\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\FooException\IncompleteDataException;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileSourceClient
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
-        private ServiceClient $serviceClient,
         private SourceFactory $sourceFactory,
+        private HttpHandler $httpHandler,
     ) {
     }
 
@@ -35,38 +30,17 @@ readonly class FileSourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $label
      *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseTypeException
-     * @throws InvalidResponseDataException
-     * @throws InvalidModelDataException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
      * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     public function create(string $apiKey, string $label): FileSource
     {
-        return $this->handleFileSourceRequest($apiKey, 'POST', null, $label);
-    }
-
-    /**
-     * @param non-empty-string $apiKey
-     * @param non-empty-string $id
-     *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
-     * @throws UnauthorizedException
-     */
-    public function get(string $apiKey, string $id): FileSource
-    {
-        return $this->handleFileSourceRequest($apiKey, 'GET', $id);
+        return $this->handleRequest($apiKey, 'POST', $label);
     }
 
     /**
@@ -74,38 +48,17 @@ readonly class FileSourceClient
      * @param non-empty-string $id
      * @param non-empty-string $label
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
      * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     public function update(string $apiKey, string $id, string $label): FileSource
     {
-        return $this->handleFileSourceRequest($apiKey, 'PUT', $id, $label);
-    }
-
-    /**
-     * @param non-empty-string $apiKey
-     * @param non-empty-string $id
-     *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
-     * @throws UnauthorizedException
-     */
-    public function delete(string $apiKey, string $id): FileSource
-    {
-        return $this->handleFileSourceRequest($apiKey, 'DELETE', $id);
+        return $this->handleRequest($apiKey, 'PUT', $label, $id);
     }
 
     /**
@@ -114,27 +67,28 @@ readonly class FileSourceClient
      *
      * @return non-empty-string[]
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
      * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     public function list(string $apiKey, string $id): array
     {
-        $request = new Request('GET', $this->urlGenerator->generate('file-source-list', ['sourceId' => $id]));
-        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
+        $request = new HttpRequest(
+            'GET',
+            $this->urlGenerator->generate('file-source-list', ['sourceId' => $id]),
+            [
+                'authorization' => 'Bearer ' . $apiKey,
+                'translate-authorization-to' => 'api-token',
+            ]
+        );
 
-        $response = $this->serviceClient->sendRequestForJson($request);
-
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $filenamesData = $responseDataInspector->getArray('files');
+        $data = $this->httpHandler->getJson($request);
 
         $filenames = [];
-        foreach ($filenamesData as $filename) {
+        foreach ($data as $filename) {
             if (is_string($filename) && '' !== $filename) {
                 $filenames[] = $filename;
             }
@@ -146,42 +100,30 @@ readonly class FileSourceClient
     /**
      * @param non-empty-string  $apiKey
      * @param non-empty-string  $method
+     * @param non-empty-string  $label
      * @param ?non-empty-string $id
-     * @param ?non-empty-string $label
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
      * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
-    private function handleFileSourceRequest(
-        string $apiKey,
-        string $method,
-        ?string $id,
-        ?string $label = null
-    ): FileSource {
-        $request = new Request($method, $this->urlGenerator->generate('file-source', ['sourceId' => $id]));
-        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
+    private function handleRequest(string $apiKey, string $method, string $label, ?string $id = null): FileSource
+    {
+        $request = new HttpRequest(
+            $method,
+            $this->urlGenerator->generate('file-source', ['sourceId' => $id]),
+            [
+                'authorization' => 'Bearer ' . $apiKey,
+                'translate-authorization-to' => 'api-token',
+                'content-type' => 'application/x-www-form-urlencoded',
+            ],
+            http_build_query(['label' => $label])
+        );
 
-        if (null !== $label) {
-            $request = $request->withPayload(new UrlEncodedPayload(['label' => $label]));
-        }
-
-        $response = $this->serviceClient->sendRequestForJson($request);
-
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $modelData = $responseDataInspector->getArray('file_source');
-
-        $source = $this->sourceFactory->create($modelData);
-        if (!$source instanceof FileSource) {
-            throw InvalidModelDataException::fromJsonResponse(FileSource::class, $response);
-        }
-
-        return $source;
+        return $this->sourceFactory->createFileSource($this->httpHandler->getJson($request));
     }
 }

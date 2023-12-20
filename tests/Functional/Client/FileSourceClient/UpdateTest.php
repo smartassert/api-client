@@ -9,13 +9,13 @@ use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooInvalidJsonResponseExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooNetworkErrorExceptionDataProviderTrait;
 
 class UpdateTest extends AbstractFileSourceClientTestCase
 {
-    use InvalidJsonResponseExceptionDataProviderTrait;
-    use NetworkErrorExceptionDataProviderTrait;
+    use FooInvalidJsonResponseExceptionDataProviderTrait;
+    use FooNetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
     use RequestAuthenticationTestTrait;
 
@@ -40,17 +40,15 @@ class UpdateTest extends AbstractFileSourceClientTestCase
             200,
             ['content-type' => 'application/json'],
             (string) json_encode([
-                'file_source' => [
-                    'type' => 'file',
-                    'id' => self::ID,
-                    'label' => self::LABEL,
-                ],
+                'type' => 'file',
+                'id' => self::ID,
+                'label' => self::LABEL,
             ])
         );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('PUT', '/file-source/' . self::ID);
+        return new ExpectedRequestProperties('PUT', '/source/file-source/' . self::ID);
     }
 }

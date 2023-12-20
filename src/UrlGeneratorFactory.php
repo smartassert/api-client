@@ -16,11 +16,12 @@ readonly class UrlGeneratorFactory
     {
         $routeCollection = new RouteCollection();
         $routeCollection->addCollection(self::createUserRoutes());
-        $routeCollection->add('file-source', new Route('/file-source/{sourceId}', ['sourceId' => null]));
-        $routeCollection->add('file-source-list', new Route('/file-source/{sourceId}/list'));
-        $routeCollection->add('git-source', new Route('/git-source/{sourceId}', ['sourceId' => null]));
+        $routeCollection->add('file-source', new Route('/source/file-source/{sourceId}', ['sourceId' => null]));
+        $routeCollection->add('file-source-list', new Route('/source/file-source/{sourceId}/list/'));
+        $routeCollection->add('git-source', new Route('/source/git-source/{sourceId}', ['sourceId' => null]));
         $routeCollection->add('file-source-file', new Route('/file-source/{sourceId}/{filename}'));
-        $routeCollection->add('sources', new Route('/sources/list'));
+        $routeCollection->add('sources', new Route('/source/sources'));
+        $routeCollection->add('source', new Route('/source/{sourceId}', ['sourceId' => null]));
 
         return new UrlGenerator($routeCollection, new RequestContext($baseUrl));
     }

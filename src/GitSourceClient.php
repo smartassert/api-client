@@ -4,30 +4,25 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
+use GuzzleHttp\Psr7\Request as HttpRequest;
+use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
-use SmartAssert\ApiClient\Model\Source\GitSource;
-use SmartAssert\ArrayInspector\ArrayInspector;
-use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
-use SmartAssert\ServiceClient\Client as ServiceClient;
-use SmartAssert\ServiceClient\Exception\CurlExceptionInterface;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
-use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
-use SmartAssert\ServiceClient\Request;
+use SmartAssert\ApiClient\FooException\Http\HttpClientException;
+use SmartAssert\ApiClient\FooException\Http\HttpException;
+use SmartAssert\ApiClient\FooException\Http\NotFoundException;
+use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
+use SmartAssert\ApiClient\FooException\Http\UnexpectedContentTypeException;
+use SmartAssert\ApiClient\FooException\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\FooException\IncompleteDataException;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class GitSourceClient
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
-        private ServiceClient $serviceClient,
         private SourceFactory $sourceFactory,
+        private HttpHandler $httpHandler,
     ) {
     }
 
@@ -38,15 +33,13 @@ readonly class GitSourceClient
      * @param non-empty-string  $path
      * @param ?non-empty-string $credentials
      *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseTypeException
-     * @throws InvalidResponseDataException
-     * @throws InvalidModelDataException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
      * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     public function create(
         string $apiKey,
@@ -55,26 +48,7 @@ readonly class GitSourceClient
         string $path,
         ?string $credentials,
     ): GitSource {
-        return $this->handleRequest($apiKey, 'POST', null, $label, $hostUrl, $path, $credentials);
-    }
-
-    /**
-     * @param non-empty-string $apiKey
-     * @param non-empty-string $id
-     *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseTypeException
-     * @throws InvalidResponseDataException
-     * @throws InvalidModelDataException
-     * @throws UnauthorizedException
-     */
-    public function get(string $apiKey, string $id): GitSource
-    {
-        return $this->handleRequest($apiKey, 'GET', $id);
+        return $this->handleRequest($apiKey, 'POST', $label, $hostUrl, $path, $credentials);
     }
 
     /**
@@ -85,15 +59,13 @@ readonly class GitSourceClient
      * @param non-empty-string  $path
      * @param ?non-empty-string $credentials
      *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseTypeException
-     * @throws InvalidResponseDataException
-     * @throws InvalidModelDataException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
      * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     public function update(
         string $apiKey,
@@ -103,91 +75,56 @@ readonly class GitSourceClient
         string $path,
         ?string $credentials,
     ): GitSource {
-        return $this->handleRequest($apiKey, 'PUT', $id, $label, $hostUrl, $path, $credentials);
-    }
-
-    /**
-     * @param non-empty-string $apiKey
-     * @param non-empty-string $id
-     *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseTypeException
-     * @throws InvalidResponseDataException
-     * @throws InvalidModelDataException
-     * @throws UnauthorizedException
-     */
-    public function delete(string $apiKey, string $id): GitSource
-    {
-        return $this->handleRequest($apiKey, 'DELETE', $id);
+        return $this->handleRequest($apiKey, 'PUT', $label, $hostUrl, $path, $credentials, $id);
     }
 
     /**
      * @param non-empty-string  $apiKey
      * @param non-empty-string  $method
-     * @param ?non-empty-string $id
-     * @param ?non-empty-string $label
-     * @param ?non-empty-string $hostUrl
-     * @param ?non-empty-string $path
+     * @param non-empty-string  $label
+     * @param non-empty-string  $hostUrl
+     * @param non-empty-string  $path
      * @param ?non-empty-string $credentials
+     * @param ?non-empty-string $id
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
+     * @throws FooException\IncompleteDataException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
      * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     private function handleRequest(
         string $apiKey,
         string $method,
-        ?string $id,
-        ?string $label = null,
-        ?string $hostUrl = null,
-        ?string $path = null,
+        string $label,
+        string $hostUrl,
+        string $path,
         ?string $credentials = null,
+        ?string $id = null,
     ): GitSource {
-        $request = new Request($method, $this->urlGenerator->generate('git-source', ['sourceId' => $id]));
-        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
+        $payload = [
+            'label' => $label,
+            'host-url' => $hostUrl,
+            'path' => $path,
+        ];
 
-        $payload = [];
-
-        if (null !== $label) {
-            $payload['label'] = $label;
-        }
-
-        if (null !== $hostUrl) {
-            $payload['host-url'] = $hostUrl;
-        }
-
-        if (null !== $path) {
-            $payload['path'] = $path;
-        }
-
-        if (null !== $credentials) {
+        if (is_string($credentials)) {
             $payload['credentials'] = $credentials;
         }
 
-        if ([] !== $payload) {
-            $request = $request->withPayload(new UrlEncodedPayload($payload));
-        }
+        $request = new HttpRequest(
+            $method,
+            $this->urlGenerator->generate('git-source', ['sourceId' => $id]),
+            [
+                'authorization' => 'Bearer ' . $apiKey,
+                'translate-authorization-to' => 'api-token',
+                'content-type' => 'application/x-www-form-urlencoded',
+            ],
+            http_build_query($payload)
+        );
 
-        $response = $this->serviceClient->sendRequestForJson($request);
-
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $modelData = $responseDataInspector->getArray('git_source');
-
-        $source = $this->sourceFactory->create($modelData);
-        if (!$source instanceof GitSource) {
-            throw InvalidModelDataException::fromJsonResponse(GitSource::class, $response);
-        }
-
-        return $source;
+        return $this->sourceFactory->createGitSource($this->httpHandler->getJson($request));
     }
 }

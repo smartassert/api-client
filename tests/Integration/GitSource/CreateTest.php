@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
+use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 
 class CreateTest extends AbstractIntegrationTestCase
 {

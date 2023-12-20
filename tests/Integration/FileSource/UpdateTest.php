@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
+use SmartAssert\ApiClient\FooException\Http\NotFoundException;
+use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 use Symfony\Component\Uid\Ulid;
 
 class UpdateTest extends AbstractIntegrationTestCase
@@ -30,7 +30,7 @@ class UpdateTest extends AbstractIntegrationTestCase
         $id = (string) new Ulid();
         \assert('' !== $id);
 
-        self::expectException(NonSuccessResponseException::class);
+        self::expectException(NotFoundException::class);
         self::expectExceptionCode(404);
 
         self::$fileSourceClient->update($apiKey->key, $id, $label);
