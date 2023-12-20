@@ -6,19 +6,18 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Model\ApiKey;
-use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsInvalidModelDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
+use SmartAssert\ApiClient\Tests\Functional\Client\FooClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooInvalidJsonResponseExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooNetworkErrorExceptionDataProviderTrait;
 
 class GetApiKeyTest extends AbstractUsersClientTestCase
 {
-    use ClientActionThrowsInvalidModelDataExceptionTestTrait;
-    use InvalidJsonResponseExceptionDataProviderTrait;
-    use NetworkErrorExceptionDataProviderTrait;
+    use FooClientActionThrowsIncompleteDataExceptionTestTrait;
+    use FooInvalidJsonResponseExceptionDataProviderTrait;
+    use FooNetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
     use RequestAuthenticationTestTrait;
 
@@ -30,16 +29,24 @@ class GetApiKeyTest extends AbstractUsersClientTestCase
         );
     }
 
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteDataExceptionDataProvider(): array
+    {
+        return [
+            'key missing' => [
+                'payload' => [],
+                'expectedMissingKey' => 'key',
+            ],
+        ];
+    }
+
     protected function createClientActionCallable(): callable
     {
         return function () {
             $this->client->getApiKey(self::API_KEY);
         };
-    }
-
-    protected function getExpectedModelClass(): string
-    {
-        return ApiKey::class;
     }
 
     protected function getResponseFixture(): ResponseInterface
@@ -48,16 +55,19 @@ class GetApiKeyTest extends AbstractUsersClientTestCase
             200,
             ['content-type' => 'application/json'],
             (string) json_encode([
-                'api_key' => [
-                    'label' => 'label',
-                    'key' => 'key',
-                ],
+                'label' => 'label',
+                'key' => 'key',
             ])
         );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('GET', '/user/apikey/');
+        return new ExpectedRequestProperties('GET', '/user/apikey');
+    }
+
+    protected function getExpectedAuthorizationHeader(): string
+    {
+        return 'Bearer ' . self::API_KEY;
     }
 }

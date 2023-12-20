@@ -6,48 +6,23 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Model\RefreshableToken;
-use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsInvalidModelDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
+use SmartAssert\ApiClient\Tests\Functional\Client\FooClientActionThrowsIncompleteDataExceptionTestTrait;
+use SmartAssert\ApiClient\Tests\Functional\Client\RequestHasNoAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooInvalidJsonResponseExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooNetworkErrorExceptionDataProviderTrait;
 
 class CreateTokenTest extends AbstractUsersClientTestCase
 {
-    use ClientActionThrowsInvalidModelDataExceptionTestTrait;
-    use InvalidJsonResponseExceptionDataProviderTrait;
-    use NetworkErrorExceptionDataProviderTrait;
+    use FooClientActionThrowsIncompleteDataExceptionTestTrait;
+    use FooInvalidJsonResponseExceptionDataProviderTrait;
+    use FooNetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
+    use RequestHasNoAuthenticationTestTrait;
 
     private const TOKEN = 'token';
     private const REFRESHABLE_TOKEN = 'refreshable_token';
-
-    public function testCreateTokenRequestProperties(): void
-    {
-        $token = md5((string) rand());
-        $refreshToken = md5((string) rand());
-
-        $this->mockHandler->append(new Response(
-            200,
-            ['content-type' => 'application/json'],
-            (string) json_encode([
-                'refreshable_token' => [
-                    'token' => $token,
-                    'refresh_token' => $refreshToken,
-                ],
-            ])
-        ));
-
-        $userIdentifier = md5((string) rand());
-        $password = md5((string) rand());
-
-        $this->client->createToken($userIdentifier, $password);
-
-        $request = $this->getLastRequest();
-        self::assertSame('POST', $request->getMethod());
-        self::assertEmpty($request->getHeaderLine('authorization'));
-    }
 
     public static function clientActionThrowsExceptionDataProvider(): array
     {
@@ -57,16 +32,28 @@ class CreateTokenTest extends AbstractUsersClientTestCase
         );
     }
 
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteDataExceptionDataProvider(): array
+    {
+        return [
+            'token missing' => [
+                'payload' => ['refresh_token' => md5((string) rand())],
+                'expectedMissingKey' => 'token',
+            ],
+            'refresh_token missing' => [
+                'payload' => ['token' => md5((string) rand())],
+                'expectedMissingKey' => 'refresh_token',
+            ],
+        ];
+    }
+
     protected function createClientActionCallable(): callable
     {
         return function () {
             $this->client->createToken(self::ID, 'password');
         };
-    }
-
-    protected function getExpectedModelClass(): string
-    {
-        return RefreshableToken::class;
     }
 
     protected function getResponseFixture(): ResponseInterface
@@ -75,16 +62,14 @@ class CreateTokenTest extends AbstractUsersClientTestCase
             200,
             ['content-type' => 'application/json'],
             (string) json_encode([
-                'refreshable_token' => [
-                    'token' => self::TOKEN,
-                    'refresh_token' => self::REFRESHABLE_TOKEN,
-                ],
+                'token' => self::TOKEN,
+                'refresh_token' => self::REFRESHABLE_TOKEN,
             ])
         );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('POST', '/user/token/create');
+        return new ExpectedRequestProperties('POST', '/user/frontend-token/create');
     }
 }

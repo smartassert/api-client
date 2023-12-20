@@ -28,13 +28,13 @@ readonly class UrlGeneratorFactory
     private static function createUserRoutes(): RouteCollection
     {
         $routeCollection = new RouteCollection();
-        $routeCollection->add('user_token_create', new Route('/user/token/create'));
-        $routeCollection->add('user_token_verify', new Route('/user/token/verify'));
-        $routeCollection->add('user_token_refresh', new Route('/user/token/refresh'));
+        $routeCollection->add('user_token_create', new Route('/user/frontend-token/create'));
+        $routeCollection->add('user_token_verify', new Route('/user/frontend-token/verify'));
+        $routeCollection->add('user_token_refresh', new Route('/user/frontend-token/refresh'));
         $routeCollection->add('user_create', new Route('/user/create'));
-        $routeCollection->add('user_refresh-token_revoke-all', new Route('/user/refresh_token/revoke-all'));
-        $routeCollection->add('user_refresh-token_revoke', new Route('/user/refresh_token/revoke'));
-        $routeCollection->add('user_apikey', new Route('/user/apikey/'));
+        $routeCollection->add('user_refresh-token_revoke-all', new Route('/user/refresh-token/revoke-all-for-user'));
+        $routeCollection->add('user_refresh-token_revoke', new Route('/user/refresh-token/revoke'));
+        $routeCollection->add('user_apikey', new Route('/user/apikey'));
         $routeCollection->add('user_apikey_list', new Route('/user/apikey/list'));
 
         return $routeCollection;

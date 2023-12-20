@@ -72,4 +72,9 @@ abstract class AbstractSourceClientTestCase extends AbstractClientTestCase
             ])
         );
     }
+
+    protected function getExpectedAuthorizationHeader(): string
+    {
+        return 'Bearer ' . self::API_KEY;
+    }
 }

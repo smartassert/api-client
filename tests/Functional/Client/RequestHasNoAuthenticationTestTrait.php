@@ -9,27 +9,23 @@ use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-trait RequestAuthenticationTestTrait
+trait RequestHasNoAuthenticationTestTrait
 {
-    public function testRequestAuthentication(): void
+    public function testRequestHasNoAuthentication(): void
     {
         $this->getMockHandler()->append($this->getResponseFixture());
 
         ($this->createClientActionCallable())();
 
         $request = $this->getLastRequest();
-        Assert::assertSame($this->getExpectedAuthorizationHeader(), $request->getHeaderLine('authorization'));
+        Assert::assertSame('', $request->getHeaderLine('authorization'));
     }
 
     abstract protected function getResponseFixture(): ResponseInterface|\Throwable;
-
-    abstract protected function getExpectedRequestProperties(): ExpectedRequestProperties;
 
     abstract protected function createClientActionCallable(): callable;
 
     abstract protected function getLastRequest(): RequestInterface;
 
     abstract protected function getMockHandler(): MockHandler;
-
-    abstract protected function getExpectedAuthorizationHeader(): string;
 }

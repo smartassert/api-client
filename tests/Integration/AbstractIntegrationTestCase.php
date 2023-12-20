@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\GitSourceClient;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
 use SmartAssert\ApiClient\UsersClient;
 use SmartAssert\ServiceClient\Client as ServiceClient;
@@ -25,15 +26,22 @@ abstract class AbstractIntegrationTestCase extends TestCase
     protected const USER2_PASSWORD = 'password';
 
     protected static UrlGeneratorInterface $urlGenerator;
+    protected static UrlGeneratorInterface $fooUrlGenerator;
     protected static UsersClient $usersClient;
     protected static FileSourceClient $fileSourceClient;
     protected static GitSourceClient $gitSourceClient;
 
     public static function setUpBeforeClass(): void
     {
-        self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9089');
+        $httpClient = new HttpClient();
 
-        self::$usersClient = new UsersClient(self::$urlGenerator, self::createServiceClient());
+        $httpHandler = new HttpHandler($httpClient);
+
+        self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9089');
+        self::$fooUrlGenerator = UrlGeneratorFactory::create('http://localhost:9093');
+
+        self::$usersClient = new UsersClient(self::$fooUrlGenerator, $httpHandler);
+
         self::$fileSourceClient = new FileSourceClient(
             self::$urlGenerator,
             self::createServiceClient(),
