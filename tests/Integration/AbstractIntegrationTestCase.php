@@ -42,16 +42,8 @@ abstract class AbstractIntegrationTestCase extends TestCase
 
         self::$usersClient = new UsersClient(self::$fooUrlGenerator, $httpHandler);
 
-        self::$fileSourceClient = new FileSourceClient(
-            self::$urlGenerator,
-            self::createServiceClient(),
-            new SourceFactory()
-        );
-        self::$gitSourceClient = new GitSourceClient(
-            self::$urlGenerator,
-            self::createServiceClient(),
-            new SourceFactory()
-        );
+        self::$fileSourceClient = new FileSourceClient(self::$fooUrlGenerator, new SourceFactory(), $httpHandler);
+        self::$gitSourceClient = new GitSourceClient(self::$fooUrlGenerator, new SourceFactory(), $httpHandler);
     }
 
     protected static function createServiceClient(): ServiceClient

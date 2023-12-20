@@ -9,13 +9,13 @@ use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooInvalidJsonResponseExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooNetworkErrorExceptionDataProviderTrait;
 
 class ListTest extends AbstractFileSourceClientTestCase
 {
-    use InvalidJsonResponseExceptionDataProviderTrait;
-    use NetworkErrorExceptionDataProviderTrait;
+    use FooInvalidJsonResponseExceptionDataProviderTrait;
+    use FooNetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
     use RequestAuthenticationTestTrait;
 
@@ -47,6 +47,6 @@ class ListTest extends AbstractFileSourceClientTestCase
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('GET', '/file-source/' . self::ID . '/list');
+        return new ExpectedRequestProperties('GET', '/source/file-source/' . self::ID . '/list/');
     }
 }
