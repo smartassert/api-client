@@ -6,8 +6,8 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
-use SmartAssert\ApiClient\Tests\Functional\Client\FooClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestHasNoAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooInvalidJsonResponseExceptionDataProviderTrait;
@@ -15,7 +15,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooNetworkErrorException
 
 class CreateTokenTest extends AbstractUsersClientTestCase
 {
-    use FooClientActionThrowsIncompleteDataExceptionTestTrait;
+    use ClientActionThrowsIncompleteDataExceptionTestTrait;
     use FooInvalidJsonResponseExceptionDataProviderTrait;
     use FooNetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
