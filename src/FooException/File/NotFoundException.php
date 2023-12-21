@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Exception\File;
+namespace SmartAssert\ApiClient\FooException\File;
 
 class NotFoundException extends \Exception
 {

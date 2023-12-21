@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
+use GuzzleHttp\Client as HttpClient;
 use SmartAssert\ApiClient\FileClient;
 use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -37,7 +39,7 @@ class ListTest extends AbstractIntegrationTestCase
 
         $fileSource = self::$fileSourceClient->create($apiKey->key, $label);
 
-        $fileClient = new FileClient(self::$urlGenerator, self::createServiceClient());
+        $fileClient = new FileClient(self::$fooUrlGenerator, new HttpHandler(new HttpClient()));
 
         foreach ($filenamesToCreate as $filename) {
             $fileClient->create($apiKey->key, $fileSource->id, $filename, md5((string) rand()));
