@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
+use GuzzleHttp\Client as HttpClient;
 use SmartAssert\ApiClient\FileClient;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 
 abstract class AbstractFileTestCase extends AbstractIntegrationTestCase
@@ -15,6 +17,11 @@ abstract class AbstractFileTestCase extends AbstractIntegrationTestCase
     {
         parent::setUpBeforeClass();
 
-        self::$fileClient = new FileClient(self::$urlGenerator, self::createServiceClient());
+        self::$fileClient = new FileClient(
+            self::$fooUrlGenerator,
+            new HttpHandler(
+                new HttpClient(),
+            )
+        );
     }
 }

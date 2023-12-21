@@ -16,4 +16,7 @@ return $config->setRules([
     'php_unit_test_class_requires_covers' => false,
     'declare_strict_types' => true,
     'single_line_empty_body' => false,
+    'types_spaces' => [
+        'space_multiple_catch' => 'single',
+    ],
 ])->setFinder($finder);

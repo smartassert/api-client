@@ -4,28 +4,22 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
-use SmartAssert\ApiClient\Exception\File\DuplicateFileException;
-use SmartAssert\ApiClient\Exception\File\NotFoundException;
-use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
-use SmartAssert\ServiceClient\Client as ServiceClient;
-use SmartAssert\ServiceClient\Exception\CurlExceptionInterface;
-use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
-use SmartAssert\ServiceClient\Payload\Payload;
-use SmartAssert\ServiceClient\Request;
-use SmartAssert\ServiceClient\Response\JsonResponse;
-use SmartAssert\ServiceClient\Response\ResponseInterface;
+use GuzzleHttp\Psr7\Request as HttpRequest;
+use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\FooException\File\DuplicateFileException;
+use SmartAssert\ApiClient\FooException\File\NotFoundException as FileNotFoundException;
+use SmartAssert\ApiClient\FooException\Http\HttpClientException;
+use SmartAssert\ApiClient\FooException\Http\HttpException;
+use SmartAssert\ApiClient\FooException\Http\NotFoundException;
+use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileClient
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
-        private ServiceClient $serviceClient,
+        private HttpHandler $httpHandler,
     ) {
     }
 
@@ -34,31 +28,28 @@ readonly class FileClient
      * @param non-empty-string $sourceId
      * @param non-empty-string $filename
      *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws UnauthorizedException
-     * @throws InvalidResponseDataException
-     * @throws NonSuccessResponseException
      * @throws DuplicateFileException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
      */
     public function create(string $apiKey, string $sourceId, string $filename, string $content): void
     {
         try {
             $this->handleRequest($apiKey, 'POST', $sourceId, $filename, $content);
-        } catch (NonSuccessResponseException $e) {
-            $response = $e->getResponse();
-            if ($response instanceof JsonResponse) {
-                $duplicateFileException = $this->createDuplicateFileExceptionFromResponse($response);
+        } catch (HttpException $httpException) {
+            $response = $httpException->response;
 
-                if ($duplicateFileException instanceof DuplicateFileException) {
-                    throw $duplicateFileException;
+            if ('application/json' === $response->getHeaderLine('content-type')) {
+                $responseData = json_decode($response->getBody()->getContents(), true);
+
+                if (is_array($responseData) && 'duplicate' === ($responseData['class'] ?? null)) {
+                    throw new DuplicateFileException($filename);
                 }
             }
 
-            throw $e;
+            throw $httpException;
         }
     }
 
@@ -67,29 +58,19 @@ readonly class FileClient
      * @param non-empty-string $sourceId
      * @param non-empty-string $filename
      *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws UnauthorizedException
-     * @throws NotFoundException
+     * @throws FileNotFoundException
+     * @throws HttpClientException
+     * @throws HttpException
      */
     public function read(string $apiKey, string $sourceId, string $filename): string
     {
         try {
             $response = $this->handleRequest($apiKey, 'GET', $sourceId, $filename);
-        } catch (NonSuccessResponseException $e) {
-            $response = $e->getResponse();
-
-            if (404 === $response->getStatusCode()) {
-                throw new NotFoundException($filename);
-            }
-
-            throw $e;
+        } catch (NotFoundException | UnauthorizedException) {
+            throw new FileNotFoundException($filename);
         }
 
-        return $response->getHttpResponse()->getBody()->getContents();
+        return $response->getBody()->getContents();
     }
 
     /**
@@ -97,17 +78,17 @@ readonly class FileClient
      * @param non-empty-string $sourceId
      * @param non-empty-string $filename
      *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws UnauthorizedException
-     * @throws NonSuccessResponseException
+     * @throws FileNotFoundException
+     * @throws HttpClientException
+     * @throws HttpException
      */
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
-        $this->handleRequest($apiKey, 'PUT', $sourceId, $filename, $content);
+        try {
+            $this->handleRequest($apiKey, 'PUT', $sourceId, $filename, $content);
+        } catch (NotFoundException | UnauthorizedException) {
+            throw new FileNotFoundException($filename);
+        }
     }
 
     /**
@@ -115,16 +96,17 @@ readonly class FileClient
      * @param non-empty-string $sourceId
      * @param non-empty-string $filename
      *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws UnauthorizedException
+     * @throws FileNotFoundException
+     * @throws HttpClientException
+     * @throws HttpException
      */
     public function delete(string $apiKey, string $sourceId, string $filename): void
     {
-        $this->handleRequest($apiKey, 'DELETE', $sourceId, $filename);
+        try {
+            $this->handleRequest($apiKey, 'DELETE', $sourceId, $filename);
+        } catch (NotFoundException | UnauthorizedException) {
+            throw new FileNotFoundException($filename);
+        }
     }
 
     /**
@@ -133,12 +115,10 @@ readonly class FileClient
      * @param non-empty-string $sourceId
      * @param non-empty-string $filename
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws RequestExceptionInterface
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
      * @throws UnauthorizedException
-     * @throws NonSuccessResponseException
      */
     private function handleRequest(
         string $apiKey,
@@ -147,7 +127,20 @@ readonly class FileClient
         string $filename,
         ?string $content = null
     ): ResponseInterface {
-        $request = new Request(
+        $headers = [
+            'authorization' => 'Bearer ' . $apiKey,
+            'translate-authorization-to' => 'api-token',
+        ];
+
+        if (is_string($content)) {
+            $headers['content-type'] = 'application/yaml';
+        }
+
+        if ('GET' === $method) {
+            $headers['accept'] = 'application/yaml, text/x-yaml';
+        }
+
+        $request = new HttpRequest(
             $method,
             $this->urlGenerator->generate(
                 'file-source-file',
@@ -155,42 +148,11 @@ readonly class FileClient
                     'sourceId' => $sourceId,
                     'filename' => $filename
                 ]
-            )
+            ),
+            $headers,
+            $content
         );
 
-        if (is_string($content)) {
-            $request = $request->withPayload(new Payload('application/yaml', $content));
-        }
-
-        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
-
-        return $this->serviceClient->sendRequest($request);
-    }
-
-    /**
-     * @throws InvalidResponseDataException
-     */
-    private function createDuplicateFileExceptionFromResponse(JsonResponse $response): ?DuplicateFileException
-    {
-        $data = $response->getData();
-        $type = $data['type'] ?? null;
-        $type = is_string($type) ? $type : null;
-
-        if (!is_string($type)) {
-            return null;
-        }
-
-        $context = $data['context'];
-        if (!is_array($context)) {
-            return null;
-        }
-
-        if ('duplicate-file-path' === $type) {
-            $path = $context['path'] ?? null;
-
-            return new DuplicateFileException(is_string($path) ? $path : null);
-        }
-
-        return null;
+        return $this->httpHandler->sendRequest($request);
     }
 }

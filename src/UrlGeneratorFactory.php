@@ -19,7 +19,7 @@ readonly class UrlGeneratorFactory
         $routeCollection->add('file-source', new Route('/source/file-source/{sourceId}', ['sourceId' => null]));
         $routeCollection->add('file-source-list', new Route('/source/file-source/{sourceId}/list/'));
         $routeCollection->add('git-source', new Route('/source/git-source/{sourceId}', ['sourceId' => null]));
-        $routeCollection->add('file-source-file', new Route('/file-source/{sourceId}/{filename}'));
+        $routeCollection->add('file-source-file', new Route('/source/file-source/{sourceId}/{filename}'));
         $routeCollection->add('sources', new Route('/source/sources'));
         $routeCollection->add('source', new Route('/source/{sourceId}', ['sourceId' => null]));
 
