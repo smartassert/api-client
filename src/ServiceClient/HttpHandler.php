@@ -8,12 +8,12 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\FooException\Http\HttpClientException;
-use SmartAssert\ApiClient\FooException\Http\HttpException;
-use SmartAssert\ApiClient\FooException\Http\NotFoundException;
-use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
-use SmartAssert\ApiClient\FooException\Http\UnexpectedContentTypeException;
-use SmartAssert\ApiClient\FooException\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Exception\Http\HttpClientException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\NotFoundException;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 
 readonly class HttpHandler
 {

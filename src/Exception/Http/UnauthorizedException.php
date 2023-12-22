@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\FooException\Http;
+namespace SmartAssert\ApiClient\Exception\Http;
 
 class UnauthorizedException extends HttpException
 {

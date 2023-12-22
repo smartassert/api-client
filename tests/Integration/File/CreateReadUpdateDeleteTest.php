@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
-use SmartAssert\ApiClient\FooException\File\DuplicateFileException;
-use SmartAssert\ApiClient\FooException\File\NotFoundException;
-use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
+use SmartAssert\ApiClient\Exception\File\DuplicateFileException;
+use SmartAssert\ApiClient\Exception\File\NotFoundException;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 
 class CreateReadUpdateDeleteTest extends AbstractFileTestCase
 {

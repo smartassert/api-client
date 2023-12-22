@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\FooException\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 

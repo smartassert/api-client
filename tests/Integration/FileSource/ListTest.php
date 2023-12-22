@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use GuzzleHttp\Client as HttpClient;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\FileClient;
-use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use Symfony\Component\Uid\Ulid;
