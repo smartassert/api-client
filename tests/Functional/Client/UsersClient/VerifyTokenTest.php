@@ -6,7 +6,6 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Model\User;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
@@ -57,11 +56,6 @@ class VerifyTokenTest extends AbstractUsersClientTestCase
     protected function getExpectedAuthorizationHeader(): string
     {
         return 'Bearer frontend token';
-    }
-
-    protected function getExpectedModelClass(): string
-    {
-        return User::class;
     }
 
     protected function getResponseFixture(): ResponseInterface
