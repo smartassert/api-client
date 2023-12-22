@@ -31,7 +31,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
 
         $httpHandler = new HttpHandler($httpClient);
 
-        self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9093');
+        self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9089');
 
         self::$usersClient = new UsersClient(self::$urlGenerator, $httpHandler);
 
