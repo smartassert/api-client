@@ -50,7 +50,7 @@ readonly class GitSourceClient
         ?string $credentials,
     ): GitSource {
         $request = $this->requestBuilder
-            ->create('POST', $this->generateUrl())
+            ->create('POST', $this->urlGenerator->generate('git-source'))
             ->withApiKeyAuthorization($apiKey)
             ->withFormBody([
                 'label' => $label,
@@ -89,7 +89,7 @@ readonly class GitSourceClient
         ?string $credentials,
     ): GitSource {
         $request = $this->requestBuilder
-            ->create('PUT', $this->generateUrl($id))
+            ->create('PUT', $this->urlGenerator->generate('git-source', ['sourceId' => $id]))
             ->withApiKeyAuthorization($apiKey)
             ->withFormBody([
                 'label' => $label,
@@ -101,10 +101,5 @@ readonly class GitSourceClient
         ;
 
         return $this->sourceFactory->createGitSource($this->httpHandler->getJson($request));
-    }
-
-    private function generateUrl(?string $id = null): string
-    {
-        return $this->urlGenerator->generate('git-source', ['sourceId' => $id]);
     }
 }

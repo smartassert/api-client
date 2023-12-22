@@ -42,7 +42,7 @@ readonly class FileSourceClient
     public function create(string $apiKey, string $label): FileSource
     {
         $request = $this->requestBuilder
-            ->create('POST', $this->generateUrl())
+            ->create('POST', $this->urlGenerator->generate('file-source'))
             ->withApiKeyAuthorization($apiKey)
             ->withFormBody(['label' => $label])
             ->get()
@@ -67,7 +67,7 @@ readonly class FileSourceClient
     public function update(string $apiKey, string $id, string $label): FileSource
     {
         $request = $this->requestBuilder
-            ->create('PUT', $this->generateUrl($id))
+            ->create('PUT', $this->urlGenerator->generate('file-source', ['sourceId' => $id]))
             ->withApiKeyAuthorization($apiKey)
             ->withFormBody(['label' => $label])
             ->get()
@@ -107,10 +107,5 @@ readonly class FileSourceClient
         }
 
         return $filenames;
-    }
-
-    private function generateUrl(?string $id = null): string
-    {
-        return $this->urlGenerator->generate('file-source', ['sourceId' => $id]);
     }
 }
