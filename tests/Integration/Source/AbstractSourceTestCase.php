@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
+use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\SourceClient;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 
@@ -21,9 +23,8 @@ abstract class AbstractSourceTestCase extends AbstractIntegrationTestCase
         self::$sourceClient = new SourceClient(
             self::$urlGenerator,
             new SourceFactory(),
-            new HttpHandler(
-                new HttpClient()
-            )
+            new HttpHandler(new HttpClient()),
+            new RequestBuilder(new HttpFactory()),
         );
     }
 }

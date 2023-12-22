@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use GuzzleHttp\Psr7\Request as HttpRequest;
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
@@ -15,6 +14,7 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
+use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class SourceClient
@@ -23,6 +23,7 @@ readonly class SourceClient
         private UrlGeneratorInterface $urlGenerator,
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
+        private RequestBuilder $requestBuilder,
     ) {
     }
 
@@ -41,14 +42,11 @@ readonly class SourceClient
      */
     public function list(string $apiKey): array
     {
-        $request = new HttpRequest(
-            'GET',
-            $this->urlGenerator->generate('sources'),
-            [
-                'authorization' => 'Bearer ' . $apiKey,
-                'translate-authorization-to' => 'api-token',
-            ]
-        );
+        $request = $this->requestBuilder
+            ->create('GET', $this->urlGenerator->generate('sources'))
+            ->withApiKeyAuthorization($apiKey)
+            ->get()
+        ;
 
         $data = $this->httpHandler->getJson($request);
 
@@ -80,7 +78,13 @@ readonly class SourceClient
      */
     public function get(string $apiKey, string $id): ?SourceInterface
     {
-        return $this->handleSourceRequest($apiKey, 'GET', $id);
+        $request = $this->requestBuilder
+            ->create('GET', $this->urlGenerator->generate('source', ['sourceId' => $id]))
+            ->withApiKeyAuthorization($apiKey)
+            ->get()
+        ;
+
+        return $this->sourceFactory->create($this->httpHandler->getJson($request));
     }
 
     /**
@@ -97,35 +101,11 @@ readonly class SourceClient
      */
     public function delete(string $apiKey, string $id): ?SourceInterface
     {
-        return $this->handleSourceRequest($apiKey, 'DELETE', $id);
-    }
-
-    /**
-     * @param non-empty-string  $apiKey
-     * @param non-empty-string  $method
-     * @param ?non-empty-string $id
-     *
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteDataException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
-     */
-    private function handleSourceRequest(
-        string $apiKey,
-        string $method,
-        ?string $id
-    ): ?SourceInterface {
-        $request = new HttpRequest(
-            $method,
-            $this->urlGenerator->generate('source', ['sourceId' => $id]),
-            [
-                'authorization' => 'Bearer ' . $apiKey,
-                'translate-authorization-to' => 'api-token',
-            ]
-        );
+        $request = $this->requestBuilder
+            ->create('DELETE', $this->urlGenerator->generate('source', ['sourceId' => $id]))
+            ->withApiKeyAuthorization($apiKey)
+            ->get()
+        ;
 
         return $this->sourceFactory->create($this->httpHandler->getJson($request));
     }

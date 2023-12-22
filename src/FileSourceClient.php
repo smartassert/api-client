@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use GuzzleHttp\Psr7\Request as HttpRequest;
 use SmartAssert\ApiClient\Data\Source\FileSource;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
@@ -15,6 +14,7 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
+use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileSourceClient
@@ -23,6 +23,7 @@ readonly class FileSourceClient
         private UrlGeneratorInterface $urlGenerator,
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
+        private RequestBuilder $requestBuilder,
     ) {
     }
 
@@ -40,7 +41,14 @@ readonly class FileSourceClient
      */
     public function create(string $apiKey, string $label): FileSource
     {
-        return $this->handleRequest($apiKey, 'POST', $label);
+        $request = $this->requestBuilder
+            ->create('POST', $this->urlGenerator->generate('file-source'))
+            ->withApiKeyAuthorization($apiKey)
+            ->withFormBody(['label' => $label])
+            ->get()
+        ;
+
+        return $this->sourceFactory->createFileSource($this->httpHandler->getJson($request));
     }
 
     /**
@@ -58,7 +66,14 @@ readonly class FileSourceClient
      */
     public function update(string $apiKey, string $id, string $label): FileSource
     {
-        return $this->handleRequest($apiKey, 'PUT', $label, $id);
+        $request = $this->requestBuilder
+            ->create('PUT', $this->urlGenerator->generate('file-source', ['sourceId' => $id]))
+            ->withApiKeyAuthorization($apiKey)
+            ->withFormBody(['label' => $label])
+            ->get()
+        ;
+
+        return $this->sourceFactory->createFileSource($this->httpHandler->getJson($request));
     }
 
     /**
@@ -76,14 +91,11 @@ readonly class FileSourceClient
      */
     public function list(string $apiKey, string $id): array
     {
-        $request = new HttpRequest(
-            'GET',
-            $this->urlGenerator->generate('file-source-list', ['sourceId' => $id]),
-            [
-                'authorization' => 'Bearer ' . $apiKey,
-                'translate-authorization-to' => 'api-token',
-            ]
-        );
+        $request = $this->requestBuilder
+            ->create('GET', $this->urlGenerator->generate('file-source-list', ['sourceId' => $id]))
+            ->withApiKeyAuthorization($apiKey)
+            ->get()
+        ;
 
         $data = $this->httpHandler->getJson($request);
 
@@ -95,35 +107,5 @@ readonly class FileSourceClient
         }
 
         return $filenames;
-    }
-
-    /**
-     * @param non-empty-string  $apiKey
-     * @param non-empty-string  $method
-     * @param non-empty-string  $label
-     * @param ?non-empty-string $id
-     *
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteDataException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
-     */
-    private function handleRequest(string $apiKey, string $method, string $label, ?string $id = null): FileSource
-    {
-        $request = new HttpRequest(
-            $method,
-            $this->urlGenerator->generate('file-source', ['sourceId' => $id]),
-            [
-                'authorization' => 'Bearer ' . $apiKey,
-                'translate-authorization-to' => 'api-token',
-                'content-type' => 'application/x-www-form-urlencoded',
-            ],
-            http_build_query(['label' => $label])
-        );
-
-        return $this->sourceFactory->createFileSource($this->httpHandler->getJson($request));
     }
 }
