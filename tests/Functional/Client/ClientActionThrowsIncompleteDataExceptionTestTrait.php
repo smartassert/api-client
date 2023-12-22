@@ -7,7 +7,6 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Assert;
 use SmartAssert\ApiClient\FooException\IncompleteDataException;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
 trait ClientActionThrowsIncompleteDataExceptionTestTrait
 {
@@ -25,7 +24,7 @@ trait ClientActionThrowsIncompleteDataExceptionTestTrait
 
         try {
             ($this->createClientActionCallable())();
-            Assert::fail(InvalidModelDataException::class . ' not thrown');
+            Assert::fail(IncompleteDataException::class . ' not thrown');
         } catch (IncompleteDataException $e) {
             Assert::assertSame($payload, $e->data);
             Assert::assertSame($expectedMissingKey, $e->missingKey);
