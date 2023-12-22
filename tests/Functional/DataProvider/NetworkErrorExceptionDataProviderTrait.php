@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\DataProvider;
 
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
-use Psr\Http\Client\ClientExceptionInterface;
+use SmartAssert\ApiClient\FooException\Http\HttpClientException;
 
 trait NetworkErrorExceptionDataProviderTrait
 {
@@ -18,7 +18,7 @@ trait NetworkErrorExceptionDataProviderTrait
         return [
             'network error' => [
                 'httpFixture' => new ConnectException('Exception message', new Request('GET', '/')),
-                'expectedExceptionClass' => ClientExceptionInterface::class,
+                'expectedExceptionClass' => HttpClientException::class,
             ],
         ];
     }
