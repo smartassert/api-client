@@ -10,14 +10,14 @@ use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDa
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestHasNoAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooNetworkErrorExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 
 class CreateTokenTest extends AbstractUsersClientTestCase
 {
     use ClientActionThrowsIncompleteDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
-    use FooNetworkErrorExceptionDataProviderTrait;
+    use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
     use RequestHasNoAuthenticationTestTrait;
 

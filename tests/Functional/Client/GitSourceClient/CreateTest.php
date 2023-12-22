@@ -7,13 +7,13 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\GitSourceClient;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
-use SmartAssert\ApiClient\Tests\Functional\DataProvider\FooNetworkErrorExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
+use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 
 class CreateTest extends AbstractGitSourceClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
-    use FooNetworkErrorExceptionDataProviderTrait;
+    use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
     use RequestAuthenticationTestTrait;
 
