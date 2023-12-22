@@ -4,107 +4,81 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
-use SmartAssert\ApiClient\Exception\UserAlreadyExistsException;
-use SmartAssert\ApiClient\Model\ApiKey;
-use SmartAssert\ApiClient\Model\RefreshableToken;
-use SmartAssert\ApiClient\Model\User;
-use SmartAssert\ArrayInspector\ArrayInspector;
-use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
-use SmartAssert\ServiceClient\Client as ServiceClient;
-use SmartAssert\ServiceClient\Exception\CurlExceptionInterface;
-use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
-use SmartAssert\ServiceClient\Payload\UrlEncodedPayload;
-use SmartAssert\ServiceClient\Request;
-use SmartAssert\ServiceClient\Response\JsonResponse;
+use GuzzleHttp\Psr7\Request as HttpRequest;
+use SmartAssert\ApiClient\Data\User\ApiKey;
+use SmartAssert\ApiClient\Data\User\Token;
+use SmartAssert\ApiClient\Data\User\User;
+use SmartAssert\ApiClient\Exception\Http\HttpClientException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\NotFoundException;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException as FooUnauthorizedException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class UsersClient
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
-        private ServiceClient $serviceClient,
+        private HttpHandler $httpHandler,
     ) {
     }
 
     /**
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseTypeException
-     * @throws InvalidResponseDataException
-     * @throws InvalidModelDataException
-     * @throws UnauthorizedException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws FooUnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
+     * @throws IncompleteDataException
      */
-    public function createToken(string $userIdentifier, string $password): RefreshableToken
+    public function createToken(string $userIdentifier, string $password): Token
     {
-        $response = $this->serviceClient->sendRequestForJson(
-            (new Request('POST', $this->urlGenerator->generate('user_token_create')))
-                ->withPayload(
-                    new UrlEncodedPayload([
-                        'user-identifier' => $userIdentifier,
-                        'password' => $password,
-                    ])
-                )
-        );
-
-        return $this->handleRefreshableTokenResponse($response);
+        return $this->doTokenAction('user_token_create', ['username' => $userIdentifier, 'password' => $password]);
     }
 
     /**
      * @param non-empty-string $token
      *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws UnauthorizedException
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseTypeException
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
+     * @throws FooUnauthorizedException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     public function verifyToken(string $token): User
     {
-        $response = $this->serviceClient->sendRequestForJson(
-            (new Request('GET', $this->urlGenerator->generate('user_token_verify')))
-                ->withAuthentication(
-                    new BearerAuthentication($token)
-                )
+        $request = new HttpRequest(
+            'GET',
+            $this->urlGenerator->generate('user_token_verify'),
+            [
+                'authorization' => 'Bearer ' . $token,
+            ]
         );
 
-        return $this->handleUserResponse($response);
+        return $this->createUser($this->httpHandler->getJson($request));
     }
 
     /**
      * @param non-empty-string $refreshToken
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
-     * @throws UnauthorizedException
+     * @throws FooUnauthorizedException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
-    public function refreshToken(string $refreshToken): RefreshableToken
+    public function refreshToken(string $refreshToken): Token
     {
-        $response = $this->serviceClient->sendRequestForJson(
-            (new Request('POST', $this->urlGenerator->generate('user_token_refresh')))
-                ->withAuthentication(new BearerAuthentication($refreshToken))
-        );
-
-        return $this->handleRefreshableTokenResponse($response);
+        return $this->doTokenAction('user_token_refresh', ['refresh_token' => $refreshToken]);
     }
 
     /**
@@ -112,104 +86,121 @@ readonly class UsersClient
      * @param non-empty-string $userIdentifier
      * @param non-empty-string $password
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
-     * @throws UnauthorizedException
-     * @throws UserAlreadyExistsException
+     * @throws FooUnauthorizedException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
+     * @throws AlreadyExistsException
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
+        $request = new HttpRequest(
+            'POST',
+            $this->urlGenerator->generate('user_create'),
+            [
+                'authorization' => $adminToken,
+                'content-type' => 'application/x-www-form-urlencoded',
+            ],
+            http_build_query([
+                'identifier' => $userIdentifier,
+                'password' => $password,
+            ])
+        );
+
         try {
-            $response = $this->serviceClient->sendRequestForJson(
-                (new Request('POST', $this->urlGenerator->generate('user_create')))
-                    ->withAuthentication(new BearerAuthentication($adminToken))
-                    ->withPayload(
-                        new UrlEncodedPayload(['user-identifier' => $userIdentifier, 'password' => $password])
-                    )
-            );
-        } catch (NonSuccessResponseException $e) {
-            if (409 === $e->getStatusCode()) {
-                throw new UserAlreadyExistsException($userIdentifier, $e->getHttpResponse());
+            $data = $this->httpHandler->getJson($request);
+        } catch (HttpException $e) {
+            if (409 === $e->getCode()) {
+                throw new AlreadyExistsException($userIdentifier, $e->response);
             }
 
             throw $e;
         }
 
-        return $this->handleUserResponse($response);
+        return $this->createUser($data);
     }
 
     /**
      * @param non-empty-string $adminToken
      * @param non-empty-string $userId
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
-     * @throws UnauthorizedException
+     * @throws FooUnauthorizedException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
      */
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
-        $this->serviceClient->sendRequest(
-            (new Request('POST', $this->urlGenerator->generate('user_refresh-token_revoke-all')))
-                ->withAuthentication(new BearerAuthentication($adminToken))
-                ->withPayload(new UrlEncodedPayload(['id' => $userId]))
+        $request = new HttpRequest(
+            'POST',
+            $this->urlGenerator->generate('user_refresh-token_revoke-all'),
+            [
+                'authorization' => $adminToken,
+                'content-type' => 'application/x-www-form-urlencoded',
+            ],
+            http_build_query([
+                'id' => $userId,
+            ])
         );
+
+        $this->httpHandler->sendRequest($request);
     }
 
     /**
      * @param non-empty-string $token
      * @param non-empty-string $refreshToken
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
-     * @throws UnauthorizedException
+     * @throws FooUnauthorizedException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
      */
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
-        $this->serviceClient->sendRequest(
-            (new Request('POST', $this->urlGenerator->generate('user_refresh-token_revoke')))
-                ->withAuthentication(new BearerAuthentication($token))
-                ->withPayload(new UrlEncodedPayload(['refresh_token' => $refreshToken]))
+        $request = new HttpRequest(
+            'POST',
+            $this->urlGenerator->generate('user_refresh-token_revoke'),
+            [
+                'authorization' => 'Bearer ' . $token,
+                'content-type' => 'application/x-www-form-urlencoded',
+            ],
+            http_build_query([
+                'refresh_token' => $refreshToken,
+            ])
         );
+
+        $this->httpHandler->sendRequest($request);
     }
 
     /**
      * @param non-empty-string $token
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
-     * @throws UnauthorizedException
+     * @throws FooUnauthorizedException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     public function getApiKey(string $token): ApiKey
     {
-        $response = $this->serviceClient->sendRequestForJson(
-            (new Request('GET', $this->urlGenerator->generate('user_apikey')))
-                ->withAuthentication(new BearerAuthentication($token))
+        $request = new HttpRequest(
+            'GET',
+            $this->urlGenerator->generate('user_apikey'),
+            [
+                'authorization' => 'Bearer ' . $token,
+            ]
         );
 
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $modelData = $responseDataInspector->getArray('api_key');
+        $data = $this->httpHandler->getJson($request);
 
-        $apiKey = $this->createApiKey(new ArrayInspector($modelData));
+        $apiKey = $this->createApiKey($data);
         if (null === $apiKey) {
-            throw InvalidModelDataException::fromJsonResponse(ApiKey::class, $response);
+            throw new IncompleteDataException($data, 'key');
         }
 
         return $apiKey;
@@ -220,30 +211,29 @@ readonly class UsersClient
      *
      * @return ApiKey[]
      *
-     * @throws ClientExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws InvalidResponseDataException
-     * @throws InvalidResponseTypeException
-     * @throws NetworkExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws RequestExceptionInterface
-     * @throws UnauthorizedException
+     * @throws FooUnauthorizedException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     public function getApiKeys(string $token): array
     {
-        $response = $this->serviceClient->sendRequestForJson(
-            (new Request('GET', $this->urlGenerator->generate('user_apikey_list')))
-                ->withAuthentication(new BearerAuthentication($token))
+        $request = new HttpRequest(
+            'GET',
+            $this->urlGenerator->generate('user_apikey_list'),
+            [
+                'authorization' => 'Bearer ' . $token,
+            ]
         );
 
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $collectionData = $responseDataInspector->getArray('api_keys');
+        $data = $this->httpHandler->getJson($request);
 
         $apiKeys = [];
-
-        foreach ($collectionData as $modelData) {
-            if (is_array($modelData)) {
-                $apiKey = $this->createApiKey(new ArrayInspector($modelData));
+        foreach ($data as $apiKeyData) {
+            if (is_array($apiKeyData)) {
+                $apiKey = $this->createApiKey($apiKeyData);
                 if (null !== $apiKey) {
                     $apiKeys[] = $apiKey;
                 }
@@ -254,51 +244,86 @@ readonly class UsersClient
     }
 
     /**
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
+     * @param array<mixed> $payload
+     *
+     * @throws FooUnauthorizedException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
-    private function handleRefreshableTokenResponse(JsonResponse $response): RefreshableToken
+    private function doTokenAction(string $route, array $payload): Token
     {
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $modelData = $responseDataInspector->getArray('refreshable_token');
+        $request = new HttpRequest(
+            'POST',
+            $this->urlGenerator->generate($route),
+            [
+                'content-type' => 'application/json',
+            ],
+            (string) json_encode($payload)
+        );
 
-        $modelDataInspector = new ArrayInspector($modelData);
-        $token = $modelDataInspector->getNonEmptyString('token');
-        $refreshToken = $modelDataInspector->getNonEmptyString('refresh_token');
-
-        if (null === $token || null === $refreshToken) {
-            throw InvalidModelDataException::fromJsonResponse(RefreshableToken::class, $response);
-        }
-
-        return new RefreshableToken($token, $refreshToken);
+        return $this->createTokenFromResponseData($this->httpHandler->getJson($request));
     }
 
     /**
-     * @throws InvalidModelDataException
-     * @throws InvalidResponseDataException
+     * @param array<mixed> $data
+     *
+     * @throws IncompleteDataException
      */
-    private function handleUserResponse(JsonResponse $response): User
+    private function createTokenFromResponseData(array $data): Token
     {
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $userData = $responseDataInspector->getArray('user');
-        $userDataInspector = new ArrayInspector($userData);
-
-        $id = $userDataInspector->getNonEmptyString('id');
-        $userIdentifier = $userDataInspector->getNonEmptyString('user-identifier');
-
-        if (null === $id || null === $userIdentifier) {
-            throw InvalidModelDataException::fromJsonResponse(User::class, $response);
+        $token = $data['token'] ?? null;
+        $token = is_string($token) ? trim($token) : null;
+        if ('' === $token || null === $token) {
+            throw new IncompleteDataException($data, 'token');
         }
 
-        return new User($id, $userIdentifier);
+        $refreshToken = $data['refresh_token'] ?? null;
+        $refreshToken = is_string($refreshToken) ? trim($refreshToken) : null;
+        if ('' === $refreshToken || null === $refreshToken) {
+            throw new IncompleteDataException($data, 'refresh_token');
+        }
+
+        return new Token($token, $refreshToken);
     }
 
-    private function createApiKey(ArrayInspector $data): ?ApiKey
+    /**
+     * @param array<mixed> $data
+     *
+     * @throws IncompleteDataException
+     */
+    private function createUser(array $data): User
     {
-        $label = $data->getNonEmptyString('label');
-        $key = $data->getNonEmptyString('key');
+        $id = $data['id'] ?? null;
+        $id = is_string($id) ? trim($id) : null;
+        if ('' === $id || null === $id) {
+            throw new IncompleteDataException($data, 'id');
+        }
 
-        if (null === $key) {
+        $identifier = $data['user-identifier'] ?? null;
+        $identifier = is_string($identifier) ? trim($identifier) : null;
+        if ('' === $identifier || null === $identifier) {
+            throw new IncompleteDataException($data, 'user-identifier');
+        }
+
+        return new User($id, $identifier);
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function createApiKey(array $data): ?ApiKey
+    {
+        $label = $data['label'] ?? null;
+        $label = is_string($label) ? trim($label) : null;
+        $label = '' === $label ? null : $label;
+
+        $key = $data['key'] ?? null;
+        $key = is_string($key) ? trim($key) : null;
+        if ('' === $key || null === $key) {
             return null;
         }
 

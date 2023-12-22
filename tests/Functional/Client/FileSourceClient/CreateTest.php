@@ -40,11 +40,9 @@ class CreateTest extends AbstractFileSourceClientTestCase
             200,
             ['content-type' => 'application/json'],
             (string) json_encode([
-                'file_source' => [
-                    'type' => 'file',
-                    'id' => self::ID,
-                    'label' => self::LABEL,
-                ],
+                'type' => 'file',
+                'id' => self::ID,
+                'label' => self::LABEL,
             ])
         );
     }

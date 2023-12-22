@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\User;
 
-use SmartAssert\ApiClient\Exception\UserAlreadyExistsException;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
+use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 
 class CreateTest extends AbstractIntegrationTestCase
 {
@@ -19,7 +19,7 @@ class CreateTest extends AbstractIntegrationTestCase
 
     public function testCreateUserAlreadyExists(): void
     {
-        self::expectException(UserAlreadyExistsException::class);
+        self::expectException(AlreadyExistsException::class);
 
         self::$usersClient->create('primary_admin_token', self::USER1_EMAIL, md5((string) rand()));
     }

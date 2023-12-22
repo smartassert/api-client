@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Model;
+namespace SmartAssert\ApiClient\Data\User;
 
 readonly class User
 {

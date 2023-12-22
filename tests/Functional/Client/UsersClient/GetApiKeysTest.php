@@ -54,4 +54,9 @@ class GetApiKeysTest extends AbstractUsersClientTestCase
     {
         return new ExpectedRequestProperties('GET', '/user/apikey/list');
     }
+
+    protected function getExpectedAuthorizationHeader(): string
+    {
+        return 'Bearer ' . self::API_KEY;
+    }
 }

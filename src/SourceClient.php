@@ -4,28 +4,25 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
-use Psr\Http\Client\RequestExceptionInterface;
+use GuzzleHttp\Psr7\Request as HttpRequest;
+use SmartAssert\ApiClient\Data\Source\SourceInterface;
+use SmartAssert\ApiClient\Exception\Http\HttpClientException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\NotFoundException;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
-use SmartAssert\ApiClient\Model\Source\SourceInterface;
-use SmartAssert\ArrayInspector\ArrayInspector;
-use SmartAssert\ServiceClient\Authentication\BearerAuthentication;
-use SmartAssert\ServiceClient\Client as ServiceClient;
-use SmartAssert\ServiceClient\Exception\CurlExceptionInterface;
-use SmartAssert\ServiceClient\Exception\InvalidResponseDataException;
-use SmartAssert\ServiceClient\Exception\InvalidResponseTypeException;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
-use SmartAssert\ServiceClient\Request;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class SourceClient
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
-        private ServiceClient $serviceClient,
         private SourceFactory $sourceFactory,
+        private HttpHandler $httpHandler,
     ) {
     }
 
@@ -34,27 +31,29 @@ readonly class SourceClient
      *
      * @return SourceInterface[]
      *
-     * @throws ClientExceptionInterface
-     * @throws NetworkExceptionInterface
-     * @throws CurlExceptionInterface
-     * @throws RequestExceptionInterface
-     * @throws NonSuccessResponseException
-     * @throws InvalidResponseTypeException
-     * @throws InvalidResponseDataException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
      * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
      */
     public function list(string $apiKey): array
     {
-        $request = new Request('GET', $this->urlGenerator->generate('sources'));
-        $request = $request->withAuthentication(new BearerAuthentication($apiKey));
+        $request = new HttpRequest(
+            'GET',
+            $this->urlGenerator->generate('sources'),
+            [
+                'authorization' => 'Bearer ' . $apiKey,
+                'translate-authorization-to' => 'api-token',
+            ]
+        );
 
-        $response = $this->serviceClient->sendRequestForJson($request);
-
-        $responseDataInspector = new ArrayInspector($response->getData());
-        $sourcesData = $responseDataInspector->getArray('sources');
+        $data = $this->httpHandler->getJson($request);
 
         $sources = [];
-        foreach ($sourcesData as $sourceData) {
+        foreach ($data as $sourceData) {
             if (is_array($sourceData)) {
                 $source = $this->sourceFactory->create($sourceData);
 
@@ -65,5 +64,69 @@ readonly class SourceClient
         }
 
         return $sources;
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $id
+     *
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
+     */
+    public function get(string $apiKey, string $id): ?SourceInterface
+    {
+        return $this->handleSourceRequest($apiKey, 'GET', $id);
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $id
+     *
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
+     */
+    public function delete(string $apiKey, string $id): ?SourceInterface
+    {
+        return $this->handleSourceRequest($apiKey, 'DELETE', $id);
+    }
+
+    /**
+     * @param non-empty-string  $apiKey
+     * @param non-empty-string  $method
+     * @param ?non-empty-string $id
+     *
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
+     */
+    private function handleSourceRequest(
+        string $apiKey,
+        string $method,
+        ?string $id
+    ): ?SourceInterface {
+        $request = new HttpRequest(
+            $method,
+            $this->urlGenerator->generate('source', ['sourceId' => $id]),
+            [
+                'authorization' => 'Bearer ' . $apiKey,
+                'translate-authorization-to' => 'api-token',
+            ]
+        );
+
+        return $this->sourceFactory->create($this->httpHandler->getJson($request));
     }
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\User;
 
-use SmartAssert\ApiClient\Model\ApiKey;
+use SmartAssert\ApiClient\Data\User\ApiKey;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 
 class GetApiKeyTest extends AbstractIntegrationTestCase
 {

@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
-use SmartAssert\ServiceClient\Exception\NonSuccessResponseException;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 abstract class AbstractClientTestCase extends TestCase
@@ -64,16 +64,16 @@ abstract class AbstractClientTestCase extends TestCase
     /**
      * @dataProvider commonNonSuccessResponseDataProvider
      */
-    public function testClientActionThrowsNonSuccessResponseException(ResponseInterface $httpFixture): void
+    public function testClientActionThrowsHttpException(ResponseInterface $httpFixture): void
     {
         $this->mockHandler->append($httpFixture);
 
         try {
             ($this->createClientActionCallable())();
 
-            self::fail(NonSuccessResponseException::class . ' not thrown');
-        } catch (NonSuccessResponseException $e) {
-            self::assertSame($httpFixture, $e->getHttpResponse());
+            self::fail(HttpException::class . ' not thrown');
+        } catch (HttpException $e) {
+            self::assertSame($httpFixture, $e->response);
         }
     }
 
@@ -86,11 +86,6 @@ abstract class AbstractClientTestCase extends TestCase
     }
 
     abstract protected function createClientActionCallable(): callable;
-
-    protected function getExpectedBearer(): string
-    {
-        return self::API_KEY;
-    }
 
     protected function getMockHandler(): MockHandler
     {

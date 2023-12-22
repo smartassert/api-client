@@ -10,7 +10,7 @@ use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 
-class CreateTest extends AbstractSourceClientTestCase
+class CreateTest extends AbstractGitSourceClientTestCase
 {
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
@@ -34,6 +34,6 @@ class CreateTest extends AbstractSourceClientTestCase
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('POST', '/git-source');
+        return new ExpectedRequestProperties('POST', '/source/git-source');
     }
 }

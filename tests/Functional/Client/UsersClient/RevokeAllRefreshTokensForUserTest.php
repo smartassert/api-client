@@ -29,7 +29,7 @@ class RevokeAllRefreshTokensForUserTest extends AbstractUsersClientTestCase
         };
     }
 
-    protected function getExpectedBearer(): string
+    protected function getExpectedAuthorizationHeader(): string
     {
         return 'admin token';
     }
@@ -41,6 +41,6 @@ class RevokeAllRefreshTokensForUserTest extends AbstractUsersClientTestCase
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('POST', '/user/refresh_token/revoke-all');
+        return new ExpectedRequestProperties('POST', '/user/refresh-token/revoke-all-for-user');
     }
 }

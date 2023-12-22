@@ -4,27 +4,11 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
-use SmartAssert\ApiClient\Factory\Source\SourceFactory;
-use SmartAssert\ApiClient\SourceClient;
-use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Services\DataRepository;
-use SmartAssert\ServiceClient\Exception\UnauthorizedException;
 
-class ListTest extends AbstractIntegrationTestCase
+class ListTest extends AbstractSourceTestCase
 {
-    protected static SourceClient $sourceClient;
-
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
-
-        self::$sourceClient = new SourceClient(
-            self::$urlGenerator,
-            self::createServiceClient(),
-            new SourceFactory(),
-        );
-    }
-
     public function testListUnauthorized(): void
     {
         self::expectException(UnauthorizedException::class);
@@ -57,7 +41,7 @@ class ListTest extends AbstractIntegrationTestCase
         );
         self::assertEquals($expectedSources, self::$sourceClient->list($apiKey->key));
 
-        self::$fileSourceClient->delete($apiKey->key, $expectedSources[0]->id);
+        self::$sourceClient->delete($apiKey->key, $expectedSources[0]->id);
         self::assertEquals([$expectedSources[1]], self::$sourceClient->list($apiKey->key));
     }
 }

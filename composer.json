@@ -23,15 +23,17 @@
         "test": "./vendor/bin/phpunit --colors=always tests",
         "sources-setup": [
             "docker-compose -f ./tests/build/docker-compose.yml exec -T sources-service php bin/console doctrine:database:create --if-not-exists",
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T sources-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
+            "docker-compose -f ./tests/build/docker-compose.yml exec -T sources-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing"
         ],
         "users-db-setup": [
             "docker-compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:database:create --if-not-exists",
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
+            "docker-compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing"
         ],
-        "users-generate-jwt-keys": "docker-compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction",
-        "users-create-user1": "curl --header 'Authorization: primary_admin_token' --data 'email=user1@example.com&password=password' http://localhost:9080/user/create",
-        "users-create-user2": "curl --header 'Authorization: primary_admin_token' --data 'email=user2@example.com&password=password' http://localhost:9080/user/create",
+        "users-generate-jwt-keys": [
+            "docker-compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction"
+        ],
+        "users-create-user1": "curl --header 'Authorization: primary_admin_token' --data 'identifier=user1@example.com&password=password' http://localhost:9089/user/create",
+        "users-create-user2": "curl --header 'Authorization: primary_admin_token' --data 'identifier=user2@example.com&password=password' http://localhost:9089/user/create",
         "users-setup": [
             "@users-db-setup",
             "@users-generate-jwt-keys",
@@ -67,16 +69,14 @@
         "psr/http-client": "^1.0",
         "psr/http-message": "^1.0",
         "psr/http-factory": "^1.0",
-        "smartassert/service-client": "^7.1",
-        "smartassert/array-inspector": ">=0.4,<1",
-        "symfony/routing": "^6.4 || ^7.0"
+        "symfony/routing": "^6.4 || ^7.0",
+        "guzzlehttp/guzzle": "^7.8"
     },
     "require-dev": {
         "ext-pdo": "*",
         "phpunit/phpunit": "^10.1",
         "squizlabs/php_codesniffer": "dev-master#5798f29bc985e7ad4470d4488db2cda8cd3f8109",
         "phpstan/phpstan": "^1.10",
-        "guzzlehttp/guzzle": "^7.8",
         "phpstan/extension-installer": "^1.3",
         "phpstan/phpstan-phpunit": "^1.3",
         "webignition/http-history-container": "^3.0",

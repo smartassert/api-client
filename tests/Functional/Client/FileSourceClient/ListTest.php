@@ -47,6 +47,6 @@ class ListTest extends AbstractFileSourceClientTestCase
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('GET', '/file-source/' . self::ID . '/list');
+        return new ExpectedRequestProperties('GET', '/source/file-source/' . self::ID . '/list/');
     }
 }

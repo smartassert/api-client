@@ -29,9 +29,9 @@ class RevokeRefreshTokenTest extends AbstractUsersClientTestCase
         };
     }
 
-    protected function getExpectedBearer(): string
+    protected function getExpectedAuthorizationHeader(): string
     {
-        return 'frontend token';
+        return 'Bearer frontend token';
     }
 
     protected function getResponseFixture(): ResponseInterface
@@ -41,6 +41,6 @@ class RevokeRefreshTokenTest extends AbstractUsersClientTestCase
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('POST', '/user/refresh_token/revoke');
+        return new ExpectedRequestProperties('POST', '/user/refresh-token/revoke');
     }
 }

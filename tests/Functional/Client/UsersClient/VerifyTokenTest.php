@@ -6,8 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Model\User;
-use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsInvalidModelDataExceptionTestTrait;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -16,7 +15,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class VerifyTokenTest extends AbstractUsersClientTestCase
 {
-    use ClientActionThrowsInvalidModelDataExceptionTestTrait;
+    use ClientActionThrowsIncompleteDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -30,6 +29,23 @@ class VerifyTokenTest extends AbstractUsersClientTestCase
         );
     }
 
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteDataExceptionDataProvider(): array
+    {
+        return [
+            'id missing' => [
+                'payload' => ['user-identifier' => md5((string) rand())],
+                'expectedMissingKey' => 'id',
+            ],
+            'user-identifier missing' => [
+                'payload' => ['id' => md5((string) rand())],
+                'expectedMissingKey' => 'user-identifier',
+            ],
+        ];
+    }
+
     protected function createClientActionCallable(): callable
     {
         return function () {
@@ -37,14 +53,9 @@ class VerifyTokenTest extends AbstractUsersClientTestCase
         };
     }
 
-    protected function getExpectedBearer(): string
+    protected function getExpectedAuthorizationHeader(): string
     {
-        return 'frontend token';
-    }
-
-    protected function getExpectedModelClass(): string
-    {
-        return User::class;
+        return 'Bearer frontend token';
     }
 
     protected function getResponseFixture(): ResponseInterface
@@ -53,16 +64,14 @@ class VerifyTokenTest extends AbstractUsersClientTestCase
             200,
             ['content-type' => 'application/json'],
             (string) json_encode([
-                'user' => [
-                    'id' => 'id',
-                    'user-identifier' => 'identifier',
-                ],
+                'id' => 'id',
+                'user-identifier' => 'identifier',
             ])
         );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('GET', '/user/token/verify');
+        return new ExpectedRequestProperties('GET', '/user/frontend-token/verify');
     }
 }
