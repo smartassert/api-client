@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use GuzzleHttp\Psr7\Request as HttpRequest;
-use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Exception\File\DuplicateFileException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
@@ -13,6 +11,7 @@ use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
+use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileClient
@@ -20,6 +19,7 @@ readonly class FileClient
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
         private HttpHandler $httpHandler,
+        private RequestBuilder $requestBuilder,
     ) {
     }
 
@@ -36,8 +36,15 @@ readonly class FileClient
      */
     public function create(string $apiKey, string $sourceId, string $filename, string $content): void
     {
+        $request = $this->requestBuilder
+            ->create('POST', $this->generateUrl($sourceId, $filename))
+            ->withApiKeyAuthorization($apiKey)
+            ->withBody('application/yaml', $content)
+            ->get()
+        ;
+
         try {
-            $this->handleRequest($apiKey, 'POST', $sourceId, $filename, $content);
+            $this->httpHandler->sendRequest($request);
         } catch (HttpException $httpException) {
             $response = $httpException->response;
 
@@ -64,8 +71,15 @@ readonly class FileClient
      */
     public function read(string $apiKey, string $sourceId, string $filename): string
     {
+        $request = $this->requestBuilder
+            ->create('GET', $this->generateUrl($sourceId, $filename))
+            ->withApiKeyAuthorization($apiKey)
+            ->withAcceptableContentTypes(['application/yaml', 'text/x-yaml'])
+            ->get()
+        ;
+
         try {
-            $response = $this->handleRequest($apiKey, 'GET', $sourceId, $filename);
+            $response = $this->httpHandler->sendRequest($request);
         } catch (NotFoundException | UnauthorizedException) {
             throw new FileNotFoundException($filename);
         }
@@ -84,8 +98,15 @@ readonly class FileClient
      */
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
+        $request = $this->requestBuilder
+            ->create('PUT', $this->generateUrl($sourceId, $filename))
+            ->withApiKeyAuthorization($apiKey)
+            ->withBody('application/yaml', $content)
+            ->get()
+        ;
+
         try {
-            $this->handleRequest($apiKey, 'PUT', $sourceId, $filename, $content);
+            $this->httpHandler->sendRequest($request);
         } catch (NotFoundException | UnauthorizedException) {
             throw new FileNotFoundException($filename);
         }
@@ -102,57 +123,31 @@ readonly class FileClient
      */
     public function delete(string $apiKey, string $sourceId, string $filename): void
     {
+        $request = $this->requestBuilder
+            ->create('DELETE', $this->generateUrl($sourceId, $filename))
+            ->withApiKeyAuthorization($apiKey)
+            ->get()
+        ;
+
         try {
-            $this->handleRequest($apiKey, 'DELETE', $sourceId, $filename);
+            $this->httpHandler->sendRequest($request);
         } catch (NotFoundException | UnauthorizedException) {
             throw new FileNotFoundException($filename);
         }
     }
 
     /**
-     * @param non-empty-string $apiKey
-     * @param non-empty-string $method
      * @param non-empty-string $sourceId
      * @param non-empty-string $filename
-     *
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
      */
-    private function handleRequest(
-        string $apiKey,
-        string $method,
-        string $sourceId,
-        string $filename,
-        ?string $content = null
-    ): ResponseInterface {
-        $headers = [
-            'authorization' => 'Bearer ' . $apiKey,
-            'translate-authorization-to' => 'api-token',
-        ];
-
-        if (is_string($content)) {
-            $headers['content-type'] = 'application/yaml';
-        }
-
-        if ('GET' === $method) {
-            $headers['accept'] = 'application/yaml, text/x-yaml';
-        }
-
-        $request = new HttpRequest(
-            $method,
-            $this->urlGenerator->generate(
-                'file-source-file',
-                [
-                    'sourceId' => $sourceId,
-                    'filename' => $filename
-                ]
-            ),
-            $headers,
-            $content
+    private function generateUrl(string $sourceId, string $filename): string
+    {
+        return $this->urlGenerator->generate(
+            'file-source-file',
+            [
+                'sourceId' => $sourceId,
+                'filename' => $filename
+            ]
         );
-
-        return $this->httpHandler->sendRequest($request);
     }
 }
