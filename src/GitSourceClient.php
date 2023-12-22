@@ -49,19 +49,7 @@ readonly class GitSourceClient
         string $path,
         ?string $credentials,
     ): GitSource {
-        $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('git-source'))
-            ->withApiKeyAuthorization($apiKey)
-            ->withFormBody([
-                'label' => $label,
-                'host-url' => $hostUrl,
-                'path' => $path,
-                'credentials' => $credentials,
-            ])
-            ->get()
-        ;
-
-        return $this->sourceFactory->createGitSource($this->httpHandler->getJson($request));
+        return $this->doAction('POST', $apiKey, $label, $hostUrl, $path, $credentials);
     }
 
     /**
@@ -88,8 +76,29 @@ readonly class GitSourceClient
         string $path,
         ?string $credentials,
     ): GitSource {
+        return $this->doAction('PUT', $apiKey, $label, $hostUrl, $path, $credentials, $id);
+    }
+
+    /**
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
+     */
+    private function doAction(
+        string $method,
+        string $apiKey,
+        string $label,
+        string $hostUrl,
+        string $path,
+        ?string $credentials,
+        ?string $id = null,
+    ): GitSource {
         $request = $this->requestBuilder
-            ->create('PUT', $this->urlGenerator->generate('git-source', ['sourceId' => $id]))
+            ->create($method, $this->urlGenerator->generate('git-source', ['sourceId' => $id]))
             ->withApiKeyAuthorization($apiKey)
             ->withFormBody([
                 'label' => $label,
