@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   users-service:
-    image: ghcr.io/smartassert/users:3.1
+    image: ghcr.io/smartassert/users:6.0
     container_name: users-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users?serverVersion=12&charset=utf8
@@ -88,36 +88,12 @@ services:
       - ./http-config/caddy/index.php:/app/public/index.php
       - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
 
-  users-service-60:
-    image: ghcr.io/smartassert/users:6.0
-    container_name: users-service-60
-    environment:
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users?serverVersion=12&charset=utf8
-      JWT_PASSPHRASE: non-empty-string
-      PRIMARY_ADMIN_TOKEN: primary_admin_token
-      SECONDARY_ADMIN_TOKEN: secondary_admin_token
-      IS_READY: 1
-    depends_on:
-      - postgres
-
-  users-http-60:
-    image: caddy:2.4.5-alpine
-    container_name: users-http-60
-    restart: unless-stopped
-    ports:
-      - "9091:80"
-    links:
-      - users-service-60:app
-    volumes:
-      - ./http-config/caddy/index.php:/app/public/index.php
-      - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
-
   sources-service-10:
     image: ghcr.io/smartassert/sources:10.0
     container_name: sources-service-10
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/sources?serverVersion=12&charset=utf8
-      AUTHENTICATION_BASE_URL: http://users-http-60
+      AUTHENTICATION_BASE_URL: http://users-http
       REMOTE_STORAGE_ENDPOINT: http://s3-mock:9090
       REMOTE_STORAGE_KEY_ID: remote_storage_key_id
       IS_READY: 1
@@ -140,7 +116,7 @@ services:
     image: ghcr.io/smartassert/api-gateway:8.0
     container_name: api-gateway-service-80
     environment:
-      AUTHENTICATION_BASE_URL: http://users-http-60
+      AUTHENTICATION_BASE_URL: http://users-http
       SOURCES_BASE_URL: http://sources-http-10
       IS_READY: 1
     depends_on:
