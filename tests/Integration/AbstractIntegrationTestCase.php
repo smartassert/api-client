@@ -20,9 +20,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
     protected const USER1_PASSWORD = 'password';
     protected const USER2_EMAIL = 'user1@example.com';
     protected const USER2_PASSWORD = 'password';
-
     protected static UrlGeneratorInterface $urlGenerator;
-    protected static UrlGeneratorInterface $fooUrlGenerator;
     protected static UsersClient $usersClient;
     protected static FileSourceClient $fileSourceClient;
     protected static GitSourceClient $gitSourceClient;
@@ -33,12 +31,11 @@ abstract class AbstractIntegrationTestCase extends TestCase
 
         $httpHandler = new HttpHandler($httpClient);
 
-        self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9089');
-        self::$fooUrlGenerator = UrlGeneratorFactory::create('http://localhost:9093');
+        self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9093');
 
-        self::$usersClient = new UsersClient(self::$fooUrlGenerator, $httpHandler);
+        self::$usersClient = new UsersClient(self::$urlGenerator, $httpHandler);
 
-        self::$fileSourceClient = new FileSourceClient(self::$fooUrlGenerator, new SourceFactory(), $httpHandler);
-        self::$gitSourceClient = new GitSourceClient(self::$fooUrlGenerator, new SourceFactory(), $httpHandler);
+        self::$fileSourceClient = new FileSourceClient(self::$urlGenerator, new SourceFactory(), $httpHandler);
+        self::$gitSourceClient = new GitSourceClient(self::$urlGenerator, new SourceFactory(), $httpHandler);
     }
 }

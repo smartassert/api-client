@@ -39,7 +39,7 @@ class ListTest extends AbstractIntegrationTestCase
 
         $fileSource = self::$fileSourceClient->create($apiKey->key, $label);
 
-        $fileClient = new FileClient(self::$fooUrlGenerator, new HttpHandler(new HttpClient()));
+        $fileClient = new FileClient(self::$urlGenerator, new HttpHandler(new HttpClient()));
 
         foreach ($filenamesToCreate as $filename) {
             $fileClient->create($apiKey->key, $fileSource->id, $filename, md5((string) rand()));

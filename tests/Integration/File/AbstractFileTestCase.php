@@ -18,7 +18,7 @@ abstract class AbstractFileTestCase extends AbstractIntegrationTestCase
         parent::setUpBeforeClass();
 
         self::$fileClient = new FileClient(
-            self::$fooUrlGenerator,
+            self::$urlGenerator,
             new HttpHandler(
                 new HttpClient(),
             )
