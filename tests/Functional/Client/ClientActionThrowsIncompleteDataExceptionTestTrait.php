@@ -9,7 +9,7 @@ use PHPUnit\Framework\Assert;
 use SmartAssert\ApiClient\FooException\IncompleteDataException;
 use SmartAssert\ServiceClient\Exception\InvalidModelDataException;
 
-trait FooClientActionThrowsIncompleteDataExceptionTestTrait
+trait ClientActionThrowsIncompleteDataExceptionTestTrait
 {
     /**
      * @dataProvider incompleteDataExceptionDataProvider
