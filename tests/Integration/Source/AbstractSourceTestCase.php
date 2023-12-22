@@ -19,7 +19,7 @@ abstract class AbstractSourceTestCase extends AbstractIntegrationTestCase
         parent::setUpBeforeClass();
 
         self::$sourceClient = new SourceClient(
-            self::$fooUrlGenerator,
+            self::$urlGenerator,
             new SourceFactory(),
             new HttpHandler(
                 new HttpClient()
