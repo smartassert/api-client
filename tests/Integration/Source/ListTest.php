@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
-use SmartAssert\ApiClient\FooException\Http\UnauthorizedException;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Services\DataRepository;
 
 class ListTest extends AbstractSourceTestCase

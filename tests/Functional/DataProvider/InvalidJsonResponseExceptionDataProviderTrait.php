@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\DataProvider;
 
 use GuzzleHttp\Psr7\Response;
-use SmartAssert\ApiClient\FooException\Http\UnexpectedContentTypeException;
-use SmartAssert\ApiClient\FooException\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 
 trait InvalidJsonResponseExceptionDataProviderTrait
 {

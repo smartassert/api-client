@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\DataProvider;
 
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
-use SmartAssert\ApiClient\FooException\Http\HttpClientException;
+use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 
 trait NetworkErrorExceptionDataProviderTrait
 {

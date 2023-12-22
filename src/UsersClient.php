@@ -8,14 +8,14 @@ use GuzzleHttp\Psr7\Request as HttpRequest;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Data\User\Token;
 use SmartAssert\ApiClient\Data\User\User;
-use SmartAssert\ApiClient\Exception\UserAlreadyExistsException;
-use SmartAssert\ApiClient\FooException\Http\HttpClientException;
-use SmartAssert\ApiClient\FooException\Http\HttpException;
-use SmartAssert\ApiClient\FooException\Http\NotFoundException;
-use SmartAssert\ApiClient\FooException\Http\UnauthorizedException as FooUnauthorizedException;
-use SmartAssert\ApiClient\FooException\Http\UnexpectedContentTypeException;
-use SmartAssert\ApiClient\FooException\Http\UnexpectedDataException;
-use SmartAssert\ApiClient\FooException\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\Http\HttpClientException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\NotFoundException;
+use SmartAssert\ApiClient\Exception\Http\UnauthorizedException as FooUnauthorizedException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -93,7 +93,7 @@ readonly class UsersClient
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
-     * @throws UserAlreadyExistsException
+     * @throws AlreadyExistsException
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
@@ -114,7 +114,7 @@ readonly class UsersClient
             $data = $this->httpHandler->getJson($request);
         } catch (HttpException $e) {
             if (409 === $e->getCode()) {
-                throw new UserAlreadyExistsException($userIdentifier, $e->response);
+                throw new AlreadyExistsException($userIdentifier, $e->response);
             }
 
             throw $e;

@@ -7,7 +7,7 @@ namespace SmartAssert\ApiClient\Factory\Source;
 use SmartAssert\ApiClient\Data\Source\FileSource as FooFileSource;
 use SmartAssert\ApiClient\Data\Source\GitSource as FooGitSource;
 use SmartAssert\ApiClient\Data\Source\SourceInterface as FooSourceInterface;
-use SmartAssert\ApiClient\FooException\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\IncompleteDataException;
 
 readonly class SourceFactory
 {
