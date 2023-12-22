@@ -32,8 +32,8 @@
         "users-generate-jwt-keys": [
             "docker-compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction"
         ],
-        "users-create-user1": "curl --header 'Authorization: primary_admin_token' --data 'identifier=user1@example.com&password=password' http://localhost:9093/user/create",
-        "users-create-user2": "curl --header 'Authorization: primary_admin_token' --data 'identifier=user2@example.com&password=password' http://localhost:9093/user/create",
+        "users-create-user1": "curl --header 'Authorization: primary_admin_token' --data 'identifier=user1@example.com&password=password' http://localhost:9089/user/create",
+        "users-create-user2": "curl --header 'Authorization: primary_admin_token' --data 'identifier=user2@example.com&password=password' http://localhost:9089/user/create",
         "users-setup": [
             "@users-db-setup",
             "@users-generate-jwt-keys",
