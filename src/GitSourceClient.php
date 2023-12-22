@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use GuzzleHttp\Psr7\Request as HttpRequest;
 use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
@@ -15,6 +14,7 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
+use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class GitSourceClient
@@ -23,6 +23,7 @@ readonly class GitSourceClient
         private UrlGeneratorInterface $urlGenerator,
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
+        private RequestBuilder $requestBuilder,
     ) {
     }
 
@@ -48,7 +49,19 @@ readonly class GitSourceClient
         string $path,
         ?string $credentials,
     ): GitSource {
-        return $this->handleRequest($apiKey, 'POST', $label, $hostUrl, $path, $credentials);
+        $request = $this->requestBuilder
+            ->create('POST', $this->generateUrl())
+            ->withApiKeyAuthorization($apiKey)
+            ->withFormData([
+                'label' => $label,
+                'host-url' => $hostUrl,
+                'path' => $path,
+                'credentials' => $credentials,
+            ])
+            ->get()
+        ;
+
+        return $this->sourceFactory->createGitSource($this->httpHandler->getJson($request));
     }
 
     /**
@@ -75,56 +88,23 @@ readonly class GitSourceClient
         string $path,
         ?string $credentials,
     ): GitSource {
-        return $this->handleRequest($apiKey, 'PUT', $label, $hostUrl, $path, $credentials, $id);
-    }
-
-    /**
-     * @param non-empty-string  $apiKey
-     * @param non-empty-string  $method
-     * @param non-empty-string  $label
-     * @param non-empty-string  $hostUrl
-     * @param non-empty-string  $path
-     * @param ?non-empty-string $credentials
-     * @param ?non-empty-string $id
-     *
-     * @throws \SmartAssert\ApiClient\Exception\IncompleteDataException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
-     */
-    private function handleRequest(
-        string $apiKey,
-        string $method,
-        string $label,
-        string $hostUrl,
-        string $path,
-        ?string $credentials = null,
-        ?string $id = null,
-    ): GitSource {
-        $payload = [
-            'label' => $label,
-            'host-url' => $hostUrl,
-            'path' => $path,
-        ];
-
-        if (is_string($credentials)) {
-            $payload['credentials'] = $credentials;
-        }
-
-        $request = new HttpRequest(
-            $method,
-            $this->urlGenerator->generate('git-source', ['sourceId' => $id]),
-            [
-                'authorization' => 'Bearer ' . $apiKey,
-                'translate-authorization-to' => 'api-token',
-                'content-type' => 'application/x-www-form-urlencoded',
-            ],
-            http_build_query($payload)
-        );
+        $request = $this->requestBuilder
+            ->create('PUT', $this->generateUrl($id))
+            ->withApiKeyAuthorization($apiKey)
+            ->withFormData([
+                'label' => $label,
+                'host-url' => $hostUrl,
+                'path' => $path,
+                'credentials' => $credentials,
+            ])
+            ->get()
+        ;
 
         return $this->sourceFactory->createGitSource($this->httpHandler->getJson($request));
+    }
+
+    private function generateUrl(?string $id = null): string
+    {
+        return $this->urlGenerator->generate('git-source', ['sourceId' => $id]);
     }
 }

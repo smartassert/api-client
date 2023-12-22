@@ -43,6 +43,11 @@ abstract class AbstractIntegrationTestCase extends TestCase
             $httpHandler,
             $requestBuilder
         );
-        self::$gitSourceClient = new GitSourceClient(self::$urlGenerator, new SourceFactory(), $httpHandler);
+        self::$gitSourceClient = new GitSourceClient(
+            self::$urlGenerator,
+            new SourceFactory(),
+            $httpHandler,
+            $requestBuilder,
+        );
     }
 }
