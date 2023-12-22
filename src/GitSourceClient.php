@@ -52,7 +52,7 @@ readonly class GitSourceClient
         $request = $this->requestBuilder
             ->create('POST', $this->generateUrl())
             ->withApiKeyAuthorization($apiKey)
-            ->withFormData([
+            ->withFormBody([
                 'label' => $label,
                 'host-url' => $hostUrl,
                 'path' => $path,
@@ -91,7 +91,7 @@ readonly class GitSourceClient
         $request = $this->requestBuilder
             ->create('PUT', $this->generateUrl($id))
             ->withApiKeyAuthorization($apiKey)
-            ->withFormData([
+            ->withFormBody([
                 'label' => $label,
                 'host-url' => $hostUrl,
                 'path' => $path,

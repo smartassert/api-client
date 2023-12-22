@@ -24,12 +24,23 @@ class RequestBuilder
         return $this;
     }
 
-    public function withApiKeyAuthorization(string $apiKey): RequestBuilder
+    public function withAuthorization(string $authorization): RequestBuilder
     {
-        $this->request = $this->request->withHeader('authorization', 'Bearer ' . $apiKey);
-        $this->request = $this->request->withHeader('translate-authorization-to', 'api-token');
+        $this->request = $this->request->withHeader('authorization', $authorization);
 
         return $this;
+    }
+
+    public function withBearerAuthorization(string $authorization): RequestBuilder
+    {
+        return $this->withAuthorization('Bearer ' . $authorization);
+    }
+
+    public function withApiKeyAuthorization(string $apiKey): RequestBuilder
+    {
+        $this->request = $this->request->withHeader('translate-authorization-to', 'api-token');
+
+        return $this->withBearerAuthorization($apiKey);
     }
 
     /**
@@ -53,12 +64,17 @@ class RequestBuilder
     /**
      * @param array<mixed> $data
      */
-    public function withFormData(array $data): RequestBuilder
+    public function withFormBody(array $data): RequestBuilder
     {
-        return $this->withBody(
-            'application/x-www-form-urlencoded',
-            http_build_query($data)
-        );
+        return $this->withBody('application/x-www-form-urlencoded', http_build_query($data));
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    public function withJsonBody(array $data): RequestBuilder
+    {
+        return $this->withBody('application/json', (string) json_encode($data));
     }
 
     public function get(): RequestInterface

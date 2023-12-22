@@ -44,7 +44,7 @@ readonly class FileSourceClient
         $request = $this->requestBuilder
             ->create('POST', $this->generateUrl())
             ->withApiKeyAuthorization($apiKey)
-            ->withFormData(['label' => $label])
+            ->withFormBody(['label' => $label])
             ->get()
         ;
 
@@ -69,7 +69,7 @@ readonly class FileSourceClient
         $request = $this->requestBuilder
             ->create('PUT', $this->generateUrl($id))
             ->withApiKeyAuthorization($apiKey)
-            ->withFormData(['label' => $label])
+            ->withFormBody(['label' => $label])
             ->get()
         ;
 
