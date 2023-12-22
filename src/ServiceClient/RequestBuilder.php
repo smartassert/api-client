@@ -50,6 +50,17 @@ class RequestBuilder
         return $this;
     }
 
+    /**
+     * @param array<mixed> $data
+     */
+    public function withFormData(array $data): RequestBuilder
+    {
+        return $this->withBody(
+            'application/x-www-form-urlencoded',
+            http_build_query($data)
+        );
+    }
+
     public function get(): RequestInterface
     {
         return $this->request;

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
+use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
 use SmartAssert\ApiClient\UsersClient;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -28,14 +30,19 @@ abstract class AbstractIntegrationTestCase extends TestCase
     public static function setUpBeforeClass(): void
     {
         $httpClient = new HttpClient();
-
         $httpHandler = new HttpHandler($httpClient);
+        $requestBuilder = new RequestBuilder(new HttpFactory());
 
         self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9089');
 
         self::$usersClient = new UsersClient(self::$urlGenerator, $httpHandler);
 
-        self::$fileSourceClient = new FileSourceClient(self::$urlGenerator, new SourceFactory(), $httpHandler);
+        self::$fileSourceClient = new FileSourceClient(
+            self::$urlGenerator,
+            new SourceFactory(),
+            $httpHandler,
+            $requestBuilder
+        );
         self::$gitSourceClient = new GitSourceClient(self::$urlGenerator, new SourceFactory(), $httpHandler);
     }
 }
