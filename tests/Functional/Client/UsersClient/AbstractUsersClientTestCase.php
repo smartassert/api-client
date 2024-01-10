@@ -27,7 +27,7 @@ abstract class AbstractUsersClientTestCase extends AbstractClientTestCase
 
         $this->client = new UsersClient(
             UrlGeneratorFactory::create('https://api.example.com'),
-            new HttpHandler($this->httpClient),
+            new HttpHandler($this->httpClient, $this->exceptionFactory),
             new RequestBuilder(new HttpFactory()),
         );
     }

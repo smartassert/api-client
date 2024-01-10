@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\File;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\FileClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
@@ -23,6 +24,7 @@ abstract class AbstractFileTestCase extends AbstractIntegrationTestCase
             self::$urlGenerator,
             new HttpHandler(
                 new HttpClient(),
+                new ExceptionFactory(self::$errorDeserializer),
             ),
             new RequestBuilder(new HttpFactory()),
         );

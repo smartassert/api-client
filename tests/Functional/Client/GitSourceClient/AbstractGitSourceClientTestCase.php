@@ -36,7 +36,7 @@ abstract class AbstractGitSourceClientTestCase extends AbstractClientTestCase
         $this->client = new GitSourceClient(
             UrlGeneratorFactory::create('https://api.example.com'),
             new SourceFactory(),
-            new HttpHandler($this->httpClient),
+            new HttpHandler($this->httpClient, $this->exceptionFactory),
             new RequestBuilder(new HttpFactory())
         );
     }

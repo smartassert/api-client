@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\FileSource;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
@@ -38,6 +39,7 @@ readonly class FileSourceClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function create(string $apiKey, string $label): FileSource
     {
@@ -63,6 +65,7 @@ readonly class FileSourceClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function update(string $apiKey, string $id, string $label): FileSource
     {
@@ -88,6 +91,7 @@ readonly class FileSourceClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function list(string $apiKey, string $id): array
     {

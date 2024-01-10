@@ -26,7 +26,7 @@ abstract class AbstractFileClientTestCase extends AbstractClientTestCase
         parent::setUp();
         $this->client = new FileClient(
             UrlGeneratorFactory::create('https://api.example.com'),
-            new HttpHandler($this->httpClient),
+            new HttpHandler($this->httpClient, $this->exceptionFactory),
             new RequestBuilder(
                 new HttpFactory(),
             )
