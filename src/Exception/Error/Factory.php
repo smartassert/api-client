@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Exception\Error;
 
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ServiceRequest\Deserializer\Error\Deserializer;
+use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
 use SmartAssert\ServiceRequest\Exception\ErrorDeserializationException;
@@ -47,6 +48,10 @@ readonly class Factory
 
         if ($error instanceof ModifyReadOnlyEntityErrorInterface) {
             return new ModifyReadOnlyEntityException($error, $response);
+        }
+
+        if ($error instanceof BadRequestErrorInterface) {
+            return new BadRequestException($error, $response);
         }
 
         return new ErrorException($error, $response);
