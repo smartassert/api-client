@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
@@ -39,6 +40,7 @@ readonly class SourceClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function list(string $apiKey): array
     {
@@ -75,6 +77,7 @@ readonly class SourceClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function get(string $apiKey, string $id): ?SourceInterface
     {
@@ -98,6 +101,7 @@ readonly class SourceClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function delete(string $apiKey, string $id): ?SourceInterface
     {

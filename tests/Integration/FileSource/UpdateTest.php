@@ -4,11 +4,20 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Exception\Error\DuplicateObjectException;
+use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
+use SmartAssert\ApiClient\Exception\Error\ModifyReadOnlyEntityException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
+use SmartAssert\ApiClient\Factory\Source\SourceFactory;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
+use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
+use SmartAssert\ApiClient\SourceClient;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
+use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Field\Field;
 use Symfony\Component\Uid\Ulid;
 
@@ -58,6 +67,32 @@ class UpdateTest extends AbstractIntegrationTestCase
 
         self::assertInstanceOf(DuplicateObjectException::class, $exception);
         self::assertEquals(new DuplicateObjectError(new Field('label', $label)), $exception->error);
+    }
+
+    public function testUpdateDeletedSource(): void
+    {
+        $sourceClient = new SourceClient(
+            self::$urlGenerator,
+            new SourceFactory(),
+            new HttpHandler(new HttpClient(), new ExceptionFactory(self::$errorDeserializer)),
+            new RequestBuilder(new HttpFactory()),
+        );
+
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $source = self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
+        $sourceClient->delete($apiKey->key, $source->id);
+
+        $exception = null;
+
+        try {
+            self::$fileSourceClient->update($apiKey->key, $source->id, md5((string) rand()));
+        } catch (ModifyReadOnlyEntityException $exception) {
+        }
+
+        self::assertInstanceOf(ModifyReadOnlyEntityException::class, $exception);
+        self::assertEquals(new ModifyReadOnlyEntityError($source->id, 'file-source'), $exception->error);
     }
 
     public function testUpdateSuccess(): void
