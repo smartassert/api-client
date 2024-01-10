@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Exception\Error;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ServiceRequest\Deserializer\Error\Deserializer;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
+use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
 use SmartAssert\ServiceRequest\Exception\ErrorDeserializationException;
 use SmartAssert\ServiceRequest\Exception\UnknownErrorClassException;
 
@@ -42,6 +43,10 @@ readonly class Factory
 
         if ($error instanceof DuplicateObjectErrorInterface) {
             return new DuplicateObjectException($error, $response);
+        }
+
+        if ($error instanceof ModifyReadOnlyEntityErrorInterface) {
+            return new ModifyReadOnlyEntityException($error, $response);
         }
 
         return new ErrorException($error, $response);
