@@ -8,21 +8,27 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
+use SmartAssert\ApiClient\Exception\Error\Factory;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ServiceRequest\Exception\ErrorDeserializationException;
+use SmartAssert\ServiceRequest\Exception\UnknownErrorClassException;
 
 readonly class HttpHandler
 {
     public function __construct(
         private ClientInterface $httpClient,
+        private Factory $exceptionFactory,
     ) {
     }
 
     /**
+     * @throws ErrorException
      * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
@@ -46,8 +52,16 @@ readonly class HttpHandler
         }
 
         if (200 !== $statusCode) {
-            // @todo: #138 Use factory to translate into class-specific error exception
-            throw new HttpException($request, $response);
+            try {
+                $exception = $this->exceptionFactory->createFromResponse($response);
+                if (null === $exception) {
+                    $exception = new HttpException($request, $response);
+                }
+            } catch (ErrorDeserializationException | UnknownErrorClassException) {
+                $exception = new HttpException($request, $response);
+            }
+
+            throw $exception;
         }
 
         return $response;
@@ -56,6 +70,7 @@ readonly class HttpHandler
     /**
      * @return array<mixed>
      *
+     * @throws ErrorException
      * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException

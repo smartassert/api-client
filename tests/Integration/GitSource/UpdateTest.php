@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
+use SmartAssert\ApiClient\Exception\Error\DuplicateObjectException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
+use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
+use SmartAssert\ServiceRequest\Field\Field;
 
 class UpdateTest extends AbstractIntegrationTestCase
 {
@@ -22,6 +25,41 @@ class UpdateTest extends AbstractIntegrationTestCase
             md5((string) rand()),
             md5((string) rand()),
         );
+    }
+
+    public function testUpdateDuplicateLabel(): void
+    {
+        $label = md5((string) rand());
+        $conflictLabel = md5((string) rand());
+
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $source = self::$gitSourceClient->create(
+            $apiKey->key,
+            $label,
+            md5((string) rand()),
+            md5((string) rand()),
+            null
+        );
+        self::$gitSourceClient->create($apiKey->key, $conflictLabel, md5((string) rand()), md5((string) rand()), null);
+
+        $exception = null;
+
+        try {
+            self::$gitSourceClient->update(
+                $apiKey->key,
+                $source->id,
+                $conflictLabel,
+                md5((string) rand()),
+                md5((string) rand()),
+                null
+            );
+        } catch (DuplicateObjectException $exception) {
+        }
+
+        self::assertInstanceOf(DuplicateObjectException::class, $exception);
+        self::assertEquals(new DuplicateObjectError(new Field('label', $conflictLabel)), $exception->error);
     }
 
     /**

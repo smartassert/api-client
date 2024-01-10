@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
@@ -23,7 +24,7 @@ abstract class AbstractSourceTestCase extends AbstractIntegrationTestCase
         self::$sourceClient = new SourceClient(
             self::$urlGenerator,
             new SourceFactory(),
-            new HttpHandler(new HttpClient()),
+            new HttpHandler(new HttpClient(), new ExceptionFactory(self::$errorDeserializer)),
             new RequestBuilder(new HttpFactory()),
         );
     }

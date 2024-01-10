@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use SmartAssert\ApiClient\Exception\File\DuplicateFileException;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
@@ -28,7 +28,7 @@ readonly class FileClient
      * @param non-empty-string $sourceId
      * @param non-empty-string $filename
      *
-     * @throws DuplicateFileException
+     * @throws ErrorException
      * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
@@ -43,21 +43,7 @@ readonly class FileClient
             ->get()
         ;
 
-        try {
-            $this->httpHandler->sendRequest($request);
-        } catch (HttpException $httpException) {
-            $response = $httpException->response;
-
-            if ('application/json' === $response->getHeaderLine('content-type')) {
-                $responseData = json_decode($response->getBody()->getContents(), true);
-
-                if (is_array($responseData) && 'duplicate' === ($responseData['class'] ?? null)) {
-                    throw new DuplicateFileException($filename);
-                }
-            }
-
-            throw $httpException;
-        }
+        $this->httpHandler->sendRequest($request);
     }
 
     /**
@@ -68,6 +54,7 @@ readonly class FileClient
      * @throws FileNotFoundException
      * @throws HttpClientException
      * @throws HttpException
+     * @throws ErrorException
      */
     public function read(string $apiKey, string $sourceId, string $filename): string
     {
@@ -95,6 +82,7 @@ readonly class FileClient
      * @throws FileNotFoundException
      * @throws HttpClientException
      * @throws HttpException
+     * @throws ErrorException
      */
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
@@ -120,6 +108,7 @@ readonly class FileClient
      * @throws FileNotFoundException
      * @throws HttpClientException
      * @throws HttpException
+     * @throws ErrorException
      */
     public function delete(string $apiKey, string $sourceId, string $filename): void
     {
