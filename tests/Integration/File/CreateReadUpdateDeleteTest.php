@@ -85,6 +85,7 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
         self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
 
         $exception = null;
+
         try {
             self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
         } catch (DuplicateObjectException $exception) {
