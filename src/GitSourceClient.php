@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\GitSource;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
@@ -41,6 +42,7 @@ readonly class GitSourceClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function create(
         string $apiKey,
@@ -67,6 +69,7 @@ readonly class GitSourceClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function update(
         string $apiKey,
@@ -87,6 +90,7 @@ readonly class GitSourceClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     private function doAction(
         string $method,
