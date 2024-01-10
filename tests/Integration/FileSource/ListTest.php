@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\FileClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -43,7 +44,7 @@ class ListTest extends AbstractIntegrationTestCase
 
         $fileClient = new FileClient(
             self::$urlGenerator,
-            new HttpHandler(new HttpClient()),
+            new HttpHandler(new HttpClient(), new ExceptionFactory(self::$errorDeserializer)),
             new RequestBuilder(new HttpFactory()),
         );
 

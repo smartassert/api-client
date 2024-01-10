@@ -12,8 +12,16 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
+use SmartAssert\ServiceRequest\Deserializer\Error\BadRequestErrorDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Error\Deserializer as ErrorDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Error\DuplicateObjectErrorDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Error\ErrorFieldDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Error\ModifyReadOnlyEntityDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Error\StorageErrorDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Field\Deserializer as FieldDeserializer;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 abstract class AbstractClientTestCase extends TestCase
@@ -24,6 +32,8 @@ abstract class AbstractClientTestCase extends TestCase
 
     protected MockHandler $mockHandler;
     protected HttpClient $httpClient;
+
+    protected ExceptionFactory $exceptionFactory;
     private HttpHistoryContainer $httpHistoryContainer;
 
     protected function setUp(): void
@@ -38,6 +48,17 @@ abstract class AbstractClientTestCase extends TestCase
         $handlerStack->push(Middleware::history($this->httpHistoryContainer));
 
         $this->httpClient = new HttpClient(['handler' => $handlerStack]);
+
+        $errorFieldDeserializer = new ErrorFieldDeserializer(new FieldDeserializer());
+
+        $this->exceptionFactory = new ExceptionFactory(
+            new ErrorDeserializer([
+                new BadRequestErrorDeserializer($errorFieldDeserializer),
+                new DuplicateObjectErrorDeserializer($errorFieldDeserializer),
+                new ModifyReadOnlyEntityDeserializer(),
+                new StorageErrorDeserializer(),
+            ]),
+        );
     }
 
     /**
