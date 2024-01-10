@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Exception\Error\BadRequestException;
 use SmartAssert\ApiClient\Exception\Error\DuplicateObjectException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\Error\ModifyReadOnlyEntityException;
@@ -15,9 +16,12 @@ use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\SourceClient;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
+use SmartAssert\ServiceRequest\Error\BadRequestError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Field\Field;
+use SmartAssert\ServiceRequest\Field\Requirements;
+use SmartAssert\ServiceRequest\Field\Size;
 
 class UpdateTest extends AbstractIntegrationTestCase
 {
@@ -33,6 +37,46 @@ class UpdateTest extends AbstractIntegrationTestCase
             md5((string) rand()),
             md5((string) rand()),
             md5((string) rand()),
+        );
+    }
+
+    public function testCreateBadRequest(): void
+    {
+        $label = str_repeat('.', 256);
+
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $source = self::$gitSourceClient->create(
+            $apiKey->key,
+            md5((string) rand()),
+            md5((string) rand()),
+            md5((string) rand()),
+            null
+        );
+
+        $exception = null;
+
+        try {
+            self::$gitSourceClient->update(
+                $apiKey->key,
+                $source->id,
+                $label,
+                md5((string) rand()),
+                md5((string) rand()),
+                null
+            );
+        } catch (BadRequestException $exception) {
+        }
+
+        self::assertInstanceOf(BadRequestException::class, $exception);
+        self::assertEquals(
+            new BadRequestError(
+                (new Field('label', $label))
+                    ->withRequirements(new Requirements('string', new Size(1, 255))),
+                'too_large'
+            ),
+            $exception->error
         );
     }
 
