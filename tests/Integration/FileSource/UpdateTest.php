@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Exception\Error\BadRequestException;
 use SmartAssert\ApiClient\Exception\Error\DuplicateObjectException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\Error\ModifyReadOnlyEntityException;
@@ -16,9 +17,12 @@ use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\SourceClient;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
+use SmartAssert\ServiceRequest\Error\BadRequestError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Field\Field;
+use SmartAssert\ServiceRequest\Field\Requirements;
+use SmartAssert\ServiceRequest\Field\Size;
 use Symfony\Component\Uid\Ulid;
 
 class UpdateTest extends AbstractIntegrationTestCase
@@ -46,6 +50,32 @@ class UpdateTest extends AbstractIntegrationTestCase
         self::expectExceptionCode(404);
 
         self::$fileSourceClient->update($apiKey->key, $id, $label);
+    }
+
+    public function testCreateFileSourceBadRequest(): void
+    {
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $source = self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
+
+        $exception = null;
+        $labelTooLong = str_repeat('.', 256);
+
+        try {
+            self::$fileSourceClient->update($apiKey->key, $source->id, $labelTooLong);
+        } catch (BadRequestException $exception) {
+        }
+
+        self::assertInstanceOf(BadRequestException::class, $exception);
+        self::assertEquals(
+            new BadRequestError(
+                (new Field('label', $labelTooLong))
+                    ->withRequirements(new Requirements('string', new Size(1, 255))),
+                'too_large'
+            ),
+            $exception->error
+        );
     }
 
     public function testUpdateDuplicateLabel(): void
