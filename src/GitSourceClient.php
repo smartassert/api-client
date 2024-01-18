@@ -51,12 +51,8 @@ readonly class GitSourceClient
     }
 
     /**
-     * @param non-empty-string  $apiKey
-     * @param non-empty-string  $id
-     * @param non-empty-string  $label
-     * @param non-empty-string  $hostUrl
-     * @param non-empty-string  $path
-     * @param ?non-empty-string $credentials
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $id
      *
      * @throws HttpClientException
      * @throws HttpException
