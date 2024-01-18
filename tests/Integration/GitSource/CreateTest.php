@@ -11,12 +11,10 @@ use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceRequest\Error\BadRequestError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Field\Field;
-use SmartAssert\ServiceRequest\Field\Requirements;
-use SmartAssert\ServiceRequest\Field\Size;
 
 class CreateTest extends AbstractIntegrationTestCase
 {
-    use CreateDataProviderTrait;
+    use CreateUpdateGitSourceDataProviderTrait;
 
     public function testCreateUnauthorized(): void
     {
@@ -31,29 +29,31 @@ class CreateTest extends AbstractIntegrationTestCase
         );
     }
 
-    public function testCreateBadRequest(): void
-    {
-        $label = str_repeat('.', 256);
-
+    /**
+     * @dataProvider badRequestDataProvider
+     *
+     * @param non-empty-string  $path
+     * @param ?non-empty-string $credentials
+     */
+    public function testCreateBadRequest(
+        string $label,
+        string $hostUrl,
+        string $path,
+        ?string $credentials,
+        BadRequestError $expected
+    ): void {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $exception = null;
 
         try {
-            self::$gitSourceClient->create($apiKey->key, $label, md5((string) rand()), md5((string) rand()), null);
+            self::$gitSourceClient->create($apiKey->key, $label, $hostUrl, $path, $credentials);
         } catch (BadRequestException $exception) {
         }
 
         self::assertInstanceOf(BadRequestException::class, $exception);
-        self::assertEquals(
-            new BadRequestError(
-                (new Field('label', $label))
-                    ->withRequirements(new Requirements('string', new Size(1, 255))),
-                'too_large'
-            ),
-            $exception->error
-        );
+        self::assertEquals($expected, $exception->error);
     }
 
     public function testCreateDuplicateLabel(): void
@@ -77,12 +77,7 @@ class CreateTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @dataProvider createDataProvider
-     *
-     * @param non-empty-string  $label
-     * @param non-empty-string  $hostUrl
-     * @param non-empty-string  $path
-     * @param ?non-empty-string $credentials
+     * @dataProvider successDataProvider
      */
     public function testCreateSuccess(
         string $label,

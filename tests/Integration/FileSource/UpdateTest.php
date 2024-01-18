@@ -21,12 +21,12 @@ use SmartAssert\ServiceRequest\Error\BadRequestError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Field\Field;
-use SmartAssert\ServiceRequest\Field\Requirements;
-use SmartAssert\ServiceRequest\Field\Size;
 use Symfony\Component\Uid\Ulid;
 
 class UpdateTest extends AbstractIntegrationTestCase
 {
+    use CreateUpdateFileSourceDataProviderTrait;
+
     public function testUpdateUnauthorized(): void
     {
         self::expectException(UnauthorizedException::class);
@@ -52,7 +52,10 @@ class UpdateTest extends AbstractIntegrationTestCase
         self::$fileSourceClient->update($apiKey->key, $id, $label);
     }
 
-    public function testCreateFileSourceBadRequest(): void
+    /**
+     * @dataProvider createUpdateFileSourceBadRequestDataProvider
+     */
+    public function testUpdateBadRequest(string $label, BadRequestError $expected): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
@@ -60,22 +63,14 @@ class UpdateTest extends AbstractIntegrationTestCase
         $source = self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
 
         $exception = null;
-        $labelTooLong = str_repeat('.', 256);
 
         try {
-            self::$fileSourceClient->update($apiKey->key, $source->id, $labelTooLong);
+            self::$fileSourceClient->update($apiKey->key, $source->id, $label);
         } catch (BadRequestException $exception) {
         }
 
         self::assertInstanceOf(BadRequestException::class, $exception);
-        self::assertEquals(
-            new BadRequestError(
-                (new Field('label', $labelTooLong))
-                    ->withRequirements(new Requirements('string', new Size(1, 255))),
-                'too_large'
-            ),
-            $exception->error
-        );
+        self::assertEquals($expected, $exception->error);
     }
 
     public function testUpdateDuplicateLabel(): void

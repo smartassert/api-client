@@ -20,12 +20,10 @@ use SmartAssert\ServiceRequest\Error\BadRequestError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Field\Field;
-use SmartAssert\ServiceRequest\Field\Requirements;
-use SmartAssert\ServiceRequest\Field\Size;
 
 class UpdateTest extends AbstractIntegrationTestCase
 {
-    use CreateDataProviderTrait;
+    use CreateUpdateGitSourceDataProviderTrait;
 
     public function testUpdateUnauthorized(): void
     {
@@ -40,10 +38,16 @@ class UpdateTest extends AbstractIntegrationTestCase
         );
     }
 
-    public function testCreateBadRequest(): void
-    {
-        $label = str_repeat('.', 256);
-
+    /**
+     * @dataProvider badRequestDataProvider
+     */
+    public function testUpdateBadRequest(
+        string $label,
+        string $hostUrl,
+        string $path,
+        ?string $credentials,
+        BadRequestError $expected
+    ): void {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
@@ -58,26 +62,12 @@ class UpdateTest extends AbstractIntegrationTestCase
         $exception = null;
 
         try {
-            self::$gitSourceClient->update(
-                $apiKey->key,
-                $source->id,
-                $label,
-                md5((string) rand()),
-                md5((string) rand()),
-                null
-            );
+            self::$gitSourceClient->update($apiKey->key, $source->id, $label, $hostUrl, $path, $credentials);
         } catch (BadRequestException $exception) {
         }
 
         self::assertInstanceOf(BadRequestException::class, $exception);
-        self::assertEquals(
-            new BadRequestError(
-                (new Field('label', $label))
-                    ->withRequirements(new Requirements('string', new Size(1, 255))),
-                'too_large'
-            ),
-            $exception->error
-        );
+        self::assertEquals($expected, $exception->error);
     }
 
     public function testUpdateDuplicateLabel(): void
@@ -155,12 +145,7 @@ class UpdateTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @dataProvider createDataProvider
-     *
-     * @param non-empty-string  $label
-     * @param non-empty-string  $hostUrl
-     * @param non-empty-string  $path
-     * @param ?non-empty-string $credentials
+     * @dataProvider successDataProvider
      */
     public function testUpdateSuccess(
         string $label,
