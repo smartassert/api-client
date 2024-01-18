@@ -34,7 +34,6 @@ class CreateTest extends AbstractIntegrationTestCase
     /**
      * @dataProvider createBadRequestDataProvider
      *
-     * @param non-empty-string  $hostUrl
      * @param non-empty-string  $path
      * @param ?non-empty-string $credentials
      */
@@ -65,6 +64,7 @@ class CreateTest extends AbstractIntegrationTestCase
     public static function createBadRequestDataProvider(): array
     {
         $labelTooLong = str_repeat('.', 256);
+        $hostUrlTooLong = str_repeat('.', 256);
 
         return [
             'label empty' => [
@@ -85,6 +85,28 @@ class CreateTest extends AbstractIntegrationTestCase
                 'credentials' => null,
                 'expected' => new BadRequestError(
                     (new Field('label', $labelTooLong))
+                        ->withRequirements(new Requirements('string', new Size(1, 255))),
+                    'too_large'
+                )
+            ],
+            'host url empty' => [
+                'label' => md5((string) rand()),
+                'hostUrl' => '',
+                'path' => md5((string) rand()),
+                'credentials' => null,
+                'expected' => new BadRequestError(
+                    (new Field('host-url', ''))
+                        ->withRequirements(new Requirements('string', new Size(1, 255))),
+                    'empty'
+                )
+            ],
+            'host url too long' => [
+                'label' => md5((string) rand()),
+                'hostUrl' => $hostUrlTooLong,
+                'path' => md5((string) rand()),
+                'credentials' => null,
+                'expected' => new BadRequestError(
+                    (new Field('host-url', $hostUrlTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'too_large'
                 )
