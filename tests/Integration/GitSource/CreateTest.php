@@ -65,6 +65,8 @@ class CreateTest extends AbstractIntegrationTestCase
     {
         $labelTooLong = str_repeat('.', 256);
         $hostUrlTooLong = str_repeat('.', 256);
+        $pathTooLong = str_repeat('.', 256);
+        $credentialsTooLong = str_repeat('.', 256);
 
         return [
             'label empty' => [
@@ -76,7 +78,7 @@ class CreateTest extends AbstractIntegrationTestCase
                     (new Field('label', ''))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'empty'
-                )
+                ),
             ],
             'label too long' => [
                 'label' => $labelTooLong,
@@ -87,7 +89,7 @@ class CreateTest extends AbstractIntegrationTestCase
                     (new Field('label', $labelTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'too_large'
-                )
+                ),
             ],
             'host url empty' => [
                 'label' => md5((string) rand()),
@@ -98,7 +100,7 @@ class CreateTest extends AbstractIntegrationTestCase
                     (new Field('host-url', ''))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'empty'
-                )
+                ),
             ],
             'host url too long' => [
                 'label' => md5((string) rand()),
@@ -109,7 +111,40 @@ class CreateTest extends AbstractIntegrationTestCase
                     (new Field('host-url', $hostUrlTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'too_large'
-                )
+                ),
+            ],
+            'path empty' => [
+                'label' => md5((string) rand()),
+                'hostUrl' => md5((string) rand()),
+                'path' => '',
+                'credentials' => null,
+                'expected' => new BadRequestError(
+                    (new Field('path', ''))
+                        ->withRequirements(new Requirements('string', new Size(1, 255))),
+                    'empty'
+                ),
+            ],
+            'path too long' => [
+                'label' => md5((string) rand()),
+                'hostUrl' => md5((string) rand()),
+                'path' => $pathTooLong,
+                'credentials' => null,
+                'expected' => new BadRequestError(
+                    (new Field('path', $pathTooLong))
+                        ->withRequirements(new Requirements('string', new Size(1, 255))),
+                    'too_large'
+                ),
+            ],
+            'credentials too long' => [
+                'label' => md5((string) rand()),
+                'hostUrl' => md5((string) rand()),
+                'path' => md5((string) rand()),
+                'credentials' => $credentialsTooLong,
+                'expected' => new BadRequestError(
+                    (new Field('credentials', $credentialsTooLong))
+                        ->withRequirements(new Requirements('string', new Size(0, 255))),
+                    'too_large'
+                ),
             ],
         ];
     }
