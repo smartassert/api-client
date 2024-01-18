@@ -31,29 +31,65 @@ class CreateTest extends AbstractIntegrationTestCase
         );
     }
 
-    public function testCreateBadRequest(): void
-    {
-        $label = str_repeat('.', 256);
-
+    /**
+     * @dataProvider createBadRequestDataProvider
+     *
+     * @param non-empty-string  $hostUrl
+     * @param non-empty-string  $path
+     * @param ?non-empty-string $credentials
+     */
+    public function testCreateBadRequest(
+        string $label,
+        string $hostUrl,
+        string $path,
+        ?string $credentials,
+        BadRequestError $expected
+    ): void {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $exception = null;
 
         try {
-            self::$gitSourceClient->create($apiKey->key, $label, md5((string) rand()), md5((string) rand()), null);
+            self::$gitSourceClient->create($apiKey->key, $label, $hostUrl, $path, $credentials);
         } catch (BadRequestException $exception) {
         }
 
         self::assertInstanceOf(BadRequestException::class, $exception);
-        self::assertEquals(
-            new BadRequestError(
-                (new Field('label', $label))
-                    ->withRequirements(new Requirements('string', new Size(1, 255))),
-                'too_large'
-            ),
-            $exception->error
-        );
+        self::assertEquals($expected, $exception->error);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function createBadRequestDataProvider(): array
+    {
+        $labelTooLong = str_repeat('.', 256);
+
+        return [
+            'label empty' => [
+                'label' => '',
+                'hostUrl' => md5((string) rand()),
+                'path' => md5((string) rand()),
+                'credentials' => null,
+                'expected' => new BadRequestError(
+                    (new Field('label', ''))
+                        ->withRequirements(new Requirements('string', new Size(1, 255))),
+                    'empty'
+                )
+            ],
+            'label too long' => [
+                'label' => $labelTooLong,
+                'hostUrl' => md5((string) rand()),
+                'path' => md5((string) rand()),
+                'credentials' => null,
+                'expected' => new BadRequestError(
+                    (new Field('label', $labelTooLong))
+                        ->withRequirements(new Requirements('string', new Size(1, 255))),
+                    'too_large'
+                )
+            ],
+        ];
     }
 
     public function testCreateDuplicateLabel(): void
