@@ -8,12 +8,11 @@ use SmartAssert\ApiClient\Exception\Error\BadRequestException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceRequest\Error\BadRequestError;
-use SmartAssert\ServiceRequest\Field\Field;
-use SmartAssert\ServiceRequest\Field\Requirements;
-use SmartAssert\ServiceRequest\Field\Size;
 
 class CreateTest extends AbstractIntegrationTestCase
 {
+    use CreateUpdateFileSourceDataProviderTrait;
+
     public function testCreateUnauthorized(): void
     {
         self::expectException(UnauthorizedException::class);
@@ -22,7 +21,7 @@ class CreateTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @dataProvider createBadRequestDataProvider
+     * @dataProvider createUpdateFileSourceBadRequestDataProvider
      */
     public function testCreateBadRequest(string $label, BadRequestError $expected): void
     {
@@ -38,34 +37,6 @@ class CreateTest extends AbstractIntegrationTestCase
 
         self::assertInstanceOf(BadRequestException::class, $exception);
         self::assertEquals($expected, $exception->error);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public static function createBadRequestDataProvider(): array
-    {
-        $labelEmpty = '';
-        $labelTooLong = str_repeat('.', 256);
-
-        return [
-            'empty' => [
-                'label' => $labelEmpty,
-                'expected' => new BadRequestError(
-                    (new Field('label', $labelEmpty))
-                        ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'empty'
-                ),
-            ],
-            'too long' => [
-                'label' => $labelTooLong,
-                'expected' => new BadRequestError(
-                    (new Field('label', $labelTooLong))
-                        ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'too_large'
-                ),
-            ],
-        ];
     }
 
     public function testCreateFileSourceSuccess(): void
