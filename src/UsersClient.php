@@ -16,7 +16,6 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
-use SmartAssert\ApiClient\Exception\User\ApiKeyNotFoundException;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -183,7 +182,6 @@ readonly class UsersClient
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
      * @throws ErrorException
-     * @throws ApiKeyNotFoundException
      */
     public function getApiKey(string $token): ApiKey
     {
@@ -193,11 +191,7 @@ readonly class UsersClient
             ->get()
         ;
 
-        try {
-            $data = $this->httpHandler->getJson($request);
-        } catch (NotFoundException $e) {
-            throw new ApiKeyNotFoundException();
-        }
+        $data = $this->httpHandler->getJson($request);
 
         $apiKey = $this->createApiKey($data);
         if (null === $apiKey) {
