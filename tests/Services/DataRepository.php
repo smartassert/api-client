@@ -11,6 +11,7 @@ class DataRepository
     public function __construct(
         private readonly string $databaseDsn,
     ) {
+        self::$connection = null;
     }
 
     /**
@@ -30,5 +31,10 @@ class DataRepository
         }
 
         return self::$connection;
+    }
+
+    public function query(string $query): void
+    {
+        $this->getConnection()->query($query);
     }
 }
