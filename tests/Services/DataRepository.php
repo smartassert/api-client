@@ -32,9 +32,4 @@ class DataRepository
 
         return self::$connection;
     }
-
-    public function query(string $query): void
-    {
-        $this->getConnection()->query($query);
-    }
 }

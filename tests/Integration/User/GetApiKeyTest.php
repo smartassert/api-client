@@ -28,7 +28,7 @@ class GetApiKeyTest extends AbstractIntegrationTestCase
         $usersDataRepository = new DataRepository(
             'pgsql:host=localhost;port=5432;dbname=users;user=postgres;password=password!'
         );
-        $usersDataRepository->query('DELETE FROM api_key WHERE owner_id = \'' . $user->id . '\'');
+        $usersDataRepository->getConnection()->query('DELETE FROM api_key WHERE owner_id = \'' . $user->id . '\'');
 
         $exception = null;
 
@@ -39,7 +39,7 @@ class GetApiKeyTest extends AbstractIntegrationTestCase
 
         self::assertEquals(new ApiKeyNotFoundException(), $exception);
 
-        $usersDataRepository->query(
+        $usersDataRepository->getConnection()->query(
             'INSERT INTO api_key (id, owner_id) VALUES (\'' . $apiKey->key . '\', \'' . $user->id . '\')'
         );
     }
