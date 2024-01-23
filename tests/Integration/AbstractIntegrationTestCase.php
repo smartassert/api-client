@@ -55,12 +55,11 @@ abstract class AbstractIntegrationTestCase extends TestCase
 
         $httpClient = new HttpClient();
         $httpHandler = new HttpHandler($httpClient, $exceptionFactory);
-        $requestBuilder = new RequestBuilder(new HttpFactory());
 
         self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9089');
+        $requestBuilder = new RequestBuilder(new HttpFactory(), self::$urlGenerator);
 
         self::$usersClient = new UsersClient(
-            self::$urlGenerator,
             $httpHandler,
             $requestBuilder,
             new TokenFactory(),
@@ -68,17 +67,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
             new ApiKeyFactory(),
         );
 
-        self::$fileSourceClient = new FileSourceClient(
-            self::$urlGenerator,
-            new SourceFactory(),
-            $httpHandler,
-            $requestBuilder
-        );
-        self::$gitSourceClient = new GitSourceClient(
-            self::$urlGenerator,
-            new SourceFactory(),
-            $httpHandler,
-            $requestBuilder,
-        );
+        self::$fileSourceClient = new FileSourceClient(new SourceFactory(), $httpHandler, $requestBuilder);
+        self::$gitSourceClient = new GitSourceClient(new SourceFactory(), $httpHandler, $requestBuilder);
     }
 }

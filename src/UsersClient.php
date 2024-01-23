@@ -20,13 +20,12 @@ use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
+use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class UsersClient
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
         private HttpHandler $httpHandler,
         private RequestBuilder $requestBuilder,
         private TokenFactory $tokenFactory,
@@ -48,7 +47,7 @@ readonly class UsersClient
     public function createToken(string $userIdentifier, string $password): Token
     {
         $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_token_create'))
+            ->create('POST', new RouteRequirements('user_token_create'))
             ->withJsonBody(['username' => $userIdentifier, 'password' => $password])
             ->get()
         ;
@@ -71,7 +70,7 @@ readonly class UsersClient
     public function verifyToken(string $token): User
     {
         $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('user_token_verify'))
+            ->create('GET', new RouteRequirements('user_token_verify'))
             ->withBearerAuthorization($token)
             ->get()
         ;
@@ -94,7 +93,7 @@ readonly class UsersClient
     public function refreshToken(string $refreshToken): Token
     {
         $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_token_refresh'))
+            ->create('POST', new RouteRequirements('user_token_refresh'))
             ->withJsonBody(['refresh_token' => $refreshToken])
             ->get()
         ;
@@ -120,7 +119,7 @@ readonly class UsersClient
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
         $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_create'))
+            ->create('POST', new RouteRequirements('user_create'))
             ->withAuthorization($adminToken)
             ->withFormBody(['identifier' => $userIdentifier, 'password' => $password])
             ->get()
@@ -152,7 +151,7 @@ readonly class UsersClient
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
         $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_refresh-token_revoke-all'))
+            ->create('POST', new RouteRequirements('user_refresh-token_revoke-all'))
             ->withAuthorization($adminToken)
             ->withFormBody(['id' => $userId])
             ->get()
@@ -174,7 +173,7 @@ readonly class UsersClient
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
         $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_refresh-token_revoke'))
+            ->create('POST', new RouteRequirements('user_refresh-token_revoke'))
             ->withBearerAuthorization($token)
             ->withFormBody(['refresh_token' => $refreshToken])
             ->get()
@@ -198,7 +197,7 @@ readonly class UsersClient
     public function getApiKey(string $token): ApiKey
     {
         $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('user_apikey'))
+            ->create('GET', new RouteRequirements('user_apikey'))
             ->withBearerAuthorization($token)
             ->get()
         ;
@@ -229,7 +228,7 @@ readonly class UsersClient
     public function getApiKeys(string $token): array
     {
         $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('user_apikey_list'))
+            ->create('GET', new RouteRequirements('user_apikey_list'))
             ->withBearerAuthorization($token)
             ->get()
         ;

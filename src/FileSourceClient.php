@@ -15,13 +15,12 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
+use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileSourceClient
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
         private RequestBuilder $requestBuilder,
@@ -43,7 +42,7 @@ readonly class FileSourceClient
     public function create(string $apiKey, string $label): FileSource
     {
         $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('file-source'))
+            ->create('POST', new RouteRequirements('file-source'))
             ->withApiKeyAuthorization($apiKey)
             ->withFormBody(['label' => $label])
             ->get()
@@ -68,7 +67,7 @@ readonly class FileSourceClient
     public function update(string $apiKey, string $id, string $label): FileSource
     {
         $request = $this->requestBuilder
-            ->create('PUT', $this->urlGenerator->generate('file-source', ['sourceId' => $id]))
+            ->create('PUT', new RouteRequirements('file-source', ['sourceId' => $id]))
             ->withApiKeyAuthorization($apiKey)
             ->withFormBody(['label' => $label])
             ->get()
@@ -94,7 +93,7 @@ readonly class FileSourceClient
     public function list(string $apiKey, string $id): array
     {
         $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('file-source-list', ['sourceId' => $id]))
+            ->create('GET', new RouteRequirements('file-source-list', ['sourceId' => $id]))
             ->withApiKeyAuthorization($apiKey)
             ->get()
         ;

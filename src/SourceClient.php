@@ -15,13 +15,12 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
+use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class SourceClient
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
         private RequestBuilder $requestBuilder,
@@ -45,7 +44,7 @@ readonly class SourceClient
     public function list(string $apiKey): array
     {
         $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('sources'))
+            ->create('GET', new RouteRequirements('sources'))
             ->withApiKeyAuthorization($apiKey)
             ->get()
         ;
@@ -82,7 +81,7 @@ readonly class SourceClient
     public function get(string $apiKey, string $id): ?SourceInterface
     {
         $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('source', ['sourceId' => $id]))
+            ->create('GET', new RouteRequirements('source', ['sourceId' => $id]))
             ->withApiKeyAuthorization($apiKey)
             ->get()
         ;
@@ -106,7 +105,7 @@ readonly class SourceClient
     public function delete(string $apiKey, string $id): ?SourceInterface
     {
         $request = $this->requestBuilder
-            ->create('DELETE', $this->urlGenerator->generate('source', ['sourceId' => $id]))
+            ->create('DELETE', new RouteRequirements('source', ['sourceId' => $id]))
             ->withApiKeyAuthorization($apiKey)
             ->get()
         ;

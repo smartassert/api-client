@@ -29,9 +29,11 @@ abstract class AbstractUsersClientTestCase extends AbstractClientTestCase
         parent::setUp();
 
         $this->client = new UsersClient(
-            UrlGeneratorFactory::create('https://api.example.com'),
             new HttpHandler($this->httpClient, $this->exceptionFactory),
-            new RequestBuilder(new HttpFactory()),
+            new RequestBuilder(
+                new HttpFactory(),
+                UrlGeneratorFactory::create('https://api.example.com'),
+            ),
             new TokenFactory(),
             new UserFactory(),
             new ApiKeyFactory(),

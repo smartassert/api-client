@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\RequestBuilder;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class RequestBuilder
 {
@@ -14,12 +15,16 @@ class RequestBuilder
 
     public function __construct(
         private readonly StreamFactoryInterface $streamFactory,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
-    public function create(string $method, string $url): RequestBuilder
+    public function create(string $method, RouteRequirements $routeRequirements): RequestBuilder
     {
-        $this->request = new Request($method, $url);
+        $this->request = new Request(
+            $method,
+            $this->urlGenerator->generate($routeRequirements->name, $routeRequirements->parameters)
+        );
 
         return $this;
     }

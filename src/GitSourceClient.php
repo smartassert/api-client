@@ -15,13 +15,12 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
+use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class GitSourceClient
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
         private RequestBuilder $requestBuilder,
@@ -94,7 +93,7 @@ readonly class GitSourceClient
         ?string $id = null,
     ): GitSource {
         $request = $this->requestBuilder
-            ->create($method, $this->urlGenerator->generate('git-source', ['sourceId' => $id]))
+            ->create($method, new RouteRequirements('git-source', ['sourceId' => $id]))
             ->withApiKeyAuthorization($apiKey)
             ->withFormBody([
                 'label' => $label,
