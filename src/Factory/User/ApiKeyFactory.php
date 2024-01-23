@@ -5,24 +5,22 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Factory\User;
 
 use SmartAssert\ApiClient\Data\User\ApiKey;
+use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Factory\AbstractFactory;
 
-readonly class ApiKeyFactory
+readonly class ApiKeyFactory extends AbstractFactory
 {
     /**
      * @param array<mixed> $data
      */
     public function create(array $data): ?ApiKey
     {
-        $label = $data['label'] ?? null;
-        $label = is_string($label) ? trim($label) : null;
-        $label = '' === $label ? null : $label;
-
-        $key = $data['key'] ?? null;
-        $key = is_string($key) ? trim($key) : null;
-        if ('' === $key || null === $key) {
+        try {
+            $key = $this->getNonEmptyString($data, 'key');
+        } catch (IncompleteDataException) {
             return null;
         }
 
-        return new ApiKey($label, $key);
+        return new ApiKey($this->getNullableNonEmptyString($data, 'label'), $key);
     }
 }
