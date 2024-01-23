@@ -45,11 +45,6 @@ class RequestBuilder
         return $this;
     }
 
-    public function withBearerAuthorization(string $authorization): RequestBuilder
-    {
-        return $this->withAuthorization('Bearer ' . $authorization);
-    }
-
     /**
      * @param non-empty-string[] $contentTypes
      */

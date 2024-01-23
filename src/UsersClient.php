@@ -19,6 +19,7 @@ use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
+use SmartAssert\ApiClient\RequestBuilder\BearerAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -70,8 +71,11 @@ readonly class UsersClient
     public function verifyToken(string $token): User
     {
         $request = $this->requestBuilder
-            ->create('GET', new RouteRequirements('user_token_verify'))
-            ->withBearerAuthorization($token)
+            ->create(
+                'GET',
+                new RouteRequirements('user_token_verify'),
+                new BearerAuthorizationHeader($token),
+            )
             ->get()
         ;
 
@@ -173,8 +177,11 @@ readonly class UsersClient
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
         $request = $this->requestBuilder
-            ->create('POST', new RouteRequirements('user_refresh-token_revoke'))
-            ->withBearerAuthorization($token)
+            ->create(
+                'POST',
+                new RouteRequirements('user_refresh-token_revoke'),
+                new BearerAuthorizationHeader($token),
+            )
             ->withFormBody(['refresh_token' => $refreshToken])
             ->get()
         ;
@@ -197,8 +204,11 @@ readonly class UsersClient
     public function getApiKey(string $token): ApiKey
     {
         $request = $this->requestBuilder
-            ->create('GET', new RouteRequirements('user_apikey'))
-            ->withBearerAuthorization($token)
+            ->create(
+                'GET',
+                new RouteRequirements('user_apikey'),
+                new BearerAuthorizationHeader($token),
+            )
             ->get()
         ;
 
@@ -228,8 +238,11 @@ readonly class UsersClient
     public function getApiKeys(string $token): array
     {
         $request = $this->requestBuilder
-            ->create('GET', new RouteRequirements('user_apikey_list'))
-            ->withBearerAuthorization($token)
+            ->create(
+                'GET',
+                new RouteRequirements('user_apikey_list'),
+                new BearerAuthorizationHeader($token),
+            )
             ->get()
         ;
 
