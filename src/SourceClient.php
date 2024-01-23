@@ -14,9 +14,9 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
-use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
-use SmartAssert\ApiClient\RequestBuilder\RequestSpecification;
-use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
+use SmartAssert\ApiClient\Request\ApiKeyAuthorizationHeader;
+use SmartAssert\ApiClient\Request\RequestSpecification;
+use SmartAssert\ApiClient\Request\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 
 readonly class SourceClient

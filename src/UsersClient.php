@@ -19,12 +19,12 @@ use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
-use SmartAssert\ApiClient\RequestBuilder\AuthorizationHeader;
-use SmartAssert\ApiClient\RequestBuilder\BearerAuthorizationHeader;
-use SmartAssert\ApiClient\RequestBuilder\FormBody;
-use SmartAssert\ApiClient\RequestBuilder\JsonBody;
-use SmartAssert\ApiClient\RequestBuilder\RequestSpecification;
-use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
+use SmartAssert\ApiClient\Request\AuthorizationHeader;
+use SmartAssert\ApiClient\Request\BearerAuthorizationHeader;
+use SmartAssert\ApiClient\Request\FormBody;
+use SmartAssert\ApiClient\Request\JsonBody;
+use SmartAssert\ApiClient\Request\RequestSpecification;
+use SmartAssert\ApiClient\Request\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 
 readonly class UsersClient

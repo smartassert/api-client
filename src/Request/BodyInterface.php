@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\RequestBuilder;
+namespace SmartAssert\ApiClient\Request;
 
 interface BodyInterface
 {
