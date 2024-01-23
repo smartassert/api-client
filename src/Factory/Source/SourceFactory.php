@@ -8,8 +8,9 @@ use SmartAssert\ApiClient\Data\Source\FileSource;
 use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Factory\AbstractFactory;
 
-readonly class SourceFactory
+readonly class SourceFactory extends AbstractFactory
 {
     /**
      * @param array<mixed> $data
@@ -39,8 +40,8 @@ readonly class SourceFactory
     public function createFileSource(array $data): FileSource
     {
         return new FileSource(
-            $this->getSourceId($data),
-            $this->getSourceLabel($data),
+            $this->getNonEmptyString($data, 'id'),
+            $this->getNonEmptyString($data, 'label'),
             $this->getSourceDeletedAt($data)
         );
     }
@@ -52,20 +53,10 @@ readonly class SourceFactory
      */
     public function createGitSource(array $data): GitSource
     {
-        $id = $this->getSourceId($data);
-        $label = $this->getSourceLabel($data);
-
-        $hostUrl = $data['host_url'] ?? null;
-        $hostUrl = is_string($hostUrl) ? trim($hostUrl) : null;
-        if ('' === $hostUrl || null === $hostUrl) {
-            throw new IncompleteDataException($data, 'host_url');
-        }
-
-        $path = $data['path'] ?? null;
-        $path = is_string($path) ? trim($path) : null;
-        if ('' === $path || null === $path) {
-            throw new IncompleteDataException($data, 'path');
-        }
+        $id = $this->getNonEmptyString($data, 'id');
+        $label = $this->getNonEmptyString($data, 'label');
+        $hostUrl = $this->getNonEmptyString($data, 'host_url');
+        $path = $this->getNonEmptyString($data, 'path');
 
         $hasCredentials = $data['has_credentials'] ?? null;
         $hasCredentials = is_bool($hasCredentials) ? $hasCredentials : false;
@@ -73,42 +64,6 @@ readonly class SourceFactory
         $deletedAt = $this->getSourceDeletedAt($data);
 
         return new GitSource($id, $label, $hostUrl, $path, $hasCredentials, $deletedAt);
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @return non-empty-string
-     *
-     * @throws IncompleteDataException
-     */
-    private function getSourceId(array $data): string
-    {
-        $id = $data['id'] ?? null;
-        $id = is_string($id) ? trim($id) : null;
-        if ('' === $id || null === $id) {
-            throw new IncompleteDataException($data, 'id');
-        }
-
-        return $id;
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @return non-empty-string
-     *
-     * @throws IncompleteDataException
-     */
-    private function getSourceLabel(array $data): string
-    {
-        $label = $data['label'] ?? null;
-        $label = is_string($label) ? trim($label) : null;
-        if ('' === $label || null === $label) {
-            throw new IncompleteDataException($data, 'label');
-        }
-
-        return $label;
     }
 
     /**

@@ -6,8 +6,9 @@ namespace SmartAssert\ApiClient\Factory\User;
 
 use SmartAssert\ApiClient\Data\User\Token;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Factory\AbstractFactory;
 
-readonly class TokenFactory
+readonly class TokenFactory extends AbstractFactory
 {
     /**
      * @param array<mixed> $data
@@ -16,18 +17,9 @@ readonly class TokenFactory
      */
     public function create(array $data): Token
     {
-        $token = $data['token'] ?? null;
-        $token = is_string($token) ? trim($token) : null;
-        if ('' === $token || null === $token) {
-            throw new IncompleteDataException($data, 'token');
-        }
-
-        $refreshToken = $data['refresh_token'] ?? null;
-        $refreshToken = is_string($refreshToken) ? trim($refreshToken) : null;
-        if ('' === $refreshToken || null === $refreshToken) {
-            throw new IncompleteDataException($data, 'refresh_token');
-        }
-
-        return new Token($token, $refreshToken);
+        return new Token(
+            $this->getNonEmptyString($data, 'token'),
+            $this->getNonEmptyString($data, 'refresh_token')
+        );
     }
 }
