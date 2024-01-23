@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Factory\Source;
 
-use SmartAssert\ApiClient\Data\Source\FileSource as FooFileSource;
-use SmartAssert\ApiClient\Data\Source\GitSource as FooGitSource;
-use SmartAssert\ApiClient\Data\Source\SourceInterface as FooSourceInterface;
+use SmartAssert\ApiClient\Data\Source\FileSource;
+use SmartAssert\ApiClient\Data\Source\GitSource;
+use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 
 readonly class SourceFactory
@@ -16,7 +16,7 @@ readonly class SourceFactory
      *
      * @throws IncompleteDataException
      */
-    public function create(array $data): ?FooSourceInterface
+    public function create(array $data): ?SourceInterface
     {
         $type = $data['type'] ?? null;
 
@@ -36,7 +36,7 @@ readonly class SourceFactory
      *
      * @throws IncompleteDataException
      */
-    public function createFileSource(array $data): FooFileSource
+    public function createFileSource(array $data): FileSource
     {
         $id = $data['id'] ?? null;
         $id = is_string($id) ? trim($id) : null;
@@ -54,7 +54,7 @@ readonly class SourceFactory
         $deletedAt = is_int($deletedAt) ? $deletedAt : null;
         $deletedAt = $deletedAt > 0 ? $deletedAt : null;
 
-        return new FooFileSource($id, $label, $deletedAt);
+        return new FileSource($id, $label, $deletedAt);
     }
 
     /**
@@ -62,7 +62,7 @@ readonly class SourceFactory
      *
      * @throws IncompleteDataException
      */
-    public function createGitSource(array $data): FooGitSource
+    public function createGitSource(array $data): GitSource
     {
         $id = $data['id'] ?? null;
         $id = is_string($id) ? trim($id) : null;
@@ -95,6 +95,6 @@ readonly class SourceFactory
         $deletedAt = is_int($deletedAt) ? $deletedAt : null;
         $deletedAt = $deletedAt > 0 ? $deletedAt : null;
 
-        return new FooGitSource($id, $label, $hostUrl, $path, $hasCredentials, $deletedAt);
+        return new GitSource($id, $label, $hostUrl, $path, $hasCredentials, $deletedAt);
     }
 }
