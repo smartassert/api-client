@@ -8,7 +8,6 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
-use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\SourceClient;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
@@ -26,10 +25,8 @@ abstract class AbstractSourceTestCase extends AbstractIntegrationTestCase
             new HttpHandler(
                 new HttpClient(),
                 new ExceptionFactory(self::$errorDeserializer),
-                new RequestBuilder(
-                    new HttpFactory(),
-                    self::$urlGenerator,
-                ),
+                new HttpFactory(),
+                self::$urlGenerator,
             ),
         );
     }

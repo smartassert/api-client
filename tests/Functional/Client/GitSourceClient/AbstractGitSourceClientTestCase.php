@@ -9,7 +9,6 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\GitSourceClient;
-use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
@@ -38,10 +37,8 @@ abstract class AbstractGitSourceClientTestCase extends AbstractClientTestCase
             new HttpHandler(
                 $this->httpClient,
                 $this->exceptionFactory,
-                new RequestBuilder(
-                    new HttpFactory(),
-                    UrlGeneratorFactory::create('https://api.example.com'),
-                ),
+                new HttpFactory(),
+                UrlGeneratorFactory::create('https://api.example.com'),
             ),
         );
     }

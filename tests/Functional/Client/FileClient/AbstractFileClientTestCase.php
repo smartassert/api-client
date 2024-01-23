@@ -6,7 +6,6 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\FileClient;
 
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\FileClient;
-use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
@@ -28,10 +27,8 @@ abstract class AbstractFileClientTestCase extends AbstractClientTestCase
             new HttpHandler(
                 $this->httpClient,
                 $this->exceptionFactory,
-                new RequestBuilder(
-                    new HttpFactory(),
-                    UrlGeneratorFactory::create('https://api.example.com'),
-                ),
+                new HttpFactory(),
+                UrlGeneratorFactory::create('https://api.example.com'),
             ),
         );
     }

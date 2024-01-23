@@ -12,7 +12,6 @@ use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\Error\ModifyReadOnlyEntityException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
-use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\SourceClient;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
@@ -112,7 +111,8 @@ class UpdateTest extends AbstractIntegrationTestCase
             new HttpHandler(
                 new HttpClient(),
                 new ExceptionFactory(self::$errorDeserializer),
-                new RequestBuilder(new HttpFactory(), self::$urlGenerator),
+                new HttpFactory(),
+                self::$urlGenerator,
             ),
         );
 

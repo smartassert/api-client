@@ -14,7 +14,6 @@ use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\GitSourceClient;
-use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
 use SmartAssert\ApiClient\UsersClient;
@@ -54,10 +53,9 @@ abstract class AbstractIntegrationTestCase extends TestCase
         $exceptionFactory = new ExceptionFactory(self::$errorDeserializer);
 
         self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9089');
-        $requestBuilder = new RequestBuilder(new HttpFactory(), self::$urlGenerator);
 
         $httpClient = new HttpClient();
-        $httpHandler = new HttpHandler($httpClient, $exceptionFactory, $requestBuilder);
+        $httpHandler = new HttpHandler($httpClient, $exceptionFactory, new HttpFactory(), self::$urlGenerator);
 
         self::$usersClient = new UsersClient(
             $httpHandler,
