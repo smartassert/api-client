@@ -38,13 +38,6 @@ class RequestBuilder
         return $this;
     }
 
-    public function withAuthorization(string $authorization): RequestBuilder
-    {
-        $this->request = $this->request->withHeader('authorization', $authorization);
-
-        return $this;
-    }
-
     /**
      * @param non-empty-string[] $contentTypes
      */

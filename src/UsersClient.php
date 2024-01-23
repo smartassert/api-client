@@ -19,6 +19,7 @@ use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
+use SmartAssert\ApiClient\RequestBuilder\AuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\BearerAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
@@ -123,8 +124,11 @@ readonly class UsersClient
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
         $request = $this->requestBuilder
-            ->create('POST', new RouteRequirements('user_create'))
-            ->withAuthorization($adminToken)
+            ->create(
+                'POST',
+                new RouteRequirements('user_create'),
+                new AuthorizationHeader($adminToken),
+            )
             ->withFormBody(['identifier' => $userIdentifier, 'password' => $password])
             ->get()
         ;
@@ -155,8 +159,11 @@ readonly class UsersClient
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
         $request = $this->requestBuilder
-            ->create('POST', new RouteRequirements('user_refresh-token_revoke-all'))
-            ->withAuthorization($adminToken)
+            ->create(
+                'POST',
+                new RouteRequirements('user_refresh-token_revoke-all'),
+                new AuthorizationHeader($adminToken),
+            )
             ->withFormBody(['id' => $userId])
             ->get()
         ;
