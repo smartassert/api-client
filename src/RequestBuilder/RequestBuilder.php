@@ -19,12 +19,21 @@ class RequestBuilder
     ) {
     }
 
-    public function create(string $method, RouteRequirements $routeRequirements): RequestBuilder
-    {
+    public function create(
+        string $method,
+        RouteRequirements $routeRequirements,
+        ?HeaderInterface $header = null,
+    ): RequestBuilder {
         $this->request = new Request(
             $method,
             $this->urlGenerator->generate($routeRequirements->name, $routeRequirements->parameters)
         );
+
+        if ($header instanceof HeaderInterface) {
+            foreach ($header->toArray() as $name => $value) {
+                $this->request = $this->request->withHeader($name, $value);
+            }
+        }
 
         return $this;
     }
@@ -39,13 +48,6 @@ class RequestBuilder
     public function withBearerAuthorization(string $authorization): RequestBuilder
     {
         return $this->withAuthorization('Bearer ' . $authorization);
-    }
-
-    public function withApiKeyAuthorization(string $apiKey): RequestBuilder
-    {
-        $this->request = $this->request->withHeader('translate-authorization-to', 'api-token');
-
-        return $this->withBearerAuthorization($apiKey);
     }
 
     /**

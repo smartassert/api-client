@@ -10,6 +10,7 @@ use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
+use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -36,8 +37,11 @@ readonly class FileClient
     public function create(string $apiKey, string $sourceId, string $filename, string $content): void
     {
         $request = $this->requestBuilder
-            ->create('POST', $this->createRouteRequirements($sourceId, $filename))
-            ->withApiKeyAuthorization($apiKey)
+            ->create(
+                'POST',
+                $this->createRouteRequirements($sourceId, $filename),
+                new ApiKeyAuthorizationHeader($apiKey),
+            )
             ->withBody('application/yaml', $content)
             ->get()
         ;
@@ -58,8 +62,11 @@ readonly class FileClient
     public function read(string $apiKey, string $sourceId, string $filename): string
     {
         $request = $this->requestBuilder
-            ->create('GET', $this->createRouteRequirements($sourceId, $filename))
-            ->withApiKeyAuthorization($apiKey)
+            ->create(
+                'GET',
+                $this->createRouteRequirements($sourceId, $filename),
+                new ApiKeyAuthorizationHeader($apiKey),
+            )
             ->withAcceptableContentTypes(['application/yaml', 'text/x-yaml'])
             ->get()
         ;
@@ -86,8 +93,11 @@ readonly class FileClient
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
         $request = $this->requestBuilder
-            ->create('PUT', $this->createRouteRequirements($sourceId, $filename))
-            ->withApiKeyAuthorization($apiKey)
+            ->create(
+                'PUT',
+                $this->createRouteRequirements($sourceId, $filename),
+                new ApiKeyAuthorizationHeader($apiKey),
+            )
             ->withBody('application/yaml', $content)
             ->get()
         ;
@@ -112,8 +122,11 @@ readonly class FileClient
     public function delete(string $apiKey, string $sourceId, string $filename): void
     {
         $request = $this->requestBuilder
-            ->create('DELETE', $this->createRouteRequirements($sourceId, $filename))
-            ->withApiKeyAuthorization($apiKey)
+            ->create(
+                'DELETE',
+                $this->createRouteRequirements($sourceId, $filename),
+                new ApiKeyAuthorizationHeader($apiKey),
+            )
             ->get()
         ;
 

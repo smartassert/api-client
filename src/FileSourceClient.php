@@ -14,6 +14,7 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
+use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -42,8 +43,11 @@ readonly class FileSourceClient
     public function create(string $apiKey, string $label): FileSource
     {
         $request = $this->requestBuilder
-            ->create('POST', new RouteRequirements('file-source'))
-            ->withApiKeyAuthorization($apiKey)
+            ->create(
+                'POST',
+                new RouteRequirements('file-source'),
+                new ApiKeyAuthorizationHeader($apiKey),
+            )
             ->withFormBody(['label' => $label])
             ->get()
         ;
@@ -67,8 +71,11 @@ readonly class FileSourceClient
     public function update(string $apiKey, string $id, string $label): FileSource
     {
         $request = $this->requestBuilder
-            ->create('PUT', new RouteRequirements('file-source', ['sourceId' => $id]))
-            ->withApiKeyAuthorization($apiKey)
+            ->create(
+                'PUT',
+                new RouteRequirements('file-source', ['sourceId' => $id]),
+                new ApiKeyAuthorizationHeader($apiKey),
+            )
             ->withFormBody(['label' => $label])
             ->get()
         ;
@@ -93,8 +100,11 @@ readonly class FileSourceClient
     public function list(string $apiKey, string $id): array
     {
         $request = $this->requestBuilder
-            ->create('GET', new RouteRequirements('file-source-list', ['sourceId' => $id]))
-            ->withApiKeyAuthorization($apiKey)
+            ->create(
+                'GET',
+                new RouteRequirements('file-source-list', ['sourceId' => $id]),
+                new ApiKeyAuthorizationHeader($apiKey),
+            )
             ->get()
         ;
 

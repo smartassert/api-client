@@ -14,6 +14,7 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
+use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -93,8 +94,11 @@ readonly class GitSourceClient
         ?string $id = null,
     ): GitSource {
         $request = $this->requestBuilder
-            ->create($method, new RouteRequirements('git-source', ['sourceId' => $id]))
-            ->withApiKeyAuthorization($apiKey)
+            ->create(
+                $method,
+                new RouteRequirements('git-source', ['sourceId' => $id]),
+                new ApiKeyAuthorizationHeader($apiKey),
+            )
             ->withFormBody([
                 'label' => $label,
                 'host-url' => $hostUrl,
