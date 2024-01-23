@@ -15,7 +15,6 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
-use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RequestSpecification;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -25,7 +24,6 @@ readonly class SourceClient
     public function __construct(
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
-        private RequestBuilder $requestBuilder,
     ) {
     }
 
@@ -45,16 +43,11 @@ readonly class SourceClient
      */
     public function list(string $apiKey): array
     {
-        $request = $this->requestBuilder
-            ->create(new RequestSpecification(
-                'GET',
-                new RouteRequirements('sources'),
-                new ApiKeyAuthorizationHeader($apiKey),
-            ))
-            ->get()
-        ;
-
-        $data = $this->httpHandler->getJson($request);
+        $data = $this->httpHandler->getJson(new RequestSpecification(
+            'GET',
+            new RouteRequirements('sources'),
+            new ApiKeyAuthorizationHeader($apiKey),
+        ));
 
         $sources = [];
         foreach ($data as $sourceData) {
@@ -85,16 +78,13 @@ readonly class SourceClient
      */
     public function get(string $apiKey, string $id): ?SourceInterface
     {
-        $request = $this->requestBuilder
-            ->create(new RequestSpecification(
+        return $this->sourceFactory->create(
+            $this->httpHandler->getJson(new RequestSpecification(
                 'GET',
                 new RouteRequirements('source', ['sourceId' => $id]),
                 new ApiKeyAuthorizationHeader($apiKey),
             ))
-            ->get()
-        ;
-
-        return $this->sourceFactory->create($this->httpHandler->getJson($request));
+        );
     }
 
     /**
@@ -112,15 +102,12 @@ readonly class SourceClient
      */
     public function delete(string $apiKey, string $id): ?SourceInterface
     {
-        $request = $this->requestBuilder
-            ->create(new RequestSpecification(
+        return $this->sourceFactory->create(
+            $this->httpHandler->getJson(new RequestSpecification(
                 'DELETE',
                 new RouteRequirements('source', ['sourceId' => $id]),
                 new ApiKeyAuthorizationHeader($apiKey),
             ))
-            ->get()
-        ;
-
-        return $this->sourceFactory->create($this->httpHandler->getJson($request));
+        );
     }
 }

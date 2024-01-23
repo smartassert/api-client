@@ -16,7 +16,6 @@ use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\FormBody;
-use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RequestSpecification;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -26,7 +25,6 @@ readonly class GitSourceClient
     public function __construct(
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
-        private RequestBuilder $requestBuilder,
     ) {
     }
 
@@ -95,8 +93,8 @@ readonly class GitSourceClient
         ?string $credentials,
         ?string $id = null,
     ): GitSource {
-        $request = $this->requestBuilder
-            ->create(new RequestSpecification(
+        return $this->sourceFactory->createGitSource(
+            $this->httpHandler->getJson(new RequestSpecification(
                 $method,
                 new RouteRequirements('git-source', ['sourceId' => $id]),
                 new ApiKeyAuthorizationHeader($apiKey),
@@ -107,9 +105,6 @@ readonly class GitSourceClient
                     'credentials' => $credentials,
                 ])
             ))
-            ->get()
-        ;
-
-        return $this->sourceFactory->createGitSource($this->httpHandler->getJson($request));
+        );
     }
 }

@@ -109,8 +109,11 @@ class UpdateTest extends AbstractIntegrationTestCase
     {
         $sourceClient = new SourceClient(
             new SourceFactory(),
-            new HttpHandler(new HttpClient(), new ExceptionFactory(self::$errorDeserializer)),
-            new RequestBuilder(new HttpFactory(), self::$urlGenerator),
+            new HttpHandler(
+                new HttpClient(),
+                new ExceptionFactory(self::$errorDeserializer),
+                new RequestBuilder(new HttpFactory(), self::$urlGenerator),
+            ),
         );
 
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

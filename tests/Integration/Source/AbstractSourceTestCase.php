@@ -23,10 +23,13 @@ abstract class AbstractSourceTestCase extends AbstractIntegrationTestCase
 
         self::$sourceClient = new SourceClient(
             new SourceFactory(),
-            new HttpHandler(new HttpClient(), new ExceptionFactory(self::$errorDeserializer)),
-            new RequestBuilder(
-                new HttpFactory(),
-                self::$urlGenerator,
+            new HttpHandler(
+                new HttpClient(),
+                new ExceptionFactory(self::$errorDeserializer),
+                new RequestBuilder(
+                    new HttpFactory(),
+                    self::$urlGenerator,
+                ),
             ),
         );
     }

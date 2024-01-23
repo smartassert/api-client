@@ -28,11 +28,14 @@ abstract class AbstractFileSourceClientTestCase extends AbstractClientTestCase
 
         $this->client = new FileSourceClient(
             new SourceFactory(),
-            new HttpHandler($this->httpClient, $this->exceptionFactory),
-            new RequestBuilder(
-                new HttpFactory(),
-                UrlGeneratorFactory::create('https://api.example.com'),
-            )
+            new HttpHandler(
+                $this->httpClient,
+                $this->exceptionFactory,
+                new RequestBuilder(
+                    new HttpFactory(),
+                    UrlGeneratorFactory::create('https://api.example.com'),
+                ),
+            ),
         );
     }
 

@@ -53,21 +53,20 @@ abstract class AbstractIntegrationTestCase extends TestCase
 
         $exceptionFactory = new ExceptionFactory(self::$errorDeserializer);
 
-        $httpClient = new HttpClient();
-        $httpHandler = new HttpHandler($httpClient, $exceptionFactory);
-
         self::$urlGenerator = UrlGeneratorFactory::create('http://localhost:9089');
         $requestBuilder = new RequestBuilder(new HttpFactory(), self::$urlGenerator);
 
+        $httpClient = new HttpClient();
+        $httpHandler = new HttpHandler($httpClient, $exceptionFactory, $requestBuilder);
+
         self::$usersClient = new UsersClient(
             $httpHandler,
-            $requestBuilder,
             new TokenFactory(),
             new UserFactory(),
             new ApiKeyFactory(),
         );
 
-        self::$fileSourceClient = new FileSourceClient(new SourceFactory(), $httpHandler, $requestBuilder);
-        self::$gitSourceClient = new GitSourceClient(new SourceFactory(), $httpHandler, $requestBuilder);
+        self::$fileSourceClient = new FileSourceClient(new SourceFactory(), $httpHandler);
+        self::$gitSourceClient = new GitSourceClient(new SourceFactory(), $httpHandler);
     }
 }

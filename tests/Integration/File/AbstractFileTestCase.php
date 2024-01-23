@@ -24,10 +24,10 @@ abstract class AbstractFileTestCase extends AbstractIntegrationTestCase
             new HttpHandler(
                 new HttpClient(),
                 new ExceptionFactory(self::$errorDeserializer),
-            ),
-            new RequestBuilder(
-                new HttpFactory(),
-                self::$urlGenerator,
+                new RequestBuilder(
+                    new HttpFactory(),
+                    self::$urlGenerator,
+                ),
             ),
         );
     }

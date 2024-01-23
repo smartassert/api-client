@@ -6,7 +6,6 @@ namespace SmartAssert\ApiClient\ServiceClient;
 
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
@@ -16,6 +15,8 @@ use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
+use SmartAssert\ApiClient\RequestBuilder\RequestSpecification;
 use SmartAssert\ServiceRequest\Exception\ErrorDeserializationException;
 use SmartAssert\ServiceRequest\Exception\UnknownErrorClassException;
 
@@ -24,6 +25,7 @@ readonly class HttpHandler
     public function __construct(
         private ClientInterface $httpClient,
         private Factory $exceptionFactory,
+        private RequestBuilder $requestBuilder,
     ) {
     }
 
@@ -34,8 +36,10 @@ readonly class HttpHandler
      * @throws NotFoundException
      * @throws UnauthorizedException
      */
-    public function sendRequest(RequestInterface $request): ResponseInterface
+    public function sendRequest(RequestSpecification $requestSpecification): ResponseInterface
     {
+        $request = $this->requestBuilder->create($requestSpecification)->get();
+
         try {
             $response = $this->httpClient->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
@@ -78,9 +82,10 @@ readonly class HttpHandler
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
      */
-    public function getJson(RequestInterface $request): array
+    public function getJson(RequestSpecification $requestSpecification): array
     {
-        $response = $this->sendRequest($request);
+        $request = $this->requestBuilder->create($requestSpecification)->get();
+        $response = $this->sendRequest($requestSpecification);
 
         $contentType = $response->getHeaderLine('content-type');
         if ('application/json' !== $contentType) {
