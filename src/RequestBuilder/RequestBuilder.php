@@ -19,23 +19,23 @@ class RequestBuilder
     ) {
     }
 
-    public function create(
-        string $method,
-        RouteRequirements $routeRequirements,
-        ?HeaderInterface $header = null,
-        ?BodyInterface $body = null,
-    ): RequestBuilder {
+    public function create(RequestSpecification $requestSpecification): RequestBuilder
+    {
+        $routeRequirements = $requestSpecification->routeRequirements;
+
         $this->request = new Request(
-            $method,
+            $requestSpecification->method,
             $this->urlGenerator->generate($routeRequirements->name, $routeRequirements->parameters)
         );
 
+        $header = $requestSpecification->header;
         if ($header instanceof HeaderInterface) {
             foreach ($header->toArray() as $name => $value) {
                 $this->request = $this->request->withHeader($name, $value);
             }
         }
 
+        $body = $requestSpecification->body;
         if ($body instanceof BodyInterface) {
             $this->request = $this->request->withHeader('content-type', $body->getContentType());
             $this->request = $this->request->withBody($this->streamFactory->createStream($body->getContent()));

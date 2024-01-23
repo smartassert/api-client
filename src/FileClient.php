@@ -14,6 +14,7 @@ use SmartAssert\ApiClient\RequestBuilder\AcceptableContentTypesHeader;
 use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\HeaderCollection;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
+use SmartAssert\ApiClient\RequestBuilder\RequestSpecification;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\RequestBuilder\YamlBody;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -40,12 +41,12 @@ readonly class FileClient
     public function create(string $apiKey, string $sourceId, string $filename, string $content): void
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'POST',
                 $this->createRouteRequirements($sourceId, $filename),
                 new ApiKeyAuthorizationHeader($apiKey),
                 new YamlBody($content),
-            )
+            ))
             ->get()
         ;
 
@@ -65,14 +66,14 @@ readonly class FileClient
     public function read(string $apiKey, string $sourceId, string $filename): string
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'GET',
                 $this->createRouteRequirements($sourceId, $filename),
                 new HeaderCollection([
                     new ApiKeyAuthorizationHeader($apiKey),
                     new AcceptableContentTypesHeader(['application/yaml', 'text/x-yaml'])
                 ]),
-            )
+            ))
             ->get()
         ;
 
@@ -98,12 +99,12 @@ readonly class FileClient
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'PUT',
                 $this->createRouteRequirements($sourceId, $filename),
                 new ApiKeyAuthorizationHeader($apiKey),
                 new YamlBody($content),
-            )
+            ))
             ->get()
         ;
 
@@ -127,11 +128,11 @@ readonly class FileClient
     public function delete(string $apiKey, string $sourceId, string $filename): void
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'DELETE',
                 $this->createRouteRequirements($sourceId, $filename),
                 new ApiKeyAuthorizationHeader($apiKey),
-            )
+            ))
             ->get()
         ;
 

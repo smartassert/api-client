@@ -17,6 +17,7 @@ use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\FormBody;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
+use SmartAssert\ApiClient\RequestBuilder\RequestSpecification;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 
@@ -44,12 +45,12 @@ readonly class FileSourceClient
     public function create(string $apiKey, string $label): FileSource
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'POST',
                 new RouteRequirements('file-source'),
                 new ApiKeyAuthorizationHeader($apiKey),
                 new FormBody(['label' => $label])
-            )
+            ))
             ->get()
         ;
 
@@ -72,12 +73,12 @@ readonly class FileSourceClient
     public function update(string $apiKey, string $id, string $label): FileSource
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'PUT',
                 new RouteRequirements('file-source', ['sourceId' => $id]),
                 new ApiKeyAuthorizationHeader($apiKey),
                 new FormBody(['label' => $label])
-            )
+            ))
             ->get()
         ;
 
@@ -101,11 +102,11 @@ readonly class FileSourceClient
     public function list(string $apiKey, string $id): array
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'GET',
                 new RouteRequirements('file-source-list', ['sourceId' => $id]),
                 new ApiKeyAuthorizationHeader($apiKey),
-            )
+            ))
             ->get()
         ;
 

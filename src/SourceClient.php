@@ -16,6 +16,7 @@ use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
+use SmartAssert\ApiClient\RequestBuilder\RequestSpecification;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 
@@ -45,11 +46,11 @@ readonly class SourceClient
     public function list(string $apiKey): array
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'GET',
                 new RouteRequirements('sources'),
                 new ApiKeyAuthorizationHeader($apiKey),
-            )
+            ))
             ->get()
         ;
 
@@ -85,11 +86,11 @@ readonly class SourceClient
     public function get(string $apiKey, string $id): ?SourceInterface
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'GET',
                 new RouteRequirements('source', ['sourceId' => $id]),
                 new ApiKeyAuthorizationHeader($apiKey),
-            )
+            ))
             ->get()
         ;
 
@@ -112,11 +113,11 @@ readonly class SourceClient
     public function delete(string $apiKey, string $id): ?SourceInterface
     {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 'DELETE',
                 new RouteRequirements('source', ['sourceId' => $id]),
                 new ApiKeyAuthorizationHeader($apiKey),
-            )
+            ))
             ->get()
         ;
 

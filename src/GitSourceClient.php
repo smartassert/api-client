@@ -17,6 +17,7 @@ use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\FormBody;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
+use SmartAssert\ApiClient\RequestBuilder\RequestSpecification;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 
@@ -95,7 +96,7 @@ readonly class GitSourceClient
         ?string $id = null,
     ): GitSource {
         $request = $this->requestBuilder
-            ->create(
+            ->create(new RequestSpecification(
                 $method,
                 new RouteRequirements('git-source', ['sourceId' => $id]),
                 new ApiKeyAuthorizationHeader($apiKey),
@@ -105,7 +106,7 @@ readonly class GitSourceClient
                     'path' => $path,
                     'credentials' => $credentials,
                 ])
-            )
+            ))
             ->get()
         ;
 
