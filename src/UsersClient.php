@@ -16,6 +16,7 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
+use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -26,6 +27,7 @@ readonly class UsersClient
         private UrlGeneratorInterface $urlGenerator,
         private HttpHandler $httpHandler,
         private RequestBuilder $requestBuilder,
+        private TokenFactory $tokenFactory,
     ) {
     }
 
@@ -37,6 +39,7 @@ readonly class UsersClient
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
      * @throws IncompleteDataException
+     * @throws ErrorException
      */
     public function createToken(string $userIdentifier, string $password): Token
     {
@@ -46,7 +49,7 @@ readonly class UsersClient
             ->get()
         ;
 
-        return $this->createTokenFromResponseData($this->httpHandler->getJson($request));
+        return $this->tokenFactory->create($this->httpHandler->getJson($request));
     }
 
     /**
@@ -81,6 +84,7 @@ readonly class UsersClient
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function refreshToken(string $refreshToken): Token
     {
@@ -90,7 +94,7 @@ readonly class UsersClient
             ->get()
         ;
 
-        return $this->createTokenFromResponseData($this->httpHandler->getJson($request));
+        return $this->tokenFactory->create($this->httpHandler->getJson($request));
     }
 
     /**
@@ -234,28 +238,6 @@ readonly class UsersClient
         }
 
         return $apiKeys;
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @throws IncompleteDataException
-     */
-    private function createTokenFromResponseData(array $data): Token
-    {
-        $token = $data['token'] ?? null;
-        $token = is_string($token) ? trim($token) : null;
-        if ('' === $token || null === $token) {
-            throw new IncompleteDataException($data, 'token');
-        }
-
-        $refreshToken = $data['refresh_token'] ?? null;
-        $refreshToken = is_string($refreshToken) ? trim($refreshToken) : null;
-        if ('' === $refreshToken || null === $refreshToken) {
-            throw new IncompleteDataException($data, 'refresh_token');
-        }
-
-        return new Token($token, $refreshToken);
     }
 
     /**
