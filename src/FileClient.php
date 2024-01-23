@@ -15,6 +15,7 @@ use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\HeaderCollection;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
+use SmartAssert\ApiClient\RequestBuilder\YamlBody;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 
 readonly class FileClient
@@ -43,8 +44,8 @@ readonly class FileClient
                 'POST',
                 $this->createRouteRequirements($sourceId, $filename),
                 new ApiKeyAuthorizationHeader($apiKey),
+                new YamlBody($content),
             )
-            ->withBody('application/yaml', $content)
             ->get()
         ;
 
@@ -101,8 +102,8 @@ readonly class FileClient
                 'PUT',
                 $this->createRouteRequirements($sourceId, $filename),
                 new ApiKeyAuthorizationHeader($apiKey),
+                new YamlBody($content),
             )
-            ->withBody('application/yaml', $content)
             ->get()
         ;
 

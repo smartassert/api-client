@@ -21,6 +21,8 @@ use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\RequestBuilder\AuthorizationHeader;
 use SmartAssert\ApiClient\RequestBuilder\BearerAuthorizationHeader;
+use SmartAssert\ApiClient\RequestBuilder\FormBody;
+use SmartAssert\ApiClient\RequestBuilder\JsonBody;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -49,8 +51,12 @@ readonly class UsersClient
     public function createToken(string $userIdentifier, string $password): Token
     {
         $request = $this->requestBuilder
-            ->create('POST', new RouteRequirements('user_token_create'))
-            ->withJsonBody(['username' => $userIdentifier, 'password' => $password])
+            ->create(
+                'POST',
+                new RouteRequirements('user_token_create'),
+                null,
+                new JsonBody(['username' => $userIdentifier, 'password' => $password])
+            )
             ->get()
         ;
 
@@ -98,8 +104,12 @@ readonly class UsersClient
     public function refreshToken(string $refreshToken): Token
     {
         $request = $this->requestBuilder
-            ->create('POST', new RouteRequirements('user_token_refresh'))
-            ->withJsonBody(['refresh_token' => $refreshToken])
+            ->create(
+                'POST',
+                new RouteRequirements('user_token_refresh'),
+                null,
+                new JsonBody(['refresh_token' => $refreshToken])
+            )
             ->get()
         ;
 
@@ -128,8 +138,8 @@ readonly class UsersClient
                 'POST',
                 new RouteRequirements('user_create'),
                 new AuthorizationHeader($adminToken),
+                new FormBody(['identifier' => $userIdentifier, 'password' => $password])
             )
-            ->withFormBody(['identifier' => $userIdentifier, 'password' => $password])
             ->get()
         ;
 
@@ -163,8 +173,8 @@ readonly class UsersClient
                 'POST',
                 new RouteRequirements('user_refresh-token_revoke-all'),
                 new AuthorizationHeader($adminToken),
+                new FormBody(['id' => $userId])
             )
-            ->withFormBody(['id' => $userId])
             ->get()
         ;
 
@@ -188,8 +198,8 @@ readonly class UsersClient
                 'POST',
                 new RouteRequirements('user_refresh-token_revoke'),
                 new BearerAuthorizationHeader($token),
+                new FormBody(['refresh_token' => $refreshToken])
             )
-            ->withFormBody(['refresh_token' => $refreshToken])
             ->get()
         ;
 

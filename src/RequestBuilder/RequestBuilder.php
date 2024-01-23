@@ -23,6 +23,7 @@ class RequestBuilder
         string $method,
         RouteRequirements $routeRequirements,
         ?HeaderInterface $header = null,
+        ?BodyInterface $body = null,
     ): RequestBuilder {
         $this->request = new Request(
             $method,
@@ -35,31 +36,12 @@ class RequestBuilder
             }
         }
 
-        return $this;
-    }
-
-    public function withBody(string $contentType, string $content): RequestBuilder
-    {
-        $this->request = $this->request->withHeader('content-type', $contentType);
-        $this->request = $this->request->withBody($this->streamFactory->createStream($content));
+        if ($body instanceof BodyInterface) {
+            $this->request = $this->request->withHeader('content-type', $body->getContentType());
+            $this->request = $this->request->withBody($this->streamFactory->createStream($body->getContent()));
+        }
 
         return $this;
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    public function withFormBody(array $data): RequestBuilder
-    {
-        return $this->withBody('application/x-www-form-urlencoded', http_build_query($data));
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    public function withJsonBody(array $data): RequestBuilder
-    {
-        return $this->withBody('application/json', (string) json_encode($data));
     }
 
     public function get(): RequestInterface
