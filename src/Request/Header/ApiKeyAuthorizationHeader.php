@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Request;
+namespace SmartAssert\ApiClient\Request\Header;
 
 class ApiKeyAuthorizationHeader extends HeaderCollection
 {

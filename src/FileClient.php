@@ -10,12 +10,12 @@ use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
-use SmartAssert\ApiClient\Request\AcceptableContentTypesHeader;
-use SmartAssert\ApiClient\Request\ApiKeyAuthorizationHeader;
-use SmartAssert\ApiClient\Request\HeaderCollection;
+use SmartAssert\ApiClient\Request\Body\YamlBody;
+use SmartAssert\ApiClient\Request\Header\AcceptableContentTypesHeader;
+use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
+use SmartAssert\ApiClient\Request\Header\HeaderCollection;
 use SmartAssert\ApiClient\Request\RequestSpecification;
 use SmartAssert\ApiClient\Request\RouteRequirements;
-use SmartAssert\ApiClient\Request\YamlBody;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 
 readonly class FileClient
