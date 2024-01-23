@@ -17,6 +17,7 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
+use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -28,6 +29,7 @@ readonly class UsersClient
         private HttpHandler $httpHandler,
         private RequestBuilder $requestBuilder,
         private TokenFactory $tokenFactory,
+        private UserFactory $userFactory,
     ) {
     }
 
@@ -62,6 +64,7 @@ readonly class UsersClient
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function verifyToken(string $token): User
     {
@@ -71,7 +74,7 @@ readonly class UsersClient
             ->get()
         ;
 
-        return $this->createUser($this->httpHandler->getJson($request));
+        return $this->userFactory->create($this->httpHandler->getJson($request));
     }
 
     /**
@@ -110,6 +113,7 @@ readonly class UsersClient
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
      * @throws AlreadyExistsException
+     * @throws ErrorException
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
@@ -130,7 +134,7 @@ readonly class UsersClient
             throw $e;
         }
 
-        return $this->createUser($data);
+        return $this->userFactory->create($this->httpHandler->getJson($request));
     }
 
     /**
@@ -238,28 +242,6 @@ readonly class UsersClient
         }
 
         return $apiKeys;
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @throws IncompleteDataException
-     */
-    private function createUser(array $data): User
-    {
-        $id = $data['id'] ?? null;
-        $id = is_string($id) ? trim($id) : null;
-        if ('' === $id || null === $id) {
-            throw new IncompleteDataException($data, 'id');
-        }
-
-        $identifier = $data['user-identifier'] ?? null;
-        $identifier = is_string($identifier) ? trim($identifier) : null;
-        if ('' === $identifier || null === $identifier) {
-            throw new IncompleteDataException($data, 'user-identifier');
-        }
-
-        return new User($id, $identifier);
     }
 
     /**

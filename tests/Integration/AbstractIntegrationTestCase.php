@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
+use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -62,6 +63,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
             $httpHandler,
             $requestBuilder,
             new TokenFactory(),
+            new UserFactory(),
         );
 
         self::$fileSourceClient = new FileSourceClient(
