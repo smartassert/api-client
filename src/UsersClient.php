@@ -16,6 +16,9 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
+use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
+use SmartAssert\ApiClient\Factory\User\TokenFactory;
+use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -26,6 +29,9 @@ readonly class UsersClient
         private UrlGeneratorInterface $urlGenerator,
         private HttpHandler $httpHandler,
         private RequestBuilder $requestBuilder,
+        private TokenFactory $tokenFactory,
+        private UserFactory $userFactory,
+        private ApiKeyFactory $apiKeyFactory,
     ) {
     }
 
@@ -37,6 +43,7 @@ readonly class UsersClient
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
      * @throws IncompleteDataException
+     * @throws ErrorException
      */
     public function createToken(string $userIdentifier, string $password): Token
     {
@@ -46,7 +53,7 @@ readonly class UsersClient
             ->get()
         ;
 
-        return $this->createTokenFromResponseData($this->httpHandler->getJson($request));
+        return $this->tokenFactory->create($this->httpHandler->getJson($request));
     }
 
     /**
@@ -59,6 +66,7 @@ readonly class UsersClient
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function verifyToken(string $token): User
     {
@@ -68,7 +76,7 @@ readonly class UsersClient
             ->get()
         ;
 
-        return $this->createUser($this->httpHandler->getJson($request));
+        return $this->userFactory->create($this->httpHandler->getJson($request));
     }
 
     /**
@@ -81,6 +89,7 @@ readonly class UsersClient
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function refreshToken(string $refreshToken): Token
     {
@@ -90,7 +99,7 @@ readonly class UsersClient
             ->get()
         ;
 
-        return $this->createTokenFromResponseData($this->httpHandler->getJson($request));
+        return $this->tokenFactory->create($this->httpHandler->getJson($request));
     }
 
     /**
@@ -106,6 +115,7 @@ readonly class UsersClient
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
      * @throws AlreadyExistsException
+     * @throws ErrorException
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
@@ -126,7 +136,7 @@ readonly class UsersClient
             throw $e;
         }
 
-        return $this->createUser($data);
+        return $this->userFactory->create($data);
     }
 
     /**
@@ -137,6 +147,7 @@ readonly class UsersClient
      * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
+     * @throws ErrorException
      */
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
@@ -158,6 +169,7 @@ readonly class UsersClient
      * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
+     * @throws ErrorException
      */
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
@@ -193,7 +205,7 @@ readonly class UsersClient
 
         $data = $this->httpHandler->getJson($request);
 
-        $apiKey = $this->createApiKey($data);
+        $apiKey = $this->apiKeyFactory->create($data);
         if (null === $apiKey) {
             throw new IncompleteDataException($data, 'key');
         }
@@ -212,6 +224,7 @@ readonly class UsersClient
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function getApiKeys(string $token): array
     {
@@ -226,7 +239,7 @@ readonly class UsersClient
         $apiKeys = [];
         foreach ($data as $apiKeyData) {
             if (is_array($apiKeyData)) {
-                $apiKey = $this->createApiKey($apiKeyData);
+                $apiKey = $this->apiKeyFactory->create($apiKeyData);
                 if (null !== $apiKey) {
                     $apiKeys[] = $apiKey;
                 }
@@ -234,67 +247,5 @@ readonly class UsersClient
         }
 
         return $apiKeys;
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @throws IncompleteDataException
-     */
-    private function createTokenFromResponseData(array $data): Token
-    {
-        $token = $data['token'] ?? null;
-        $token = is_string($token) ? trim($token) : null;
-        if ('' === $token || null === $token) {
-            throw new IncompleteDataException($data, 'token');
-        }
-
-        $refreshToken = $data['refresh_token'] ?? null;
-        $refreshToken = is_string($refreshToken) ? trim($refreshToken) : null;
-        if ('' === $refreshToken || null === $refreshToken) {
-            throw new IncompleteDataException($data, 'refresh_token');
-        }
-
-        return new Token($token, $refreshToken);
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @throws IncompleteDataException
-     */
-    private function createUser(array $data): User
-    {
-        $id = $data['id'] ?? null;
-        $id = is_string($id) ? trim($id) : null;
-        if ('' === $id || null === $id) {
-            throw new IncompleteDataException($data, 'id');
-        }
-
-        $identifier = $data['user-identifier'] ?? null;
-        $identifier = is_string($identifier) ? trim($identifier) : null;
-        if ('' === $identifier || null === $identifier) {
-            throw new IncompleteDataException($data, 'user-identifier');
-        }
-
-        return new User($id, $identifier);
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createApiKey(array $data): ?ApiKey
-    {
-        $label = $data['label'] ?? null;
-        $label = is_string($label) ? trim($label) : null;
-        $label = '' === $label ? null : $label;
-
-        $key = $data['key'] ?? null;
-        $key = is_string($key) ? trim($key) : null;
-        if ('' === $key || null === $key) {
-            return null;
-        }
-
-        return new ApiKey($label, $key);
     }
 }

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
+use SmartAssert\ApiClient\Factory\User\TokenFactory;
+use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
@@ -29,6 +32,9 @@ abstract class AbstractUsersClientTestCase extends AbstractClientTestCase
             UrlGeneratorFactory::create('https://api.example.com'),
             new HttpHandler($this->httpClient, $this->exceptionFactory),
             new RequestBuilder(new HttpFactory()),
+            new TokenFactory(),
+            new UserFactory(),
+            new ApiKeyFactory(),
         );
     }
 }
