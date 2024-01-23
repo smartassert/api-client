@@ -38,16 +38,6 @@ class RequestBuilder
         return $this;
     }
 
-    /**
-     * @param non-empty-string[] $contentTypes
-     */
-    public function withAcceptableContentTypes(array $contentTypes): RequestBuilder
-    {
-        $this->request = $this->request->withHeader('accept', implode(', ', $contentTypes));
-
-        return $this;
-    }
-
     public function withBody(string $contentType, string $content): RequestBuilder
     {
         $this->request = $this->request->withHeader('content-type', $contentType);

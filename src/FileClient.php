@@ -10,7 +10,9 @@ use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
+use SmartAssert\ApiClient\RequestBuilder\AcceptableContentTypesHeader;
 use SmartAssert\ApiClient\RequestBuilder\ApiKeyAuthorizationHeader;
+use SmartAssert\ApiClient\RequestBuilder\HeaderCollection;
 use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\RequestBuilder\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -65,9 +67,11 @@ readonly class FileClient
             ->create(
                 'GET',
                 $this->createRouteRequirements($sourceId, $filename),
-                new ApiKeyAuthorizationHeader($apiKey),
+                new HeaderCollection([
+                    new ApiKeyAuthorizationHeader($apiKey),
+                    new AcceptableContentTypesHeader(['application/yaml', 'text/x-yaml'])
+                ]),
             )
-            ->withAcceptableContentTypes(['application/yaml', 'text/x-yaml'])
             ->get()
         ;
 
