@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
+use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\FileSourceClient;
@@ -64,6 +65,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
             $requestBuilder,
             new TokenFactory(),
             new UserFactory(),
+            new ApiKeyFactory(),
         );
 
         self::$fileSourceClient = new FileSourceClient(

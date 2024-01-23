@@ -16,6 +16,7 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
+use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -30,6 +31,7 @@ readonly class UsersClient
         private RequestBuilder $requestBuilder,
         private TokenFactory $tokenFactory,
         private UserFactory $userFactory,
+        private ApiKeyFactory $apiKeyFactory,
     ) {
     }
 
@@ -134,7 +136,7 @@ readonly class UsersClient
             throw $e;
         }
 
-        return $this->userFactory->create($this->httpHandler->getJson($request));
+        return $this->userFactory->create($data);
     }
 
     /**
@@ -145,6 +147,7 @@ readonly class UsersClient
      * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
+     * @throws ErrorException
      */
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
@@ -166,6 +169,7 @@ readonly class UsersClient
      * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
+     * @throws ErrorException
      */
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
@@ -201,7 +205,7 @@ readonly class UsersClient
 
         $data = $this->httpHandler->getJson($request);
 
-        $apiKey = $this->createApiKey($data);
+        $apiKey = $this->apiKeyFactory->create($data);
         if (null === $apiKey) {
             throw new IncompleteDataException($data, 'key');
         }
@@ -220,6 +224,7 @@ readonly class UsersClient
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
+     * @throws ErrorException
      */
     public function getApiKeys(string $token): array
     {
@@ -234,7 +239,7 @@ readonly class UsersClient
         $apiKeys = [];
         foreach ($data as $apiKeyData) {
             if (is_array($apiKeyData)) {
-                $apiKey = $this->createApiKey($apiKeyData);
+                $apiKey = $this->apiKeyFactory->create($apiKeyData);
                 if (null !== $apiKey) {
                     $apiKeys[] = $apiKey;
                 }
@@ -242,23 +247,5 @@ readonly class UsersClient
         }
 
         return $apiKeys;
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createApiKey(array $data): ?ApiKey
-    {
-        $label = $data['label'] ?? null;
-        $label = is_string($label) ? trim($label) : null;
-        $label = '' === $label ? null : $label;
-
-        $key = $data['key'] ?? null;
-        $key = is_string($key) ? trim($key) : null;
-        if ('' === $key || null === $key) {
-            return null;
-        }
-
-        return new ApiKey($label, $key);
     }
 }

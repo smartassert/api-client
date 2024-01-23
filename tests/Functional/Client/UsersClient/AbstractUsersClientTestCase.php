@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -33,6 +34,7 @@ abstract class AbstractUsersClientTestCase extends AbstractClientTestCase
             new RequestBuilder(new HttpFactory()),
             new TokenFactory(),
             new UserFactory(),
+            new ApiKeyFactory(),
         );
     }
 }
