@@ -38,7 +38,7 @@ readonly class HttpHandler
      */
     public function sendRequest(RequestSpecification $requestSpecification): ResponseInterface
     {
-        $request = $this->requestBuilder->create($requestSpecification)->get();
+        $request = $this->requestBuilder->create($requestSpecification);
 
         try {
             $response = $this->httpClient->sendRequest($request);
@@ -84,7 +84,7 @@ readonly class HttpHandler
      */
     public function getJson(RequestSpecification $requestSpecification): array
     {
-        $request = $this->requestBuilder->create($requestSpecification)->get();
+        $request = $this->requestBuilder->create($requestSpecification);
         $response = $this->sendRequest($requestSpecification);
 
         $contentType = $response->getHeaderLine('content-type');
