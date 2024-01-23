@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\ServiceClient;
+namespace SmartAssert\ApiClient\RequestBuilder;
 
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;

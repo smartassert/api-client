@@ -6,8 +6,8 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\FileClient;
 
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\FileClient;
+use SmartAssert\ApiClient\RequestBuilder\RequestBuilder;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
