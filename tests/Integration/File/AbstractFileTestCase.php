@@ -9,7 +9,6 @@ use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\FileClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 
 abstract class AbstractFileTestCase extends AbstractIntegrationTestCase
@@ -21,12 +20,12 @@ abstract class AbstractFileTestCase extends AbstractIntegrationTestCase
         parent::setUpBeforeClass();
 
         self::$fileClient = new FileClient(
-            self::$urlGenerator,
             new HttpHandler(
                 new HttpClient(),
                 new ExceptionFactory(self::$errorDeserializer),
+                new HttpFactory(),
+                self::$urlGenerator,
             ),
-            new RequestBuilder(new HttpFactory()),
         );
     }
 }

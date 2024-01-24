@@ -10,7 +10,6 @@ use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\FileClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -43,9 +42,12 @@ class ListTest extends AbstractIntegrationTestCase
         $fileSource = self::$fileSourceClient->create($apiKey->key, $label);
 
         $fileClient = new FileClient(
-            self::$urlGenerator,
-            new HttpHandler(new HttpClient(), new ExceptionFactory(self::$errorDeserializer)),
-            new RequestBuilder(new HttpFactory()),
+            new HttpHandler(
+                new HttpClient(),
+                new ExceptionFactory(self::$errorDeserializer),
+                new HttpFactory(),
+                self::$urlGenerator,
+            ),
         );
 
         foreach ($filenamesToCreate as $filename) {

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\ServiceClient;
 
+use GuzzleHttp\Psr7\Request;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
@@ -16,14 +18,20 @@ use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Request\Body\BodyInterface;
+use SmartAssert\ApiClient\Request\Header\HeaderInterface;
+use SmartAssert\ApiClient\Request\RequestSpecification;
 use SmartAssert\ServiceRequest\Exception\ErrorDeserializationException;
 use SmartAssert\ServiceRequest\Exception\UnknownErrorClassException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class HttpHandler
 {
     public function __construct(
         private ClientInterface $httpClient,
         private Factory $exceptionFactory,
+        private StreamFactoryInterface $streamFactory,
+        private UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -34,8 +42,10 @@ readonly class HttpHandler
      * @throws NotFoundException
      * @throws UnauthorizedException
      */
-    public function sendRequest(RequestInterface $request): ResponseInterface
+    public function sendRequest(RequestSpecification $requestSpecification): ResponseInterface
     {
+        $request = $this->createRequest($requestSpecification);
+
         try {
             $response = $this->httpClient->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
@@ -78,9 +88,10 @@ readonly class HttpHandler
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
      */
-    public function getJson(RequestInterface $request): array
+    public function getJson(RequestSpecification $requestSpecification): array
     {
-        $response = $this->sendRequest($request);
+        $request = $this->createRequest($requestSpecification);
+        $response = $this->sendRequest($requestSpecification);
 
         $contentType = $response->getHeaderLine('content-type');
         if ('application/json' !== $contentType) {
@@ -93,5 +104,30 @@ readonly class HttpHandler
         }
 
         return $responseData;
+    }
+
+    private function createRequest(RequestSpecification $requestSpecification): RequestInterface
+    {
+        $routeRequirements = $requestSpecification->routeRequirements;
+
+        $request = new Request(
+            $requestSpecification->method,
+            $this->urlGenerator->generate($routeRequirements->name, $routeRequirements->parameters)
+        );
+
+        $header = $requestSpecification->header;
+        if ($header instanceof HeaderInterface) {
+            foreach ($header->toArray() as $name => $value) {
+                $request = $request->withHeader($name, $value);
+            }
+        }
+
+        $body = $requestSpecification->body;
+        if ($body instanceof BodyInterface) {
+            $request = $request->withHeader('content-type', $body->getContentType());
+            $request = $request->withBody($this->streamFactory->createStream($body->getContent()));
+        }
+
+        return $request;
     }
 }

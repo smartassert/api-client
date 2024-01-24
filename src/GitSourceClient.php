@@ -14,17 +14,17 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
+use SmartAssert\ApiClient\Request\Body\FormBody;
+use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
+use SmartAssert\ApiClient\Request\RequestSpecification;
+use SmartAssert\ApiClient\Request\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class GitSourceClient
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
-        private RequestBuilder $requestBuilder,
     ) {
     }
 
@@ -93,18 +93,18 @@ readonly class GitSourceClient
         ?string $credentials,
         ?string $id = null,
     ): GitSource {
-        $request = $this->requestBuilder
-            ->create($method, $this->urlGenerator->generate('git-source', ['sourceId' => $id]))
-            ->withApiKeyAuthorization($apiKey)
-            ->withFormBody([
-                'label' => $label,
-                'host-url' => $hostUrl,
-                'path' => $path,
-                'credentials' => $credentials,
-            ])
-            ->get()
-        ;
-
-        return $this->sourceFactory->createGitSource($this->httpHandler->getJson($request));
+        return $this->sourceFactory->createGitSource(
+            $this->httpHandler->getJson(new RequestSpecification(
+                $method,
+                new RouteRequirements('git-source', ['sourceId' => $id]),
+                new ApiKeyAuthorizationHeader($apiKey),
+                new FormBody([
+                    'label' => $label,
+                    'host-url' => $hostUrl,
+                    'path' => $path,
+                    'credentials' => $credentials,
+                ])
+            ))
+        );
     }
 }

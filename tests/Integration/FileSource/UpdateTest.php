@@ -14,7 +14,6 @@ use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\SourceClient;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceRequest\Error\BadRequestError;
@@ -97,10 +96,13 @@ class UpdateTest extends AbstractIntegrationTestCase
     public function testUpdateDeletedSource(): void
     {
         $sourceClient = new SourceClient(
-            self::$urlGenerator,
             new SourceFactory(),
-            new HttpHandler(new HttpClient(), new ExceptionFactory(self::$errorDeserializer)),
-            new RequestBuilder(new HttpFactory()),
+            new HttpHandler(
+                new HttpClient(),
+                new ExceptionFactory(self::$errorDeserializer),
+                new HttpFactory(),
+                self::$urlGenerator,
+            ),
         );
 
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

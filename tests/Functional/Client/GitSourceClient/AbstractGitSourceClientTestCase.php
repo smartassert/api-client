@@ -10,7 +10,6 @@ use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
@@ -34,10 +33,13 @@ abstract class AbstractGitSourceClientTestCase extends AbstractClientTestCase
         parent::setUp();
 
         $this->client = new GitSourceClient(
-            UrlGeneratorFactory::create('https://api.example.com'),
             new SourceFactory(),
-            new HttpHandler($this->httpClient, $this->exceptionFactory),
-            new RequestBuilder(new HttpFactory())
+            new HttpHandler(
+                $this->httpClient,
+                $this->exceptionFactory,
+                new HttpFactory(),
+                UrlGeneratorFactory::create('https://api.example.com'),
+            ),
         );
     }
 

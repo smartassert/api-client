@@ -14,17 +14,17 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
+use SmartAssert\ApiClient\Request\Body\FormBody;
+use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
+use SmartAssert\ApiClient\Request\RequestSpecification;
+use SmartAssert\ApiClient\Request\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class FileSourceClient
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
-        private RequestBuilder $requestBuilder,
     ) {
     }
 
@@ -42,14 +42,14 @@ readonly class FileSourceClient
      */
     public function create(string $apiKey, string $label): FileSource
     {
-        $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('file-source'))
-            ->withApiKeyAuthorization($apiKey)
-            ->withFormBody(['label' => $label])
-            ->get()
-        ;
-
-        return $this->sourceFactory->createFileSource($this->httpHandler->getJson($request));
+        return $this->sourceFactory->createFileSource(
+            $this->httpHandler->getJson(new RequestSpecification(
+                'POST',
+                new RouteRequirements('file-source'),
+                new ApiKeyAuthorizationHeader($apiKey),
+                new FormBody(['label' => $label])
+            ))
+        );
     }
 
     /**
@@ -67,14 +67,14 @@ readonly class FileSourceClient
      */
     public function update(string $apiKey, string $id, string $label): FileSource
     {
-        $request = $this->requestBuilder
-            ->create('PUT', $this->urlGenerator->generate('file-source', ['sourceId' => $id]))
-            ->withApiKeyAuthorization($apiKey)
-            ->withFormBody(['label' => $label])
-            ->get()
-        ;
-
-        return $this->sourceFactory->createFileSource($this->httpHandler->getJson($request));
+        return $this->sourceFactory->createFileSource(
+            $this->httpHandler->getJson(new RequestSpecification(
+                'PUT',
+                new RouteRequirements('file-source', ['sourceId' => $id]),
+                new ApiKeyAuthorizationHeader($apiKey),
+                new FormBody(['label' => $label])
+            ))
+        );
     }
 
     /**
@@ -93,13 +93,11 @@ readonly class FileSourceClient
      */
     public function list(string $apiKey, string $id): array
     {
-        $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('file-source-list', ['sourceId' => $id]))
-            ->withApiKeyAuthorization($apiKey)
-            ->get()
-        ;
-
-        $data = $this->httpHandler->getJson($request);
+        $data = $this->httpHandler->getJson(new RequestSpecification(
+            'GET',
+            new RouteRequirements('file-source-list', ['sourceId' => $id]),
+            new ApiKeyAuthorizationHeader($apiKey),
+        ));
 
         $filenames = [];
         foreach ($data as $filename) {

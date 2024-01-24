@@ -9,7 +9,6 @@ use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
@@ -29,9 +28,12 @@ abstract class AbstractUsersClientTestCase extends AbstractClientTestCase
         parent::setUp();
 
         $this->client = new UsersClient(
-            UrlGeneratorFactory::create('https://api.example.com'),
-            new HttpHandler($this->httpClient, $this->exceptionFactory),
-            new RequestBuilder(new HttpFactory()),
+            new HttpHandler(
+                $this->httpClient,
+                $this->exceptionFactory,
+                new HttpFactory(),
+                UrlGeneratorFactory::create('https://api.example.com'),
+            ),
             new TokenFactory(),
             new UserFactory(),
             new ApiKeyFactory(),

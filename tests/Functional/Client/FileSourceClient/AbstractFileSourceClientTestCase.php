@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
@@ -27,10 +26,13 @@ abstract class AbstractFileSourceClientTestCase extends AbstractClientTestCase
         parent::setUp();
 
         $this->client = new FileSourceClient(
-            UrlGeneratorFactory::create('https://api.example.com'),
             new SourceFactory(),
-            new HttpHandler($this->httpClient, $this->exceptionFactory),
-            new RequestBuilder(new HttpFactory())
+            new HttpHandler(
+                $this->httpClient,
+                $this->exceptionFactory,
+                new HttpFactory(),
+                UrlGeneratorFactory::create('https://api.example.com'),
+            ),
         );
     }
 

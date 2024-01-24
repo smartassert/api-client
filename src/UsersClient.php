@@ -19,16 +19,18 @@ use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
 use SmartAssert\ApiClient\Factory\User\UserFactory;
+use SmartAssert\ApiClient\Request\Body\FormBody;
+use SmartAssert\ApiClient\Request\Body\JsonBody;
+use SmartAssert\ApiClient\Request\Header\AuthorizationHeader;
+use SmartAssert\ApiClient\Request\Header\BearerAuthorizationHeader;
+use SmartAssert\ApiClient\Request\RequestSpecification;
+use SmartAssert\ApiClient\Request\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\ServiceClient\RequestBuilder;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class UsersClient
 {
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
         private HttpHandler $httpHandler,
-        private RequestBuilder $requestBuilder,
         private TokenFactory $tokenFactory,
         private UserFactory $userFactory,
         private ApiKeyFactory $apiKeyFactory,
@@ -47,13 +49,14 @@ readonly class UsersClient
      */
     public function createToken(string $userIdentifier, string $password): Token
     {
-        $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_token_create'))
-            ->withJsonBody(['username' => $userIdentifier, 'password' => $password])
-            ->get()
-        ;
-
-        return $this->tokenFactory->create($this->httpHandler->getJson($request));
+        return $this->tokenFactory->create(
+            $this->httpHandler->getJson(new RequestSpecification(
+                'POST',
+                new RouteRequirements('user_token_create'),
+                null,
+                new JsonBody(['username' => $userIdentifier, 'password' => $password])
+            ))
+        );
     }
 
     /**
@@ -70,13 +73,13 @@ readonly class UsersClient
      */
     public function verifyToken(string $token): User
     {
-        $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('user_token_verify'))
-            ->withBearerAuthorization($token)
-            ->get()
-        ;
-
-        return $this->userFactory->create($this->httpHandler->getJson($request));
+        return $this->userFactory->create(
+            $this->httpHandler->getJson(new RequestSpecification(
+                'GET',
+                new RouteRequirements('user_token_verify'),
+                new BearerAuthorizationHeader($token),
+            ))
+        );
     }
 
     /**
@@ -93,13 +96,14 @@ readonly class UsersClient
      */
     public function refreshToken(string $refreshToken): Token
     {
-        $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_token_refresh'))
-            ->withJsonBody(['refresh_token' => $refreshToken])
-            ->get()
-        ;
-
-        return $this->tokenFactory->create($this->httpHandler->getJson($request));
+        return $this->tokenFactory->create(
+            $this->httpHandler->getJson(new RequestSpecification(
+                'POST',
+                new RouteRequirements('user_token_refresh'),
+                null,
+                new JsonBody(['refresh_token' => $refreshToken])
+            ))
+        );
     }
 
     /**
@@ -119,15 +123,13 @@ readonly class UsersClient
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
-        $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_create'))
-            ->withAuthorization($adminToken)
-            ->withFormBody(['identifier' => $userIdentifier, 'password' => $password])
-            ->get()
-        ;
-
         try {
-            $data = $this->httpHandler->getJson($request);
+            $data = $this->httpHandler->getJson(new RequestSpecification(
+                'POST',
+                new RouteRequirements('user_create'),
+                new AuthorizationHeader($adminToken),
+                new FormBody(['identifier' => $userIdentifier, 'password' => $password])
+            ));
         } catch (HttpException $e) {
             if (409 === $e->getCode()) {
                 throw new AlreadyExistsException($userIdentifier, $e->response);
@@ -151,14 +153,12 @@ readonly class UsersClient
      */
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
-        $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_refresh-token_revoke-all'))
-            ->withAuthorization($adminToken)
-            ->withFormBody(['id' => $userId])
-            ->get()
-        ;
-
-        $this->httpHandler->sendRequest($request);
+        $this->httpHandler->sendRequest(new RequestSpecification(
+            'POST',
+            new RouteRequirements('user_refresh-token_revoke-all'),
+            new AuthorizationHeader($adminToken),
+            new FormBody(['id' => $userId])
+        ));
     }
 
     /**
@@ -173,14 +173,12 @@ readonly class UsersClient
      */
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
-        $request = $this->requestBuilder
-            ->create('POST', $this->urlGenerator->generate('user_refresh-token_revoke'))
-            ->withBearerAuthorization($token)
-            ->withFormBody(['refresh_token' => $refreshToken])
-            ->get()
-        ;
-
-        $this->httpHandler->sendRequest($request);
+        $this->httpHandler->sendRequest(new RequestSpecification(
+            'POST',
+            new RouteRequirements('user_refresh-token_revoke'),
+            new BearerAuthorizationHeader($token),
+            new FormBody(['refresh_token' => $refreshToken])
+        ));
     }
 
     /**
@@ -197,13 +195,11 @@ readonly class UsersClient
      */
     public function getApiKey(string $token): ApiKey
     {
-        $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('user_apikey'))
-            ->withBearerAuthorization($token)
-            ->get()
-        ;
-
-        $data = $this->httpHandler->getJson($request);
+        $data = $this->httpHandler->getJson(new RequestSpecification(
+            'GET',
+            new RouteRequirements('user_apikey'),
+            new BearerAuthorizationHeader($token),
+        ));
 
         $apiKey = $this->apiKeyFactory->create($data);
         if (null === $apiKey) {
@@ -228,13 +224,11 @@ readonly class UsersClient
      */
     public function getApiKeys(string $token): array
     {
-        $request = $this->requestBuilder
-            ->create('GET', $this->urlGenerator->generate('user_apikey_list'))
-            ->withBearerAuthorization($token)
-            ->get()
-        ;
-
-        $data = $this->httpHandler->getJson($request);
+        $data = $this->httpHandler->getJson(new RequestSpecification(
+            'GET',
+            new RouteRequirements('user_apikey_list'),
+            new BearerAuthorizationHeader($token),
+        ));
 
         $apiKeys = [];
         foreach ($data as $apiKeyData) {
