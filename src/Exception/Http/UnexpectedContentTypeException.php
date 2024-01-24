@@ -10,10 +10,11 @@ use Psr\Http\Message\ResponseInterface;
 class UnexpectedContentTypeException extends HttpException
 {
     public function __construct(
+        string $name,
         RequestInterface $request,
         ResponseInterface $response,
         public readonly string $contentType,
     ) {
-        parent::__construct($request, $response);
+        parent::__construct($name, $request, $response);
     }
 }

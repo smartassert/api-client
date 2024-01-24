@@ -6,9 +6,7 @@ namespace SmartAssert\ApiClient\Exception\Error;
 
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ServiceRequest\Deserializer\Error\Deserializer;
-use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
-use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
-use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
+use SmartAssert\ServiceRequest\Error\ErrorInterface;
 use SmartAssert\ServiceRequest\Exception\ErrorDeserializationException;
 use SmartAssert\ServiceRequest\Exception\UnknownErrorClassException;
 
@@ -23,7 +21,7 @@ readonly class Factory
      * @throws ErrorDeserializationException
      * @throws UnknownErrorClassException
      */
-    public function createFromResponse(ResponseInterface $response): ?ErrorException
+    public function createFromResponse(ResponseInterface $response): ?ErrorInterface
     {
         if ($response->getStatusCode() < 400) {
             return null;
@@ -40,20 +38,6 @@ readonly class Factory
             return null;
         }
 
-        $error = $this->errorDeserializer->deserialize($data);
-
-        if ($error instanceof DuplicateObjectErrorInterface) {
-            return new DuplicateObjectException($error, $response);
-        }
-
-        if ($error instanceof ModifyReadOnlyEntityErrorInterface) {
-            return new ModifyReadOnlyEntityException($error, $response);
-        }
-
-        if ($error instanceof BadRequestErrorInterface) {
-            return new BadRequestException($error, $response);
-        }
-
-        return new ErrorException($error, $response);
+        return $this->errorDeserializer->deserialize($data);
     }
 }

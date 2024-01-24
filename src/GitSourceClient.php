@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
-use SmartAssert\ApiClient\Exception\Http\HttpClientException;
+use SmartAssert\ApiClient\Exception\Http\FailedRequestException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
@@ -31,7 +31,7 @@ readonly class GitSourceClient
     /**
      * @param non-empty-string $apiKey
      *
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws IncompleteDataException
      * @throws NotFoundException
@@ -54,7 +54,7 @@ readonly class GitSourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws IncompleteDataException
      * @throws NotFoundException
@@ -75,7 +75,7 @@ readonly class GitSourceClient
     }
 
     /**
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws IncompleteDataException
      * @throws NotFoundException

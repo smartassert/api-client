@@ -6,10 +6,8 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
-use SmartAssert\ApiClient\Exception\Error\BadRequestException;
-use SmartAssert\ApiClient\Exception\Error\DuplicateObjectException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
-use SmartAssert\ApiClient\Exception\Error\ModifyReadOnlyEntityException;
+use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
@@ -17,8 +15,11 @@ use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\SourceClient;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceRequest\Error\BadRequestError;
+use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
+use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
+use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
 use SmartAssert\ServiceRequest\Field\Field;
 use Symfony\Component\Uid\Ulid;
 
@@ -65,11 +66,14 @@ class UpdateTest extends AbstractIntegrationTestCase
 
         try {
             self::$fileSourceClient->update($apiKey->key, $source->id, $label);
-        } catch (BadRequestException $exception) {
+        } catch (ErrorExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(BadRequestException::class, $exception);
-        self::assertEquals($expected, $exception->error);
+        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+
+        $error = $exception->getError();
+        self::assertInstanceOf(BadRequestErrorInterface::class, $error);
+        self::assertEquals($expected, $error);
     }
 
     public function testUpdateDuplicateLabel(): void
@@ -86,11 +90,14 @@ class UpdateTest extends AbstractIntegrationTestCase
 
         try {
             self::$fileSourceClient->update($apiKey->key, $createdFileSource->id, $label);
-        } catch (DuplicateObjectException $exception) {
+        } catch (ErrorExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(DuplicateObjectException::class, $exception);
-        self::assertEquals(new DuplicateObjectError(new Field('label', $label)), $exception->error);
+        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+
+        $error = $exception->getError();
+        self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
+        self::assertEquals(new DuplicateObjectError(new Field('label', $label)), $error);
     }
 
     public function testUpdateDeletedSource(): void
@@ -115,11 +122,14 @@ class UpdateTest extends AbstractIntegrationTestCase
 
         try {
             self::$fileSourceClient->update($apiKey->key, $source->id, md5((string) rand()));
-        } catch (ModifyReadOnlyEntityException $exception) {
+        } catch (ErrorExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ModifyReadOnlyEntityException::class, $exception);
-        self::assertEquals(new ModifyReadOnlyEntityError($source->id, 'file-source'), $exception->error);
+        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+
+        $error = $exception->getError();
+        self::assertInstanceOf(ModifyReadOnlyEntityErrorInterface::class, $error);
+        self::assertEquals(new ModifyReadOnlyEntityError($source->id, 'file-source'), $error);
     }
 
     public function testUpdateSuccess(): void

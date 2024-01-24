@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
-use SmartAssert\ApiClient\Exception\Http\HttpClientException;
+use SmartAssert\ApiClient\Exception\Http\FailedRequestException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
@@ -31,7 +31,7 @@ readonly class FileClient
      * @param non-empty-string $filename
      *
      * @throws ErrorException
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws NotFoundException
      * @throws UnauthorizedException
@@ -52,7 +52,7 @@ readonly class FileClient
      * @param non-empty-string $filename
      *
      * @throws FileNotFoundException
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws ErrorException
      */
@@ -80,7 +80,7 @@ readonly class FileClient
      * @param non-empty-string $filename
      *
      * @throws FileNotFoundException
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws ErrorException
      */
@@ -104,7 +104,7 @@ readonly class FileClient
      * @param non-empty-string $filename
      *
      * @throws FileNotFoundException
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws ErrorException
      */

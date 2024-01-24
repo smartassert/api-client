@@ -16,4 +16,12 @@ readonly class RequestSpecification
         public ?BodyInterface $body = null,
     ) {
     }
+
+    /**
+     * @return non-empty-string
+     */
+    public function getName(): string
+    {
+        return strtolower($this->method) . '_' . $this->routeRequirements->name;
+    }
 }

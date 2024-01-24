@@ -10,10 +10,11 @@ use Psr\Http\Message\ResponseInterface;
 class UnexpectedDataException extends HttpException
 {
     public function __construct(
+        string $name,
         RequestInterface $request,
         ResponseInterface $response,
         public readonly string $type,
     ) {
-        parent::__construct($request, $response);
+        parent::__construct($name, $request, $response);
     }
 }

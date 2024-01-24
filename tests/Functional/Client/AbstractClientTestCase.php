@@ -94,7 +94,7 @@ abstract class AbstractClientTestCase extends TestCase
 
             self::fail(HttpException::class . ' not thrown');
         } catch (HttpException $e) {
-            self::assertSame($httpFixture, $e->response);
+            self::assertSame($httpFixture, $e->getResponse());
         }
     }
 
