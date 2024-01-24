@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
-use SmartAssert\ApiClient\Exception\Error\BadRequestException;
-use SmartAssert\ApiClient\Exception\Error\DuplicateObjectException;
+use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
-use SmartAssert\ServiceRequest\Error\BadRequestError;
+use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
+use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
 use SmartAssert\ServiceRequest\Field\Field;
 
 class CreateTest extends AbstractIntegrationTestCase
@@ -40,7 +40,7 @@ class CreateTest extends AbstractIntegrationTestCase
         string $hostUrl,
         string $path,
         ?string $credentials,
-        BadRequestError $expected
+        BadRequestErrorInterface $expected
     ): void {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
@@ -49,11 +49,14 @@ class CreateTest extends AbstractIntegrationTestCase
 
         try {
             self::$gitSourceClient->create($apiKey->key, $label, $hostUrl, $path, $credentials);
-        } catch (BadRequestException $exception) {
+        } catch (ErrorExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(BadRequestException::class, $exception);
-        self::assertEquals($expected, $exception->error);
+        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+
+        $error = $exception->getError();
+        self::assertInstanceOf(BadRequestErrorInterface::class, $error);
+        self::assertEquals($expected, $error);
     }
 
     public function testCreateDuplicateLabel(): void
@@ -69,11 +72,14 @@ class CreateTest extends AbstractIntegrationTestCase
 
         try {
             self::$gitSourceClient->create($apiKey->key, $label, md5((string) rand()), md5((string) rand()), null);
-        } catch (DuplicateObjectException $exception) {
+        } catch (ErrorExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(DuplicateObjectException::class, $exception);
-        self::assertEquals(new DuplicateObjectError(new Field('label', $label)), $exception->error);
+        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+
+        $error = $exception->getError();
+        self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
+        self::assertEquals(new DuplicateObjectError(new Field('label', $label)), $error);
     }
 
     /**

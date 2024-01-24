@@ -4,15 +4,25 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Exception\Error;
 
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ServiceRequest\Error\ErrorInterface;
 
-class ErrorException extends \Exception
+class ErrorException extends HttpException implements ErrorExceptionInterface
 {
     public function __construct(
-        public readonly ErrorInterface $error,
-        public readonly ResponseInterface $response,
+        string $name,
+        RequestInterface $request,
+        ResponseInterface $response,
+        private readonly ErrorInterface $error,
     ) {
-        parent::__construct();
+        parent::__construct($name, $request, $response);
+    }
+
+    public function getError(): ErrorInterface
+    {
+        return $this->error;
     }
 }

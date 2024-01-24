@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
-use SmartAssert\ApiClient\Exception\Error\BadRequestException;
+use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
-use SmartAssert\ServiceRequest\Error\BadRequestError;
+use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 
 class CreateTest extends AbstractIntegrationTestCase
 {
@@ -23,7 +23,7 @@ class CreateTest extends AbstractIntegrationTestCase
     /**
      * @dataProvider createUpdateFileSourceBadRequestDataProvider
      */
-    public function testCreateBadRequest(string $label, BadRequestError $expected): void
+    public function testCreateBadRequest(string $label, BadRequestErrorInterface $expected): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
@@ -32,11 +32,14 @@ class CreateTest extends AbstractIntegrationTestCase
 
         try {
             self::$fileSourceClient->create($apiKey->key, $label);
-        } catch (BadRequestException $exception) {
+        } catch (ErrorExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(BadRequestException::class, $exception);
-        self::assertEquals($expected, $exception->error);
+        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+
+        $error = $exception->getError();
+        self::assertInstanceOf(BadRequestErrorInterface::class, $error);
+        self::assertEquals($expected, $error);
     }
 
     public function testCreateFileSourceSuccess(): void

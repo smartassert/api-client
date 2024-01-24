@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
-use SmartAssert\ApiClient\Exception\Http\HttpClientException;
+use SmartAssert\ApiClient\Exception\Http\FailedRequestException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
@@ -32,7 +32,7 @@ readonly class SourceClient
      *
      * @return SourceInterface[]
      *
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws IncompleteDataException
      * @throws NotFoundException
@@ -67,7 +67,7 @@ readonly class SourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws IncompleteDataException
      * @throws NotFoundException
@@ -91,7 +91,7 @@ readonly class SourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws HttpClientException
+     * @throws FailedRequestException
      * @throws HttpException
      * @throws IncompleteDataException
      * @throws NotFoundException
