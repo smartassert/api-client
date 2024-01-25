@@ -71,7 +71,7 @@
         "psr/http-factory": "^1.0",
         "symfony/routing": "^6.4 || ^7.0",
         "guzzlehttp/guzzle": "^7.8",
-        "smartassert/service-request": "^0.7"
+        "smartassert/service-request": "^0.8"
     },
     "require-dev": {
         "ext-pdo": "*",
