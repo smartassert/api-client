@@ -20,7 +20,7 @@ use SmartAssert\ApiClient\Request\RequestSpecification;
 use SmartAssert\ApiClient\Request\RouteRequirements;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 
-readonly class FileSourceClient
+readonly class FileSourceClient implements FileSourceClientInterface
 {
     public function __construct(
         private SourceFactory $sourceFactory,
