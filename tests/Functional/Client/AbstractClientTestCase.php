@@ -18,10 +18,10 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponse
 use SmartAssert\ServiceRequest\Deserializer\Error\BadRequestErrorDeserializer;
 use SmartAssert\ServiceRequest\Deserializer\Error\Deserializer as ErrorDeserializer;
 use SmartAssert\ServiceRequest\Deserializer\Error\DuplicateObjectErrorDeserializer;
-use SmartAssert\ServiceRequest\Deserializer\Error\ErrorFieldDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Error\ErrorParameterDeserializer;
 use SmartAssert\ServiceRequest\Deserializer\Error\ModifyReadOnlyEntityDeserializer;
 use SmartAssert\ServiceRequest\Deserializer\Error\StorageErrorDeserializer;
-use SmartAssert\ServiceRequest\Deserializer\Field\Deserializer as FieldDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Parameter\Deserializer as ParameterDeserializer;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 abstract class AbstractClientTestCase extends TestCase
@@ -49,7 +49,7 @@ abstract class AbstractClientTestCase extends TestCase
 
         $this->httpClient = new HttpClient(['handler' => $handlerStack]);
 
-        $errorFieldDeserializer = new ErrorFieldDeserializer(new FieldDeserializer());
+        $errorFieldDeserializer = new ErrorParameterDeserializer(new ParameterDeserializer());
 
         $this->exceptionFactory = new ExceptionFactory(
             new ErrorDeserializer([

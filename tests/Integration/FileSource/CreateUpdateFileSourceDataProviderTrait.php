@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use SmartAssert\ServiceRequest\Error\BadRequestError;
-use SmartAssert\ServiceRequest\Field\Field;
-use SmartAssert\ServiceRequest\Field\Requirements;
-use SmartAssert\ServiceRequest\Field\Size;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
+use SmartAssert\ServiceRequest\Parameter\Requirements;
+use SmartAssert\ServiceRequest\Parameter\Size;
 
 trait CreateUpdateFileSourceDataProviderTrait
 {
@@ -23,7 +23,7 @@ trait CreateUpdateFileSourceDataProviderTrait
             'empty' => [
                 'label' => $labelEmpty,
                 'expected' => new BadRequestError(
-                    (new Field('label', $labelEmpty))
+                    (new Parameter('label', $labelEmpty))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'empty'
                 ),
@@ -31,7 +31,7 @@ trait CreateUpdateFileSourceDataProviderTrait
             'too long' => [
                 'label' => $labelTooLong,
                 'expected' => new BadRequestError(
-                    (new Field('label', $labelTooLong))
+                    (new Parameter('label', $labelTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'too_large'
                 ),

@@ -9,7 +9,7 @@ use SmartAssert\ApiClient\Exception\File\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
-use SmartAssert\ServiceRequest\Field\Field;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
 
 class CreateReadUpdateDeleteTest extends AbstractFileTestCase
 {
@@ -96,7 +96,7 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
 
         $error = $exception->getError();
         self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
-        self::assertEquals(new DuplicateObjectError(new Field('filename', $filename)), $error);
+        self::assertEquals(new DuplicateObjectError(new Parameter('filename', $filename)), $error);
     }
 
     public function testCreateReadUpdateDeleteSuccess(): void
