@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
 use SmartAssert\ServiceRequest\Error\BadRequestError;
-use SmartAssert\ServiceRequest\Field\Field;
-use SmartAssert\ServiceRequest\Field\Requirements;
-use SmartAssert\ServiceRequest\Field\Size;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
+use SmartAssert\ServiceRequest\Parameter\Requirements;
+use SmartAssert\ServiceRequest\Parameter\Size;
 
 trait CreateUpdateGitSourceDataProviderTrait
 {
@@ -51,7 +51,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'path' => md5((string) rand()),
                 'credentials' => null,
                 'expected' => new BadRequestError(
-                    (new Field('label', ''))
+                    (new Parameter('label', ''))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'empty'
                 ),
@@ -62,7 +62,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'path' => md5((string) rand()),
                 'credentials' => null,
                 'expected' => new BadRequestError(
-                    (new Field('label', $labelTooLong))
+                    (new Parameter('label', $labelTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'too_large'
                 ),
@@ -73,7 +73,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'path' => md5((string) rand()),
                 'credentials' => null,
                 'expected' => new BadRequestError(
-                    (new Field('host-url', ''))
+                    (new Parameter('host-url', ''))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'empty'
                 ),
@@ -84,7 +84,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'path' => md5((string) rand()),
                 'credentials' => null,
                 'expected' => new BadRequestError(
-                    (new Field('host-url', $hostUrlTooLong))
+                    (new Parameter('host-url', $hostUrlTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'too_large'
                 ),
@@ -95,7 +95,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'path' => '',
                 'credentials' => null,
                 'expected' => new BadRequestError(
-                    (new Field('path', ''))
+                    (new Parameter('path', ''))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'empty'
                 ),
@@ -106,7 +106,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'path' => $pathTooLong,
                 'credentials' => null,
                 'expected' => new BadRequestError(
-                    (new Field('path', $pathTooLong))
+                    (new Parameter('path', $pathTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
                     'too_large'
                 ),
@@ -117,7 +117,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'path' => md5((string) rand()),
                 'credentials' => $credentialsTooLong,
                 'expected' => new BadRequestError(
-                    (new Field('credentials', $credentialsTooLong))
+                    (new Parameter('credentials', $credentialsTooLong))
                         ->withRequirements(new Requirements('string', new Size(0, 255))),
                     'too_large'
                 ),

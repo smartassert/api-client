@@ -10,7 +10,7 @@ use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
-use SmartAssert\ServiceRequest\Field\Field;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
 
 class CreateTest extends AbstractIntegrationTestCase
 {
@@ -79,7 +79,7 @@ class CreateTest extends AbstractIntegrationTestCase
 
         $error = $exception->getError();
         self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
-        self::assertEquals(new DuplicateObjectError(new Field('label', $label)), $error);
+        self::assertEquals(new DuplicateObjectError(new Parameter('label', $label)), $error);
     }
 
     /**

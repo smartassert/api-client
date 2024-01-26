@@ -20,10 +20,10 @@ use SmartAssert\ApiClient\UsersClient;
 use SmartAssert\ServiceRequest\Deserializer\Error\BadRequestErrorDeserializer;
 use SmartAssert\ServiceRequest\Deserializer\Error\Deserializer as ErrorDeserializer;
 use SmartAssert\ServiceRequest\Deserializer\Error\DuplicateObjectErrorDeserializer;
-use SmartAssert\ServiceRequest\Deserializer\Error\ErrorFieldDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Error\ErrorParameterDeserializer;
 use SmartAssert\ServiceRequest\Deserializer\Error\ModifyReadOnlyEntityDeserializer;
 use SmartAssert\ServiceRequest\Deserializer\Error\StorageErrorDeserializer;
-use SmartAssert\ServiceRequest\Deserializer\Field\Deserializer as FieldDeserializer;
+use SmartAssert\ServiceRequest\Deserializer\Parameter\Deserializer as ParameterDeserializer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class AbstractIntegrationTestCase extends TestCase
@@ -41,7 +41,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $errorFieldDeserializer = new ErrorFieldDeserializer(new FieldDeserializer());
+        $errorFieldDeserializer = new ErrorParameterDeserializer(new ParameterDeserializer());
 
         self::$errorDeserializer = new ErrorDeserializer([
             new BadRequestErrorDeserializer($errorFieldDeserializer),

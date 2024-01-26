@@ -18,7 +18,7 @@ use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
-use SmartAssert\ServiceRequest\Field\Field;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
 
 class UpdateTest extends AbstractIntegrationTestCase
 {
@@ -107,7 +107,7 @@ class UpdateTest extends AbstractIntegrationTestCase
 
         $error = $exception->getError();
         self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
-        self::assertEquals(new DuplicateObjectError(new Field('label', $conflictLabel)), $error);
+        self::assertEquals(new DuplicateObjectError(new Parameter('label', $conflictLabel)), $error);
     }
 
     public function testUpdateDeletedSource(): void
