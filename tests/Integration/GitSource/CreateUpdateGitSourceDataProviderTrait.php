@@ -64,7 +64,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'expected' => new BadRequestError(
                     (new Parameter('label', $labelTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'too_large'
+                    'wrong_size'
                 ),
             ],
             'host url empty' => [
@@ -86,7 +86,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'expected' => new BadRequestError(
                     (new Parameter('host-url', $hostUrlTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'too_large'
+                    'wrong_size'
                 ),
             ],
             'path empty' => [
@@ -108,7 +108,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'expected' => new BadRequestError(
                     (new Parameter('path', $pathTooLong))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'too_large'
+                    'wrong_size'
                 ),
             ],
             'credentials too long' => [
@@ -119,7 +119,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'expected' => new BadRequestError(
                     (new Parameter('credentials', $credentialsTooLong))
                         ->withRequirements(new Requirements('string', new Size(0, 255))),
-                    'too_large'
+                    'wrong_size'
                 ),
             ],
         ];
