@@ -40,7 +40,7 @@ class UpdateTest extends AbstractFileSourceClientTestCase
         $exception = null;
 
         try {
-            $this->client->update('api key', 'id', 'label');
+            ($this->createClientActionCallable())();
         } catch (IncompleteResponseDataException $exception) {
         }
 

@@ -13,6 +13,7 @@ use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Body\FormBody;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
@@ -77,7 +78,7 @@ readonly class GitSourceClient
     /**
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
@@ -93,18 +94,24 @@ readonly class GitSourceClient
         ?string $credentials,
         ?string $id = null,
     ): GitSource {
-        return $this->sourceFactory->createGitSource(
-            $this->httpHandler->getJson(new RequestSpecification(
-                $method,
-                new RouteRequirements('git-source', ['sourceId' => $id]),
-                new ApiKeyAuthorizationHeader($apiKey),
-                new FormBody([
-                    'label' => $label,
-                    'host-url' => $hostUrl,
-                    'path' => $path,
-                    'credentials' => $credentials,
-                ])
-            ))
+        $requestSpecification = new RequestSpecification(
+            $method,
+            new RouteRequirements('git-source', ['sourceId' => $id]),
+            new ApiKeyAuthorizationHeader($apiKey),
+            new FormBody([
+                'label' => $label,
+                'host-url' => $hostUrl,
+                'path' => $path,
+                'credentials' => $credentials,
+            ])
         );
+
+        try {
+            return $this->sourceFactory->createGitSource(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 }

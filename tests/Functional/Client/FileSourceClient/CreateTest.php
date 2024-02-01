@@ -40,7 +40,7 @@ class CreateTest extends AbstractFileSourceClientTestCase
         $exception = null;
 
         try {
-            $this->client->create('api key', 'label');
+            ($this->createClientActionCallable())();
         } catch (IncompleteResponseDataException $exception) {
         }
 

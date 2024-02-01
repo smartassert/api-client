@@ -11,14 +11,12 @@ use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
-use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
 
 abstract class AbstractGitSourceClientTestCase extends AbstractClientTestCase
 {
     use CommonNonSuccessResponseDataProviderTrait;
-    use ClientActionThrowsIncompleteDataExceptionTestTrait;
 
     protected const ID = 'id';
     protected const LABEL = 'label';
