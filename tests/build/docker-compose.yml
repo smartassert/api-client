@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   users-service:
-    image: ghcr.io/smartassert/users:7.1
+    image: ghcr.io/smartassert/users:8.0
     container_name: users-service
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/users?serverVersion=12&charset=utf8
