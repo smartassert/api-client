@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\User;
 
+use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
+use SmartAssert\ServiceRequest\Error\BadRequestError;
+use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
+use SmartAssert\ServiceRequest\Parameter\Parameter;
+use SmartAssert\ServiceRequest\Parameter\Requirements;
+use SmartAssert\ServiceRequest\Parameter\Size;
 
 class CreateTest extends AbstractIntegrationTestCase
 {
@@ -15,6 +21,31 @@ class CreateTest extends AbstractIntegrationTestCase
         self::expectException(UnauthorizedException::class);
 
         self::$usersClient->create(md5((string) rand()), md5((string) rand()), md5((string) rand()));
+    }
+
+    public function testCreateBadRequest(): void
+    {
+        $userIdentifier = str_repeat('.', 255);
+
+        $exception = null;
+
+        try {
+            self::$usersClient->create('primary_admin_token', $userIdentifier, md5((string) rand()));
+        } catch (ErrorExceptionInterface $exception) {
+        }
+
+        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+
+        $error = $exception->getError();
+        self::assertInstanceOf(BadRequestErrorInterface::class, $error);
+        self::assertEquals(
+            new BadRequestError(
+                (new Parameter('identifier', $userIdentifier))
+                    ->withRequirements(new Requirements('string', new Size(1, 254))),
+                'wrong_size'
+            ),
+            $error
+        );
     }
 
     public function testCreateUserAlreadyExists(): void
