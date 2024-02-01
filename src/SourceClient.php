@@ -13,6 +13,7 @@ use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\Request\RequestSpecification;
@@ -34,7 +35,7 @@ readonly class SourceClient
      *
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
@@ -43,16 +44,22 @@ readonly class SourceClient
      */
     public function list(string $apiKey): array
     {
-        $data = $this->httpHandler->getJson(new RequestSpecification(
+        $requestSpecification = new RequestSpecification(
             'GET',
             new RouteRequirements('sources'),
             new ApiKeyAuthorizationHeader($apiKey),
-        ));
+        );
+
+        $data = $this->httpHandler->getJson($requestSpecification);
 
         $sources = [];
         foreach ($data as $sourceData) {
             if (is_array($sourceData)) {
-                $source = $this->sourceFactory->create($sourceData);
+                try {
+                    $source = $this->sourceFactory->create($sourceData);
+                } catch (IncompleteDataException $e) {
+                    throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+                }
 
                 if ($source instanceof SourceInterface) {
                     $sources[] = $source;
@@ -69,7 +76,7 @@ readonly class SourceClient
      *
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
@@ -78,13 +85,7 @@ readonly class SourceClient
      */
     public function get(string $apiKey, string $id): ?SourceInterface
     {
-        return $this->sourceFactory->create(
-            $this->httpHandler->getJson(new RequestSpecification(
-                'GET',
-                new RouteRequirements('source', ['sourceId' => $id]),
-                new ApiKeyAuthorizationHeader($apiKey),
-            ))
-        );
+        return $this->doSourceAction('GET', $apiKey, $id);
     }
 
     /**
@@ -93,7 +94,7 @@ readonly class SourceClient
      *
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
@@ -102,12 +103,37 @@ readonly class SourceClient
      */
     public function delete(string $apiKey, string $id): ?SourceInterface
     {
-        return $this->sourceFactory->create(
-            $this->httpHandler->getJson(new RequestSpecification(
-                'DELETE',
-                new RouteRequirements('source', ['sourceId' => $id]),
-                new ApiKeyAuthorizationHeader($apiKey),
-            ))
+        return $this->doSourceAction('DELETE', $apiKey, $id);
+    }
+
+    /**
+     * @param non-empty-string $method
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $id
+     *
+     * @throws ErrorException
+     * @throws FailedRequestException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedContentTypeException
+     * @throws UnexpectedDataException
+     */
+    private function doSourceAction(string $method, string $apiKey, string $id): ?SourceInterface
+    {
+        $requestSpecification = new RequestSpecification(
+            $method,
+            new RouteRequirements('source', ['sourceId' => $id]),
+            new ApiKeyAuthorizationHeader($apiKey),
         );
+
+        try {
+            return $this->sourceFactory->create(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 }
