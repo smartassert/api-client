@@ -13,6 +13,7 @@ use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Body\FormBody;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
@@ -33,7 +34,7 @@ readonly class FileSourceClient
      *
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
@@ -42,14 +43,20 @@ readonly class FileSourceClient
      */
     public function create(string $apiKey, string $label): FileSource
     {
-        return $this->sourceFactory->createFileSource(
-            $this->httpHandler->getJson(new RequestSpecification(
-                'POST',
-                new RouteRequirements('file-source'),
-                new ApiKeyAuthorizationHeader($apiKey),
-                new FormBody(['label' => $label])
-            ))
+        $requestSpecification = new RequestSpecification(
+            'POST',
+            new RouteRequirements('file-source'),
+            new ApiKeyAuthorizationHeader($apiKey),
+            new FormBody(['label' => $label])
         );
+
+        try {
+            return $this->sourceFactory->createFileSource(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 
     /**
