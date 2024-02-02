@@ -14,8 +14,7 @@ use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Request\Body\BodyInterface;
@@ -93,24 +92,22 @@ readonly class HttpHandler
      * @throws HttpException
      * @throws NotFoundException
      * @throws UnauthorizedException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      */
     public function getJson(RequestSpecification $requestSpecification): array
     {
-        $request = $this->createRequest($requestSpecification);
         $requestName = $requestSpecification->getName();
 
         $response = $this->sendRequest($requestSpecification);
 
         $contentType = $response->getHeaderLine('content-type');
         if ('application/json' !== $contentType) {
-            throw new UnexpectedContentTypeException($requestName, $contentType);
+            throw new UnexpectedResponseFormatException($requestName, $contentType, null);
         }
 
         $responseData = json_decode($response->getBody()->getContents(), true);
         if (!is_array($responseData)) {
-            throw new UnexpectedDataException($requestName, gettype($responseData));
+            throw new UnexpectedResponseFormatException($requestName, $contentType, gettype($responseData));
         }
 
         return $responseData;

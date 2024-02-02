@@ -10,8 +10,7 @@ use SmartAssert\ApiClient\Data\User\User;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
@@ -43,8 +42,7 @@ readonly class UsersClient
      * @throws HttpException
      * @throws NotFoundException
      * @throws UnauthorizedException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      * @throws IncompleteResponseDataException
      * @throws ErrorException
      */
@@ -74,8 +72,7 @@ readonly class UsersClient
      * @throws HttpException
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      * @throws ErrorException
      */
     public function verifyToken(string $token): User
@@ -103,8 +100,7 @@ readonly class UsersClient
      * @throws HttpException
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      * @throws ErrorException
      */
     public function refreshToken(string $refreshToken): Token
@@ -135,8 +131,7 @@ readonly class UsersClient
      * @throws HttpException
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      * @throws AlreadyExistsException
      * @throws ErrorException
      */
@@ -214,8 +209,7 @@ readonly class UsersClient
      * @throws HttpException
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      * @throws ErrorException
      */
     public function getApiKey(string $token): ApiKey
@@ -248,8 +242,7 @@ readonly class UsersClient
      * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      * @throws ErrorException
      */
     public function getApiKeys(string $token): array

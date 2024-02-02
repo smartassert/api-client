@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\DataProvider;
 
 use GuzzleHttp\Psr7\Response;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 
 trait InvalidJsonResponseExceptionDataProviderTrait
 {
@@ -18,11 +17,11 @@ trait InvalidJsonResponseExceptionDataProviderTrait
         return [
             'invalid response content type' => [
                 'httpFixture' => new Response(200, ['content-type' => 'text/plain']),
-                'expectedExceptionClass' => UnexpectedContentTypeException::class,
+                'expectedExceptionClass' => UnexpectedResponseFormatException::class,
             ],
             'invalid response data' => [
                 'httpFixture' => new Response(200, ['content-type' => 'application/json'], '1'),
-                'expectedExceptionClass' => UnexpectedDataException::class,
+                'expectedExceptionClass' => UnexpectedResponseFormatException::class,
             ],
         ];
     }
