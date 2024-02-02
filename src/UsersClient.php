@@ -101,7 +101,7 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
@@ -109,14 +109,20 @@ readonly class UsersClient
      */
     public function refreshToken(string $refreshToken): Token
     {
-        return $this->tokenFactory->create(
-            $this->httpHandler->getJson(new RequestSpecification(
-                'POST',
-                new RouteRequirements('user_token_refresh'),
-                null,
-                new JsonBody(['refresh_token' => $refreshToken])
-            ))
+        $requestSpecification = new RequestSpecification(
+            'POST',
+            new RouteRequirements('user_token_refresh'),
+            null,
+            new JsonBody(['refresh_token' => $refreshToken])
         );
+
+        try {
+            return $this->tokenFactory->create(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 
     /**
