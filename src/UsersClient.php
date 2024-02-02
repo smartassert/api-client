@@ -15,6 +15,7 @@ use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
@@ -44,19 +45,25 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws ErrorException
      */
     public function createToken(string $userIdentifier, string $password): Token
     {
-        return $this->tokenFactory->create(
-            $this->httpHandler->getJson(new RequestSpecification(
-                'POST',
-                new RouteRequirements('user_token_create'),
-                null,
-                new JsonBody(['username' => $userIdentifier, 'password' => $password])
-            ))
+        $requestSpecification = new RequestSpecification(
+            'POST',
+            new RouteRequirements('user_token_create'),
+            null,
+            new JsonBody(['username' => $userIdentifier, 'password' => $password])
         );
+
+        try {
+            return $this->tokenFactory->create(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 
     /**
@@ -65,7 +72,7 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
@@ -73,13 +80,19 @@ readonly class UsersClient
      */
     public function verifyToken(string $token): User
     {
-        return $this->userFactory->create(
-            $this->httpHandler->getJson(new RequestSpecification(
-                'GET',
-                new RouteRequirements('user_token_verify'),
-                new BearerAuthorizationHeader($token),
-            ))
+        $requestSpecification = new RequestSpecification(
+            'GET',
+            new RouteRequirements('user_token_verify'),
+            new BearerAuthorizationHeader($token),
         );
+
+        try {
+            return $this->userFactory->create(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 
     /**
@@ -88,7 +101,7 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
@@ -96,14 +109,20 @@ readonly class UsersClient
      */
     public function refreshToken(string $refreshToken): Token
     {
-        return $this->tokenFactory->create(
-            $this->httpHandler->getJson(new RequestSpecification(
-                'POST',
-                new RouteRequirements('user_token_refresh'),
-                null,
-                new JsonBody(['refresh_token' => $refreshToken])
-            ))
+        $requestSpecification = new RequestSpecification(
+            'POST',
+            new RouteRequirements('user_token_refresh'),
+            null,
+            new JsonBody(['refresh_token' => $refreshToken])
         );
+
+        try {
+            return $this->tokenFactory->create(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 
     /**
@@ -114,7 +133,7 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
@@ -123,13 +142,15 @@ readonly class UsersClient
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
+        $requestSpecification = new RequestSpecification(
+            'POST',
+            new RouteRequirements('user_create'),
+            new AuthorizationHeader($adminToken),
+            new FormBody(['identifier' => $userIdentifier, 'password' => $password])
+        );
+
         try {
-            $data = $this->httpHandler->getJson(new RequestSpecification(
-                'POST',
-                new RouteRequirements('user_create'),
-                new AuthorizationHeader($adminToken),
-                new FormBody(['identifier' => $userIdentifier, 'password' => $password])
-            ));
+            $data = $this->httpHandler->getJson($requestSpecification);
         } catch (HttpException $e) {
             if (409 === $e->getCode()) {
                 throw new AlreadyExistsException($userIdentifier, $e->getResponse());
@@ -138,7 +159,11 @@ readonly class UsersClient
             throw $e;
         }
 
-        return $this->userFactory->create($data);
+        try {
+            return $this->userFactory->create($data);
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 
     /**
@@ -187,7 +212,7 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
@@ -195,15 +220,20 @@ readonly class UsersClient
      */
     public function getApiKey(string $token): ApiKey
     {
-        $data = $this->httpHandler->getJson(new RequestSpecification(
+        $requestSpecification = new RequestSpecification(
             'GET',
             new RouteRequirements('user_apikey'),
             new BearerAuthorizationHeader($token),
-        ));
+        );
+
+        $data = $this->httpHandler->getJson($requestSpecification);
 
         $apiKey = $this->apiKeyFactory->create($data);
         if (null === $apiKey) {
-            throw new IncompleteDataException($data, 'key');
+            throw new IncompleteResponseDataException(
+                $requestSpecification->getName(),
+                new IncompleteDataException($data, 'key')
+            );
         }
 
         return $apiKey;

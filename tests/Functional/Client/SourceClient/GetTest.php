@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Tests\Functional\Client\GitSourceClient;
+namespace SmartAssert\ApiClient\Tests\Functional\Client\SourceClient;
 
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
@@ -11,7 +13,7 @@ use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
 
-class CreateTest extends AbstractGitSourceClientTestCase
+class GetTest extends AbstractSourceClientTestCase
 {
     use ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
@@ -33,16 +35,10 @@ class CreateTest extends AbstractGitSourceClientTestCase
     public static function incompleteResponseDataExceptionDataProvider(): array
     {
         return [
-            'host_url missing' => [
-                'payload' => [
-                    'type' => 'git',
-                    'id' => self::ID,
-                    'label' => self::LABEL,
-                    'path' => self::PATH,
-                    'has_credentials' => self::HAS_CREDENTIALS,
-                ],
-                'expectedRequestName' => 'post_git-source',
-                'expectedMissingKey' => 'host_url',
+            'label missing' => [
+                'payload' => ['type' => 'file', 'id' => self::ID],
+                'expectedRequestName' => 'get_source',
+                'expectedMissingKey' => 'label',
             ],
         ];
     }
@@ -50,12 +46,25 @@ class CreateTest extends AbstractGitSourceClientTestCase
     protected function createClientActionCallable(): callable
     {
         return function () {
-            $this->client->create(self::API_KEY, self::LABEL, self::HOST_URL, self::PATH, null);
+            $this->client->get(self::API_KEY, self::ID);
         };
+    }
+
+    protected function getResponseFixture(): ResponseInterface
+    {
+        return new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode([
+                'type' => 'file',
+                'id' => self::ID,
+                'label' => 'source label',
+            ])
+        );
     }
 
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
-        return new ExpectedRequestProperties('POST', '/source/git-source');
+        return new ExpectedRequestProperties('GET', '/source/' . self::ID);
     }
 }

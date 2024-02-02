@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\FileSourceClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -14,6 +15,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class UpdateTest extends AbstractFileSourceClientTestCase
 {
+    use ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -25,6 +27,20 @@ class UpdateTest extends AbstractFileSourceClientTestCase
             self::networkErrorExceptionDataProvider(),
             self::invalidJsonResponseExceptionDataProvider(),
         );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteResponseDataExceptionDataProvider(): array
+    {
+        return [
+            'id missing' => [
+                'payload' => ['type' => 'file', 'label' => self::LABEL],
+                'expectedRequestName' => 'put_file-source',
+                'expectedMissingKey' => 'id',
+            ],
+        ];
     }
 
     protected function createClientActionCallable(): callable

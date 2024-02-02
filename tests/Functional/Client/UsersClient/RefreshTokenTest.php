@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestHasNoAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -15,7 +15,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class RefreshTokenTest extends AbstractUsersClientTestCase
 {
-    use ClientActionThrowsIncompleteDataExceptionTestTrait;
+    use ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -41,6 +41,20 @@ class RefreshTokenTest extends AbstractUsersClientTestCase
             ],
             'refresh_token missing' => [
                 'payload' => ['token' => md5((string) rand())],
+                'expectedMissingKey' => 'refresh_token',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteResponseDataExceptionDataProvider(): array
+    {
+        return [
+            'refresh_token missing' => [
+                'payload' => ['token' => 'token'],
+                'expectedRequestName' => 'post_user_token_refresh',
                 'expectedMissingKey' => 'refresh_token',
             ],
         ];

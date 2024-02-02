@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -15,7 +15,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class GetApiKeyTest extends AbstractUsersClientTestCase
 {
-    use ClientActionThrowsIncompleteDataExceptionTestTrait;
+    use ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -37,6 +37,20 @@ class GetApiKeyTest extends AbstractUsersClientTestCase
         return [
             'key missing' => [
                 'payload' => [],
+                'expectedMissingKey' => 'key',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteResponseDataExceptionDataProvider(): array
+    {
+        return [
+            'key missing' => [
+                'payload' => ['label' => 'label'],
+                'expectedRequestName' => 'get_user_apikey',
                 'expectedMissingKey' => 'key',
             ],
         ];

@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -15,7 +15,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class VerifyTokenTest extends AbstractUsersClientTestCase
 {
-    use ClientActionThrowsIncompleteDataExceptionTestTrait;
+    use ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -41,6 +41,20 @@ class VerifyTokenTest extends AbstractUsersClientTestCase
             ],
             'user-identifier missing' => [
                 'payload' => ['id' => md5((string) rand())],
+                'expectedMissingKey' => 'user-identifier',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteResponseDataExceptionDataProvider(): array
+    {
+        return [
+            'user-identifier missing' => [
+                'payload' => ['id' => self::ID],
+                'expectedRequestName' => 'get_user_token_verify',
                 'expectedMissingKey' => 'user-identifier',
             ],
         ];
