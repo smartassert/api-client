@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
-use SmartAssert\ApiClient\Exception\Http\FailedRequestException;
+use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
@@ -38,7 +38,7 @@ readonly class HttpHandler
 
     /**
      * @throws ErrorException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
      * @throws UnauthorizedException
@@ -56,16 +56,16 @@ readonly class HttpHandler
         try {
             $response = $this->httpClient->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
-            throw new FailedRequestException($requestName, $request, $e);
+            throw new HttpClientException($requestName, $e);
         }
 
         $statusCode = $response->getStatusCode();
         if (401 === $statusCode) {
-            throw new UnauthorizedException($requestName, $request, $response);
+            throw new UnauthorizedException($requestName);
         }
 
         if (404 === $statusCode) {
-            throw new NotFoundException($requestName, $request, $response);
+            throw new NotFoundException($requestName);
         }
 
         if (200 !== $statusCode) {
@@ -73,7 +73,7 @@ readonly class HttpHandler
                 $error = $this->errorFactory->createFromResponse($response);
 
                 $exception = $error instanceof ErrorInterface
-                    ? new ErrorException($requestName, $request, $response, $error)
+                    ? new ErrorException($requestName, $error)
                     : new HttpException($requestName, $request, $response);
             } catch (ErrorDeserializationException | UnknownErrorClassException) {
                 $exception = new HttpException($requestName, $request, $response);
@@ -89,7 +89,7 @@ readonly class HttpHandler
      * @return array<mixed>
      *
      * @throws ErrorException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
      * @throws UnauthorizedException
@@ -105,12 +105,12 @@ readonly class HttpHandler
 
         $contentType = $response->getHeaderLine('content-type');
         if ('application/json' !== $contentType) {
-            throw new UnexpectedContentTypeException($requestName, $request, $response, $contentType);
+            throw new UnexpectedContentTypeException($requestName, $contentType);
         }
 
         $responseData = json_decode($response->getBody()->getContents(), true);
         if (!is_array($responseData)) {
-            throw new UnexpectedDataException($requestName, $request, $response, gettype($responseData));
+            throw new UnexpectedDataException($requestName, gettype($responseData));
         }
 
         return $responseData;

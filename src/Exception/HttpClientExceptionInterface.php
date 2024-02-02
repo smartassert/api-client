@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Exception;
 
 use Psr\Http\Client\ClientExceptionInterface;
 
-interface FailedRequestInterface extends ActionExceptionInterface
+interface HttpClientExceptionInterface
 {
     public function getHttpClientException(): ClientExceptionInterface;
 }

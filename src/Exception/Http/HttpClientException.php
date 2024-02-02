@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Exception\Http;
 
+use Psr\Http\Client\ClientExceptionInterface;
+use SmartAssert\ApiClient\Exception\HttpClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\NamedRequestExceptionInterface;
 
-class UnexpectedContentTypeException extends \Exception implements NamedRequestExceptionInterface
+class HttpClientException extends \Exception implements HttpClientExceptionInterface, NamedRequestExceptionInterface
 {
     /**
      * @param non-empty-string $requestName
      */
     public function __construct(
         private readonly string $requestName,
-        public readonly string $contentType,
+        private readonly ClientExceptionInterface $clientException
     ) {
         parent::__construct();
     }
@@ -21,5 +23,10 @@ class UnexpectedContentTypeException extends \Exception implements NamedRequestE
     public function getRequestName(): string
     {
         return $this->requestName;
+    }
+
+    public function getHttpClientException(): ClientExceptionInterface
+    {
+        return $this->clientException;
     }
 }

@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Exception\Http;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Exception\NamedRequestExceptionInterface;
 
-class UnexpectedDataException extends HttpException
+class UnexpectedDataException extends \Exception implements NamedRequestExceptionInterface
 {
+    /**
+     * @param non-empty-string $requestName
+     */
     public function __construct(
-        string $requestName,
-        RequestInterface $request,
-        ResponseInterface $response,
+        private readonly string $requestName,
         public readonly string $type,
     ) {
-        parent::__construct($requestName, $request, $response);
+        parent::__construct();
+    }
+
+    public function getRequestName(): string
+    {
+        return $this->requestName;
     }
 }

@@ -4,6 +4,21 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Exception\Http;
 
-class UnauthorizedException extends HttpException
+use SmartAssert\ApiClient\Exception\NamedRequestExceptionInterface;
+
+class UnauthorizedException extends \Exception implements NamedRequestExceptionInterface
 {
+    /**
+     * @param non-empty-string $requestName
+     */
+    public function __construct(
+        private readonly string $requestName,
+    ) {
+        parent::__construct();
+    }
+
+    public function getRequestName(): string
+    {
+        return $this->requestName;
+    }
 }
