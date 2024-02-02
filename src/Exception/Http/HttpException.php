@@ -12,11 +12,11 @@ use SmartAssert\ApiClient\Exception\ResponseExceptionInterface;
 class HttpException extends ActionException implements ResponseExceptionInterface
 {
     public function __construct(
-        string $name,
+        string $requestName,
         RequestInterface $request,
         private readonly ResponseInterface $response,
     ) {
-        parent::__construct($name, $request, $response->getStatusCode());
+        parent::__construct($requestName, $request, $response->getStatusCode());
     }
 
     public function getResponse(): ResponseInterface

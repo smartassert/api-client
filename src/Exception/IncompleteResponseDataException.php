@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Exception;
 
-class IncompleteResponseDataException extends \Exception
+class IncompleteResponseDataException extends \Exception implements NamedRequestExceptionInterface
 {
     /**
      * @param non-empty-string $requestName
@@ -18,5 +18,10 @@ class IncompleteResponseDataException extends \Exception
             0,
             $incompleteDataException
         );
+    }
+
+    public function getRequestName(): string
+    {
+        return $this->requestName;
     }
 }
