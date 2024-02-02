@@ -8,8 +8,7 @@ use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
@@ -37,8 +36,7 @@ readonly class GitSourceClient
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      * @throws ErrorException
      */
     public function create(
@@ -60,8 +58,7 @@ readonly class GitSourceClient
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      * @throws ErrorException
      */
     public function update(
@@ -81,8 +78,7 @@ readonly class GitSourceClient
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
-     * @throws UnexpectedContentTypeException
-     * @throws UnexpectedDataException
+     * @throws UnexpectedResponseFormatException
      * @throws ErrorException
      */
     private function doAction(
