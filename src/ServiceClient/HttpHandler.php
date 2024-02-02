@@ -110,7 +110,7 @@ readonly class HttpHandler
 
         $responseData = json_decode($response->getBody()->getContents(), true);
         if (!is_array($responseData)) {
-            throw new UnexpectedDataException($requestName, $request, $response, gettype($responseData));
+            throw new UnexpectedDataException($requestName, gettype($responseData));
         }
 
         return $responseData;
