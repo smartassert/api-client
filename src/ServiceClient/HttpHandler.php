@@ -105,7 +105,7 @@ readonly class HttpHandler
 
         $contentType = $response->getHeaderLine('content-type');
         if ('application/json' !== $contentType) {
-            throw new UnexpectedContentTypeException($requestName, $request, $response, $contentType);
+            throw new UnexpectedContentTypeException($requestName, $contentType);
         }
 
         $responseData = json_decode($response->getBody()->getContents(), true);
