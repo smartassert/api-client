@@ -15,6 +15,7 @@ use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedContentTypeException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedDataException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
@@ -44,19 +45,25 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws ErrorException
      */
     public function createToken(string $userIdentifier, string $password): Token
     {
-        return $this->tokenFactory->create(
-            $this->httpHandler->getJson(new RequestSpecification(
-                'POST',
-                new RouteRequirements('user_token_create'),
-                null,
-                new JsonBody(['username' => $userIdentifier, 'password' => $password])
-            ))
+        $requestSpecification = new RequestSpecification(
+            'POST',
+            new RouteRequirements('user_token_create'),
+            null,
+            new JsonBody(['username' => $userIdentifier, 'password' => $password])
         );
+
+        try {
+            return $this->tokenFactory->create(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 
     /**
