@@ -13,12 +13,12 @@ use SmartAssert\ServiceRequest\Error\ErrorInterface;
 class ErrorException extends HttpException implements ErrorExceptionInterface
 {
     public function __construct(
-        string $name,
+        string $requestName,
         RequestInterface $request,
         ResponseInterface $response,
         private readonly ErrorInterface $error,
     ) {
-        parent::__construct($name, $request, $response);
+        parent::__construct($requestName, $request, $response);
     }
 
     public function getError(): ErrorInterface

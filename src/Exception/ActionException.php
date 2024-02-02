@@ -9,19 +9,19 @@ use Psr\Http\Message\RequestInterface;
 class ActionException extends \Exception implements ActionExceptionInterface
 {
     /**
-     * @param non-empty-string $name
+     * @param non-empty-string $requestName
      */
     public function __construct(
-        private readonly string $name,
+        private readonly string $requestName,
         private readonly RequestInterface $request,
         int $code = 0,
     ) {
         parent::__construct('', $code);
     }
 
-    public function getName(): string
+    public function getRequestName(): string
     {
-        return $this->name;
+        return $this->requestName;
     }
 
     public function getRequest(): RequestInterface

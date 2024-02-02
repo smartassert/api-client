@@ -12,11 +12,11 @@ use SmartAssert\ApiClient\Exception\FailedRequestInterface;
 class FailedRequestException extends ActionException implements FailedRequestInterface
 {
     public function __construct(
-        string $name,
+        string $requestName,
         RequestInterface $request,
         private readonly ClientExceptionInterface $clientException
     ) {
-        parent::__construct($name, $request);
+        parent::__construct($requestName, $request);
     }
 
     public function getHttpClientException(): ClientExceptionInterface

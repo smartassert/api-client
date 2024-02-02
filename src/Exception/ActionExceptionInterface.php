@@ -6,12 +6,7 @@ namespace SmartAssert\ApiClient\Exception;
 
 use Psr\Http\Message\RequestInterface;
 
-interface ActionExceptionInterface extends \Throwable
+interface ActionExceptionInterface extends \Throwable, NamedRequestExceptionInterface
 {
-    /**
-     * @return non-empty-string
-     */
-    public function getName(): string;
-
     public function getRequest(): RequestInterface;
 }
