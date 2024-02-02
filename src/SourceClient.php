@@ -53,12 +53,15 @@ readonly class SourceClient
         $data = $this->httpHandler->getJson($requestSpecification);
 
         $sources = [];
-        foreach ($data as $sourceData) {
+        foreach ($data as $dataIndex => $sourceData) {
             if (is_array($sourceData)) {
                 try {
                     $source = $this->sourceFactory->create($sourceData);
                 } catch (IncompleteDataException $e) {
-                    throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+                    throw new IncompleteResponseDataException(
+                        $requestSpecification->getName(),
+                        new IncompleteDataException($data, $dataIndex . '.' . $e->missingKey)
+                    );
                 }
 
                 if ($source instanceof SourceInterface) {

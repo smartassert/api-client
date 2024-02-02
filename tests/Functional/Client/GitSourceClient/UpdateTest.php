@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Functional\Client\GitSourceClient;
 
-use GuzzleHttp\Psr7\Response;
-use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -14,6 +13,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class UpdateTest extends AbstractGitSourceClientTestCase
 {
+    use ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -27,33 +27,24 @@ class UpdateTest extends AbstractGitSourceClientTestCase
         );
     }
 
-    public function testUpdateThrowsIncompleteResponseDataException(): void
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteResponseDataExceptionDataProvider(): array
     {
-        $responseData = [
-            'type' => 'git',
-            'id' => self::ID,
-            'label' => self::LABEL,
-            'path' => self::PATH,
-            'has_credentials' => self::HAS_CREDENTIALS,
+        return [
+            'host_url missing' => [
+                'payload' => [
+                    'type' => 'git',
+                    'id' => self::ID,
+                    'label' => self::LABEL,
+                    'path' => self::PATH,
+                    'has_credentials' => self::HAS_CREDENTIALS,
+                ],
+                'expectedRequestName' => 'put_git-source',
+                'expectedMissingKey' => 'host_url',
+            ],
         ];
-
-        $this->mockHandler->append(new Response(
-            200,
-            ['content-type' => 'application/json'],
-            (string) json_encode($responseData)
-        ));
-
-        $exception = null;
-
-        try {
-            ($this->createClientActionCallable())();
-        } catch (IncompleteResponseDataException $exception) {
-        }
-
-        self::assertInstanceOf(IncompleteResponseDataException::class, $exception);
-        self::assertSame('put_git-source', $exception->requestName);
-        self::assertSame('host_url', $exception->incompleteDataException->missingKey);
-        self::assertSame($responseData, $exception->incompleteDataException->data);
     }
 
     protected function createClientActionCallable(): callable

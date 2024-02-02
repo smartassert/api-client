@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\SourceClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -15,6 +15,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class DeleteTest extends AbstractSourceClientTestCase
 {
+    use ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -28,26 +29,18 @@ class DeleteTest extends AbstractSourceClientTestCase
         );
     }
 
-    public function testDeleteThrowsIncompleteResponseDataException(): void
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteResponseDataExceptionDataProvider(): array
     {
-        $responseData = ['type' => 'file', 'id' => self::ID];
-        $this->mockHandler->append(new Response(
-            200,
-            ['content-type' => 'application/json'],
-            (string) json_encode($responseData)
-        ));
-
-        $exception = null;
-
-        try {
-            ($this->createClientActionCallable())();
-        } catch (IncompleteResponseDataException $exception) {
-        }
-
-        self::assertInstanceOf(IncompleteResponseDataException::class, $exception);
-        self::assertSame('delete_source', $exception->requestName);
-        self::assertSame('label', $exception->incompleteDataException->missingKey);
-        self::assertSame($responseData, $exception->incompleteDataException->data);
+        return [
+            'label missing' => [
+                'payload' => ['type' => 'file', 'id' => self::ID],
+                'expectedRequestName' => 'delete_source',
+                'expectedMissingKey' => 'label',
+            ],
+        ];
     }
 
     protected function createClientActionCallable(): callable

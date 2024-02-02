@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestHasNoAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -15,6 +15,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class CreateTokenTest extends AbstractUsersClientTestCase
 {
+    use ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -48,26 +49,18 @@ class CreateTokenTest extends AbstractUsersClientTestCase
         ];
     }
 
-    public function testCreateTokenThrowsIncompleteResponseDataException(): void
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteResponseDataExceptionDataProvider(): array
     {
-        $responseData = ['token' => self::TOKEN];
-        $this->mockHandler->append(new Response(
-            200,
-            ['content-type' => 'application/json'],
-            (string) json_encode($responseData)
-        ));
-
-        $exception = null;
-
-        try {
-            ($this->createClientActionCallable())();
-        } catch (IncompleteResponseDataException $exception) {
-        }
-
-        self::assertInstanceOf(IncompleteResponseDataException::class, $exception);
-        self::assertSame('post_user_token_create', $exception->requestName);
-        self::assertSame('refresh_token', $exception->incompleteDataException->missingKey);
-        self::assertSame($responseData, $exception->incompleteDataException->data);
+        return [
+            'refresh_token missing' => [
+                'payload' => ['token' => self::TOKEN],
+                'expectedRequestName' => 'post_user_token_create',
+                'expectedMissingKey' => 'refresh_token',
+            ],
+        ];
     }
 
     protected function createClientActionCallable(): callable

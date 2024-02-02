@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\SourceClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -15,6 +15,7 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class ListTest extends AbstractSourceClientTestCase
 {
+    use ClientActionThrowsIncompleteResponseDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -28,32 +29,23 @@ class ListTest extends AbstractSourceClientTestCase
         );
     }
 
-    public function testListThrowsIncompleteResponseDataException(): void
+    /**
+     * @return array<mixed>
+     */
+    public static function incompleteResponseDataExceptionDataProvider(): array
     {
-        $responseData = [
-            [
-                'type' => 'file',
-                'id' => 'file source id',
+        return [
+            'label missing' => [
+                'payload' => [
+                    [
+                        'type' => 'file',
+                        'id' => 'file source id',
+                    ],
+                ],
+                'expectedRequestName' => 'get_sources',
+                'expectedMissingKey' => '0.label',
             ],
         ];
-
-        $this->mockHandler->append(new Response(
-            200,
-            ['content-type' => 'application/json'],
-            (string) json_encode($responseData)
-        ));
-
-        $exception = null;
-
-        try {
-            ($this->createClientActionCallable())();
-        } catch (IncompleteResponseDataException $exception) {
-        }
-
-        self::assertInstanceOf(IncompleteResponseDataException::class, $exception);
-        self::assertSame('get_sources', $exception->requestName);
-        self::assertSame('label', $exception->incompleteDataException->missingKey);
-        self::assertSame($responseData[0], $exception->incompleteDataException->data);
     }
 
     protected function createClientActionCallable(): callable
