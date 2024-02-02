@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Exception;
 
 use Psr\Http\Message\ResponseInterface;
 
-interface ResponseExceptionInterface extends ActionExceptionInterface
+interface ResponseExceptionInterface extends HttpExceptionInterface
 {
     public function getResponse(): ResponseInterface;
 }
