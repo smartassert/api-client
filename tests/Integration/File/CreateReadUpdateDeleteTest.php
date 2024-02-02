@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\File;
 
 use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ApiClient\Exception\File\NotFoundException;
-use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
+use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
