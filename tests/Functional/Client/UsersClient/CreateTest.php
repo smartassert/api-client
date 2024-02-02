@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\UsersClient;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
@@ -15,7 +15,6 @@ use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDat
 
 class CreateTest extends AbstractUsersClientTestCase
 {
-    use ClientActionThrowsIncompleteDataExceptionTestTrait;
     use InvalidJsonResponseExceptionDataProviderTrait;
     use NetworkErrorExceptionDataProviderTrait;
     use RequestPropertiesTestTrait;
@@ -44,6 +43,28 @@ class CreateTest extends AbstractUsersClientTestCase
                 'expectedMissingKey' => 'user-identifier',
             ],
         ];
+    }
+
+    public function testCreateThrowsIncompleteResponseDataException(): void
+    {
+        $responseData = ['id' => self::ID];
+        $this->mockHandler->append(new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode($responseData)
+        ));
+
+        $exception = null;
+
+        try {
+            ($this->createClientActionCallable())();
+        } catch (IncompleteResponseDataException $exception) {
+        }
+
+        self::assertInstanceOf(IncompleteResponseDataException::class, $exception);
+        self::assertSame('post_user_create', $exception->requestName);
+        self::assertSame('user-identifier', $exception->incompleteDataException->missingKey);
+        self::assertSame($responseData, $exception->incompleteDataException->data);
     }
 
     protected function createClientActionCallable(): callable

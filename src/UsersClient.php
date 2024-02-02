@@ -133,7 +133,7 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
@@ -142,13 +142,15 @@ readonly class UsersClient
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
+        $requestSpecification = new RequestSpecification(
+            'POST',
+            new RouteRequirements('user_create'),
+            new AuthorizationHeader($adminToken),
+            new FormBody(['identifier' => $userIdentifier, 'password' => $password])
+        );
+
         try {
-            $data = $this->httpHandler->getJson(new RequestSpecification(
-                'POST',
-                new RouteRequirements('user_create'),
-                new AuthorizationHeader($adminToken),
-                new FormBody(['identifier' => $userIdentifier, 'password' => $password])
-            ));
+            $data = $this->httpHandler->getJson($requestSpecification);
         } catch (HttpException $e) {
             if (409 === $e->getCode()) {
                 throw new AlreadyExistsException($userIdentifier, $e->getResponse());
@@ -157,7 +159,11 @@ readonly class UsersClient
             throw $e;
         }
 
-        return $this->userFactory->create($data);
+        try {
+            return $this->userFactory->create($data);
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 
     /**
