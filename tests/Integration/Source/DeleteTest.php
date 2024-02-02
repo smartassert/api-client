@@ -29,7 +29,6 @@ class DeleteTest extends AbstractSourceTestCase
         \assert('' !== $id);
 
         self::expectException(NotFoundException::class);
-        self::expectExceptionCode(404);
 
         self::$sourceClient->delete($apiKey->key, $id);
     }

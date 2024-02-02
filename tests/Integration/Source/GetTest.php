@@ -28,7 +28,6 @@ class GetTest extends AbstractSourceTestCase
         \assert('' !== $id);
 
         self::expectException(NotFoundException::class);
-        self::expectExceptionCode(404);
 
         self::$sourceClient->get($apiKey->key, $id);
     }

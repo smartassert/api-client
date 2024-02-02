@@ -47,7 +47,6 @@ class UpdateTest extends AbstractIntegrationTestCase
         \assert('' !== $id);
 
         self::expectException(NotFoundException::class);
-        self::expectExceptionCode(404);
 
         self::$fileSourceClient->update($apiKey->key, $id, $label);
     }
