@@ -8,7 +8,7 @@ use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Data\User\Token;
 use SmartAssert\ApiClient\Data\User\User;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
-use SmartAssert\ApiClient\Exception\Http\FailedRequestException;
+use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
@@ -39,7 +39,7 @@ readonly class UsersClient
     }
 
     /**
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
      * @throws UnauthorizedException
@@ -70,7 +70,7 @@ readonly class UsersClient
      * @param non-empty-string $token
      *
      * @throws UnauthorizedException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
@@ -99,7 +99,7 @@ readonly class UsersClient
      * @param non-empty-string $refreshToken
      *
      * @throws UnauthorizedException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
@@ -131,7 +131,7 @@ readonly class UsersClient
      * @param non-empty-string $password
      *
      * @throws UnauthorizedException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
@@ -171,7 +171,7 @@ readonly class UsersClient
      * @param non-empty-string $userId
      *
      * @throws UnauthorizedException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
      * @throws ErrorException
@@ -191,7 +191,7 @@ readonly class UsersClient
      * @param non-empty-string $refreshToken
      *
      * @throws UnauthorizedException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
      * @throws ErrorException
@@ -210,7 +210,7 @@ readonly class UsersClient
      * @param non-empty-string $token
      *
      * @throws UnauthorizedException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws IncompleteResponseDataException
      * @throws NotFoundException
@@ -245,7 +245,7 @@ readonly class UsersClient
      * @return ApiKey[]
      *
      * @throws UnauthorizedException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException

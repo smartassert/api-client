@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
-use SmartAssert\ApiClient\Exception\Http\FailedRequestException;
+use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\NotFoundException;
 use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
@@ -38,7 +38,7 @@ readonly class HttpHandler
 
     /**
      * @throws ErrorException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
      * @throws UnauthorizedException
@@ -56,7 +56,7 @@ readonly class HttpHandler
         try {
             $response = $this->httpClient->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
-            throw new FailedRequestException($requestName, $request, $e);
+            throw new HttpClientException($requestName, $e);
         }
 
         $statusCode = $response->getStatusCode();
@@ -89,7 +89,7 @@ readonly class HttpHandler
      * @return array<mixed>
      *
      * @throws ErrorException
-     * @throws FailedRequestException
+     * @throws HttpClientException
      * @throws HttpException
      * @throws NotFoundException
      * @throws UnauthorizedException
