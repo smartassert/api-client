@@ -34,7 +34,7 @@ readonly class GitSourceClient
      *
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
@@ -57,7 +57,7 @@ readonly class GitSourceClient
      *
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnauthorizedException
      * @throws UnexpectedContentTypeException
