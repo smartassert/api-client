@@ -72,7 +72,7 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
@@ -80,13 +80,19 @@ readonly class UsersClient
      */
     public function verifyToken(string $token): User
     {
-        return $this->userFactory->create(
-            $this->httpHandler->getJson(new RequestSpecification(
-                'GET',
-                new RouteRequirements('user_token_verify'),
-                new BearerAuthorizationHeader($token),
-            ))
+        $requestSpecification = new RequestSpecification(
+            'GET',
+            new RouteRequirements('user_token_verify'),
+            new BearerAuthorizationHeader($token),
         );
+
+        try {
+            return $this->userFactory->create(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+        }
     }
 
     /**
