@@ -212,7 +212,7 @@ readonly class UsersClient
      * @throws UnauthorizedException
      * @throws FailedRequestException
      * @throws HttpException
-     * @throws IncompleteDataException
+     * @throws IncompleteResponseDataException
      * @throws NotFoundException
      * @throws UnexpectedContentTypeException
      * @throws UnexpectedDataException
@@ -220,15 +220,20 @@ readonly class UsersClient
      */
     public function getApiKey(string $token): ApiKey
     {
-        $data = $this->httpHandler->getJson(new RequestSpecification(
+        $requestSpecification = new RequestSpecification(
             'GET',
             new RouteRequirements('user_apikey'),
             new BearerAuthorizationHeader($token),
-        ));
+        );
+
+        $data = $this->httpHandler->getJson($requestSpecification);
 
         $apiKey = $this->apiKeyFactory->create($data);
         if (null === $apiKey) {
-            throw new IncompleteDataException($data, 'key');
+            throw new IncompleteResponseDataException(
+                $requestSpecification->getName(),
+                new IncompleteDataException($data, 'key')
+            );
         }
 
         return $apiKey;
