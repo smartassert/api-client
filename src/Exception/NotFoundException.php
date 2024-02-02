@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Exception\Http;
-
-use SmartAssert\ApiClient\Exception\NamedRequestExceptionInterface;
+namespace SmartAssert\ApiClient\Exception;
 
 class NotFoundException extends \Exception implements NamedRequestExceptionInterface
 {

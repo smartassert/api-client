@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Integration\Source;
 
-use SmartAssert\ApiClient\Exception\Http\NotFoundException;
-use SmartAssert\ApiClient\Exception\Http\UnauthorizedException;
+use SmartAssert\ApiClient\Exception\NotFoundException;
+use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\Source\AbstractSourceTestCase;
 use Symfony\Component\Uid\Ulid;
 
