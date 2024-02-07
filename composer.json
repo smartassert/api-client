@@ -22,15 +22,15 @@
         "static-analysis": "./vendor/bin/phpstan",
         "test": "./vendor/bin/phpunit --colors=always tests",
         "sources-setup": [
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T sources-service php bin/console doctrine:database:create --if-not-exists",
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T sources-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing"
+            "docker compose -f ./tests/build/docker-compose.yml exec -T sources-service php bin/console doctrine:database:create --if-not-exists",
+            "docker compose -f ./tests/build/docker-compose.yml exec -T sources-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing"
         ],
         "users-db-setup": [
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:database:create --if-not-exists",
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing"
+            "docker compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:database:create --if-not-exists",
+            "docker compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing"
         ],
         "users-generate-jwt-keys": [
-            "docker-compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction"
+            "docker compose -f ./tests/build/docker-compose.yml exec -T users-service php bin/console lexik:jwt:generate-keypair --overwrite --no-interaction"
         ],
         "users-create-user1": "curl --header 'Authorization: primary_admin_token' --data 'identifier=user1@example.com&password=password' http://localhost:9089/user/create",
         "users-create-user2": "curl --header 'Authorization: primary_admin_token' --data 'identifier=user2@example.com&password=password' http://localhost:9089/user/create",
@@ -41,9 +41,9 @@
             "@users-create-user2",
             ""
         ],
-        "integration-up": "docker-compose -f tests/build/docker-compose.yml  up -d",
-        "integration-status": "docker-compose -f tests/build/docker-compose.yml ps",
-        "integration-logs": "docker-compose -f tests/build/docker-compose.yml logs",
+        "integration-up": "docker compose -f tests/build/docker-compose.yml  up -d",
+        "integration-status": "docker compose -f tests/build/docker-compose.yml ps",
+        "integration-logs": "docker compose -f tests/build/docker-compose.yml logs",
         "integration-setup": [
             "@integration-up",
             "sleep 2",
@@ -51,7 +51,7 @@
             "@sources-setup"
         ],
         "integration-teardown": [
-            "docker-compose -f ./tests/build/docker-compose.yml down"
+            "docker compose -f ./tests/build/docker-compose.yml down"
         ]
     },
     "autoload": {
