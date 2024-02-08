@@ -55,10 +55,7 @@ readonly class HttpHandler
 
         $statusCode = $response->getStatusCode();
         if (401 === $statusCode) {
-            throw new ClientException(
-                $requestName,
-                new UnauthorizedException($requestName)
-            );
+            throw new ClientException($requestName, new UnauthorizedException());
         }
 
         if (404 === $statusCode) {
