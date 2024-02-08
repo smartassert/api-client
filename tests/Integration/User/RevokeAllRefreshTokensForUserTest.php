@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\User;
 
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 
@@ -18,7 +19,14 @@ class RevokeAllRefreshTokensForUserTest extends AbstractIntegrationTestCase
 
         self::$usersClient->revokeAllRefreshTokensForUser('primary_admin_token', $user->id);
 
-        self::expectException(UnauthorizedException::class);
-        self::$usersClient->refreshToken($refreshedToken->refreshToken);
+        $exception = null;
+
+        try {
+            self::$usersClient->refreshToken($refreshedToken->refreshToken);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 }

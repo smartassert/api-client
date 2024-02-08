@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
@@ -18,15 +19,21 @@ class CreateTest extends AbstractIntegrationTestCase
 
     public function testCreateUnauthorized(): void
     {
-        self::expectException(UnauthorizedException::class);
+        $exception = null;
 
-        self::$gitSourceClient->create(
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()),
-        );
+        try {
+            self::$gitSourceClient->create(
+                md5((string) rand()),
+                md5((string) rand()),
+                md5((string) rand()),
+                md5((string) rand()),
+                md5((string) rand()),
+            );
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
     /**
@@ -49,12 +56,15 @@ class CreateTest extends AbstractIntegrationTestCase
 
         try {
             self::$gitSourceClient->create($apiKey->key, $label, $hostUrl, $path, $credentials);
-        } catch (ErrorExceptionInterface $exception) {
+        } catch (ClientException $exception) {
         }
 
-        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+        self::assertInstanceOf(ClientException::class, $exception);
 
-        $error = $exception->getError();
+        $errorException = $exception->getInnerException();
+        self::assertInstanceOf(ErrorExceptionInterface::class, $errorException);
+
+        $error = $errorException->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
         self::assertEquals($expected, $error);
     }
@@ -72,12 +82,15 @@ class CreateTest extends AbstractIntegrationTestCase
 
         try {
             self::$gitSourceClient->create($apiKey->key, $label, md5((string) rand()), md5((string) rand()), null);
-        } catch (ErrorExceptionInterface $exception) {
+        } catch (ClientException $exception) {
         }
 
-        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+        self::assertInstanceOf(ClientException::class, $exception);
 
-        $error = $exception->getError();
+        $errorException = $exception->getInnerException();
+        self::assertInstanceOf(ErrorExceptionInterface::class, $errorException);
+
+        $error = $errorException->getError();
         self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
         self::assertEquals(new DuplicateObjectError(new Parameter('label', $label)), $error);
     }

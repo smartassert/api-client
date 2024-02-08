@@ -5,14 +5,8 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\FileSource;
-use SmartAssert\ApiClient\Exception\Error\ErrorException;
-use SmartAssert\ApiClient\Exception\Http\HttpClientException;
-use SmartAssert\ApiClient\Exception\Http\HttpException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
-use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
-use SmartAssert\ApiClient\Exception\NotFoundException;
-use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Body\FormBody;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
@@ -31,13 +25,7 @@ readonly class FileSourceClient
     /**
      * @param non-empty-string $apiKey
      *
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function create(string $apiKey, string $label): FileSource
     {
@@ -48,13 +36,7 @@ readonly class FileSourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function update(string $apiKey, string $id, string $label): FileSource
     {
@@ -67,12 +49,7 @@ readonly class FileSourceClient
      *
      * @return non-empty-string[]
      *
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function list(string $apiKey, string $id): array
     {
@@ -93,13 +70,7 @@ readonly class FileSourceClient
     }
 
     /**
-     * @throws ErrorException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
+     * @throws ClientException
      */
     private function makeMutationRequest(string $method, string $apiKey, ?string $id, string $label): FileSource
     {
@@ -115,7 +86,7 @@ readonly class FileSourceClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification->getName(), $e);
         }
     }
 }

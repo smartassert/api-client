@@ -7,14 +7,9 @@ namespace SmartAssert\ApiClient;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Data\User\Token;
 use SmartAssert\ApiClient\Data\User\User;
-use SmartAssert\ApiClient\Exception\Error\ErrorException;
-use SmartAssert\ApiClient\Exception\Http\HttpClientException;
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
-use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
-use SmartAssert\ApiClient\Exception\NotFoundException;
-use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
@@ -38,13 +33,7 @@ readonly class UsersClient
     }
 
     /**
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
-     * @throws IncompleteResponseDataException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function createToken(string $userIdentifier, string $password): Token
     {
@@ -60,20 +49,14 @@ readonly class UsersClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification->getName(), $e);
         }
     }
 
     /**
      * @param non-empty-string $token
      *
-     * @throws UnauthorizedException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function verifyToken(string $token): User
     {
@@ -88,20 +71,14 @@ readonly class UsersClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification->getName(), $e);
         }
     }
 
     /**
      * @param non-empty-string $refreshToken
      *
-     * @throws UnauthorizedException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function refreshToken(string $refreshToken): Token
     {
@@ -117,7 +94,7 @@ readonly class UsersClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification->getName(), $e);
         }
     }
 
@@ -126,14 +103,7 @@ readonly class UsersClient
      * @param non-empty-string $userIdentifier
      * @param non-empty-string $password
      *
-     * @throws UnauthorizedException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnexpectedResponseFormatException
-     * @throws AlreadyExistsException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
@@ -146,9 +116,14 @@ readonly class UsersClient
 
         try {
             $data = $this->httpHandler->getJson($requestSpecification);
-        } catch (HttpException $e) {
-            if (409 === $e->getCode()) {
-                throw new AlreadyExistsException($userIdentifier, $e->getResponse());
+        } catch (ClientException $e) {
+            $innerException = $e->getInnerException();
+
+            if ($innerException instanceof HttpException && 409 === $innerException->getCode()) {
+                throw new ClientException(
+                    $e->getRequestName(),
+                    new AlreadyExistsException($userIdentifier, $innerException->getResponse())
+                );
             }
 
             throw $e;
@@ -157,7 +132,7 @@ readonly class UsersClient
         try {
             return $this->userFactory->create($data);
         } catch (IncompleteDataException $e) {
-            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification->getName(), $e);
         }
     }
 
@@ -165,11 +140,7 @@ readonly class UsersClient
      * @param non-empty-string $adminToken
      * @param non-empty-string $userId
      *
-     * @throws UnauthorizedException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
@@ -185,11 +156,7 @@ readonly class UsersClient
      * @param non-empty-string $token
      * @param non-empty-string $refreshToken
      *
-     * @throws UnauthorizedException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
@@ -204,13 +171,7 @@ readonly class UsersClient
     /**
      * @param non-empty-string $token
      *
-     * @throws UnauthorizedException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function getApiKey(string $token): ApiKey
     {
@@ -224,7 +185,7 @@ readonly class UsersClient
 
         $apiKey = $this->apiKeyFactory->create($data);
         if (null === $apiKey) {
-            throw new IncompleteResponseDataException(
+            throw new ClientException(
                 $requestSpecification->getName(),
                 new IncompleteDataException($data, 'key')
             );
@@ -238,12 +199,7 @@ readonly class UsersClient
      *
      * @return ApiKey[]
      *
-     * @throws UnauthorizedException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function getApiKeys(string $token): array
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\User;
 
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
@@ -18,9 +19,15 @@ class CreateTest extends AbstractIntegrationTestCase
 {
     public function testCreateUnauthorized(): void
     {
-        self::expectException(UnauthorizedException::class);
+        $exception = null;
 
-        self::$usersClient->create(md5((string) rand()), md5((string) rand()), md5((string) rand()));
+        try {
+            self::$usersClient->create(md5((string) rand()), md5((string) rand()), md5((string) rand()));
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
     public function testCreateBadRequest(): void
@@ -31,12 +38,15 @@ class CreateTest extends AbstractIntegrationTestCase
 
         try {
             self::$usersClient->create('primary_admin_token', $userIdentifier, md5((string) rand()));
-        } catch (ErrorExceptionInterface $exception) {
+        } catch (ClientException $exception) {
         }
 
-        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+        self::assertInstanceOf(ClientException::class, $exception);
 
-        $error = $exception->getError();
+        $errorException = $exception->getInnerException();
+        self::assertInstanceOf(ErrorExceptionInterface::class, $errorException);
+
+        $error = $errorException->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
         self::assertEquals(
             new BadRequestError(
@@ -50,9 +60,15 @@ class CreateTest extends AbstractIntegrationTestCase
 
     public function testCreateUserAlreadyExists(): void
     {
-        self::expectException(AlreadyExistsException::class);
+        $exception = null;
 
-        self::$usersClient->create('primary_admin_token', self::USER1_EMAIL, md5((string) rand()));
+        try {
+            self::$usersClient->create('primary_admin_token', self::USER1_EMAIL, md5((string) rand()));
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(AlreadyExistsException::class, $exception->getInnerException());
     }
 
     public function testCreateUserSuccess(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Services\DataRepository;
 
@@ -11,9 +12,15 @@ class ListTest extends AbstractSourceTestCase
 {
     public function testListUnauthorized(): void
     {
-        self::expectException(UnauthorizedException::class);
+        $exception = null;
 
-        self::$sourceClient->list(md5((string) rand()));
+        try {
+            self::$sourceClient->list(md5((string) rand()));
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
     public function testListSuccess(): void

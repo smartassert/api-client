@@ -5,14 +5,8 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
-use SmartAssert\ApiClient\Exception\Error\ErrorException;
-use SmartAssert\ApiClient\Exception\Http\HttpClientException;
-use SmartAssert\ApiClient\Exception\Http\HttpException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
-use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
-use SmartAssert\ApiClient\Exception\NotFoundException;
-use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\Request\RequestSpecification;
@@ -32,13 +26,7 @@ readonly class SourceClient
      *
      * @return SourceInterface[]
      *
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function list(string $apiKey): array
     {
@@ -56,7 +44,7 @@ readonly class SourceClient
                 try {
                     $source = $this->sourceFactory->create($sourceData);
                 } catch (IncompleteDataException $e) {
-                    throw new IncompleteResponseDataException(
+                    throw new ClientException(
                         $requestSpecification->getName(),
                         new IncompleteDataException($data, $dataIndex . '.' . $e->missingKey)
                     );
@@ -75,13 +63,7 @@ readonly class SourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function get(string $apiKey, string $id): ?SourceInterface
     {
@@ -92,13 +74,7 @@ readonly class SourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
-     * @throws ErrorException
+     * @throws ClientException
      */
     public function delete(string $apiKey, string $id): ?SourceInterface
     {
@@ -110,13 +86,7 @@ readonly class SourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ErrorException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws IncompleteResponseDataException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
+     * @throws ClientException
      */
     private function doSourceAction(string $method, string $apiKey, string $id): ?SourceInterface
     {
@@ -131,7 +101,7 @@ readonly class SourceClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new IncompleteResponseDataException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification->getName(), $e);
         }
     }
 }

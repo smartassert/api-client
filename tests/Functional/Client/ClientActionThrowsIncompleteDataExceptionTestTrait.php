@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client;
 
 use GuzzleHttp\Psr7\Response;
-use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\IncompleteDataException;
 
-trait ClientActionThrowsIncompleteResponseDataExceptionTestTrait
+trait ClientActionThrowsIncompleteDataExceptionTestTrait
 {
     /**
      * @dataProvider incompleteResponseDataExceptionDataProvider
@@ -15,7 +16,7 @@ trait ClientActionThrowsIncompleteResponseDataExceptionTestTrait
      * @param array<mixed>     $payload
      * @param non-empty-string $expectedMissingKey
      */
-    public function testClientActionThrowsIncompleteResponseDataException(
+    public function testClientActionThrowsIncompleteDataException(
         array $payload,
         string $expectedRequestName,
         string $expectedMissingKey,
@@ -28,13 +29,17 @@ trait ClientActionThrowsIncompleteResponseDataExceptionTestTrait
 
         try {
             ($this->createClientActionCallable())();
-        } catch (IncompleteResponseDataException $exception) {
+        } catch (ClientException $exception) {
         }
 
-        self::assertInstanceOf(IncompleteResponseDataException::class, $exception);
-        self::assertSame($expectedRequestName, $exception->requestName);
-        self::assertSame($expectedMissingKey, $exception->incompleteDataException->missingKey);
-        self::assertSame($payload, $exception->incompleteDataException->data);
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertSame($expectedRequestName, $exception->getRequestName());
+
+        $innerException = $exception->getInnerException();
+        self::assertInstanceOf(IncompleteDataException::class, $innerException);
+
+        self::assertSame($expectedMissingKey, $innerException->missingKey);
+        self::assertSame($payload, $innerException->data);
     }
 
     /**

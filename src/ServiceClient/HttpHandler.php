@@ -10,6 +10,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
 use SmartAssert\ApiClient\Exception\Http\HttpClientException;
@@ -36,35 +37,35 @@ readonly class HttpHandler
     }
 
     /**
-     * @throws ErrorException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
+     * @throws ClientException
      */
     public function sendRequest(RequestSpecification $requestSpecification): ResponseInterface
     {
-        // exceptions thrown are either:
-        //  - http request did not work (psr client exception)
-        //  - http request did work but not as we wanted
-        //  - http request worked and returned a well-defined error
-
         $request = $this->createRequest($requestSpecification);
         $requestName = $requestSpecification->getName();
 
         try {
             $response = $this->httpClient->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
-            throw new HttpClientException($requestName, $e);
+            throw new ClientException(
+                $requestName,
+                new HttpClientException($requestName, $e)
+            );
         }
 
         $statusCode = $response->getStatusCode();
         if (401 === $statusCode) {
-            throw new UnauthorizedException($requestName);
+            throw new ClientException(
+                $requestName,
+                new UnauthorizedException($requestName)
+            );
         }
 
         if (404 === $statusCode) {
-            throw new NotFoundException($requestName);
+            throw new ClientException(
+                $requestName,
+                new NotFoundException($requestName)
+            );
         }
 
         if (200 !== $statusCode) {
@@ -78,7 +79,7 @@ readonly class HttpHandler
                 $exception = new HttpException($requestName, $request, $response);
             }
 
-            throw $exception;
+            throw new ClientException($requestName, $exception);
         }
 
         return $response;
@@ -87,12 +88,7 @@ readonly class HttpHandler
     /**
      * @return array<mixed>
      *
-     * @throws ErrorException
-     * @throws HttpClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
-     * @throws UnexpectedResponseFormatException
+     * @throws ClientException
      */
     public function getJson(RequestSpecification $requestSpecification): array
     {
@@ -102,12 +98,18 @@ readonly class HttpHandler
 
         $contentType = $response->getHeaderLine('content-type');
         if ('application/json' !== $contentType) {
-            throw new UnexpectedResponseFormatException($requestName, $contentType, null);
+            throw new ClientException(
+                $requestName,
+                new UnexpectedResponseFormatException($requestName, $contentType, null)
+            );
         }
 
         $responseData = json_decode($response->getBody()->getContents(), true);
         if (!is_array($responseData)) {
-            throw new UnexpectedResponseFormatException($requestName, $contentType, gettype($responseData));
+            throw new ClientException(
+                $requestName,
+                new UnexpectedResponseFormatException($requestName, $contentType, gettype($responseData))
+            );
         }
 
         return $responseData;
