@@ -62,10 +62,7 @@ readonly class HttpHandler
         }
 
         if (404 === $statusCode) {
-            throw new ClientException(
-                $requestName,
-                new NotFoundException($requestName)
-            );
+            throw new ClientException($requestName, new NotFoundException());
         }
 
         if (200 !== $statusCode) {
