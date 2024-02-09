@@ -13,7 +13,6 @@ use Psr\Http\Message\StreamFactoryInterface;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
-use SmartAssert\ApiClient\Exception\Http\HttpClientException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
@@ -47,10 +46,7 @@ readonly class HttpHandler
         try {
             $response = $this->httpClient->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
-            throw new ClientException(
-                $requestName,
-                new HttpClientException($requestName, $e)
-            );
+            throw new ClientException($requestName, $e);
         }
 
         $statusCode = $response->getStatusCode();
