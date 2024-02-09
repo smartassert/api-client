@@ -67,7 +67,7 @@ readonly class HttpHandler
                 $error = $this->errorFactory->createFromResponse($response);
 
                 $exception = $error instanceof ErrorInterface
-                    ? new ErrorException($requestName, $error)
+                    ? new ErrorException($error)
                     : new HttpException($requestName, $request, $response);
             } catch (ErrorDeserializationException | UnknownErrorClassException) {
                 $exception = new HttpException($requestName, $request, $response);
