@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\User;
 
 use SmartAssert\ApiClient\Exception\ClientException;
-use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
@@ -44,7 +44,7 @@ class CreateTest extends AbstractIntegrationTestCase
         self::assertInstanceOf(ClientException::class, $exception);
 
         $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorExceptionInterface::class, $errorException);
+        self::assertInstanceOf(ErrorException::class, $errorException);
 
         $error = $errorException->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);

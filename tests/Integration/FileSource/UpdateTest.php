@@ -7,8 +7,8 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
-use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ApiClient\Exception\NotFoundException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
@@ -85,7 +85,7 @@ class UpdateTest extends AbstractIntegrationTestCase
         self::assertInstanceOf(ClientException::class, $exception);
 
         $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorExceptionInterface::class, $errorException);
+        self::assertInstanceOf(ErrorException::class, $errorException);
 
         $error = $errorException->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
@@ -112,7 +112,7 @@ class UpdateTest extends AbstractIntegrationTestCase
         self::assertInstanceOf(ClientException::class, $exception);
 
         $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorExceptionInterface::class, $errorException);
+        self::assertInstanceOf(ErrorException::class, $errorException);
 
         $error = $errorException->getError();
         self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
@@ -147,7 +147,7 @@ class UpdateTest extends AbstractIntegrationTestCase
         self::assertInstanceOf(ClientException::class, $exception);
 
         $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorExceptionInterface::class, $errorException);
+        self::assertInstanceOf(ErrorException::class, $errorException);
 
         $error = $errorException->getError();
         self::assertInstanceOf(ModifyReadOnlyEntityErrorInterface::class, $error);

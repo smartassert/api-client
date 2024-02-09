@@ -6,9 +6,8 @@ namespace SmartAssert\ApiClient\Exception\Http;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Exception\HttpExceptionInterface;
 
-class HttpException extends \Exception implements HttpExceptionInterface
+class HttpException extends \Exception
 {
     public function __construct(
         private readonly RequestInterface $request,

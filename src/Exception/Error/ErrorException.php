@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Exception\Error;
 
-use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ServiceRequest\Error\ErrorInterface;
 
-class ErrorException extends \Exception implements ErrorExceptionInterface
+class ErrorException extends \Exception
 {
     public function __construct(
         private readonly ErrorInterface $error,

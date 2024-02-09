@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
 use SmartAssert\ApiClient\Exception\ClientException;
-use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
@@ -126,7 +126,7 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
         self::assertInstanceOf(ClientException::class, $exception);
 
         $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorExceptionInterface::class, $errorException);
+        self::assertInstanceOf(ErrorException::class, $errorException);
 
         $error = $errorException->getError();
         self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
