@@ -64,9 +64,9 @@ readonly class HttpHandler
 
                 $exception = $error instanceof ErrorInterface
                     ? new ErrorException($error)
-                    : new HttpException($requestName, $request, $response);
+                    : new HttpException($request, $response);
             } catch (ErrorDeserializationException | UnknownErrorClassException) {
-                $exception = new HttpException($requestName, $request, $response);
+                $exception = new HttpException($request, $response);
             }
 
             throw new ClientException($requestName, $exception);
