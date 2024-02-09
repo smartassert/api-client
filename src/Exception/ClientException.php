@@ -11,7 +11,7 @@ use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 
-class ClientException extends \Exception implements NamedRequestExceptionInterface
+class ClientException extends \Exception
 {
     /**
      * @param non-empty-string $requestName
