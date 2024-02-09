@@ -90,7 +90,7 @@ readonly class HttpHandler
         if ('application/json' !== $contentType) {
             throw new ClientException(
                 $requestName,
-                new UnexpectedResponseFormatException($requestName, $contentType, null)
+                new UnexpectedResponseFormatException($contentType, null)
             );
         }
 
@@ -98,7 +98,7 @@ readonly class HttpHandler
         if (!is_array($responseData)) {
             throw new ClientException(
                 $requestName,
-                new UnexpectedResponseFormatException($requestName, $contentType, gettype($responseData))
+                new UnexpectedResponseFormatException($contentType, gettype($responseData))
             );
         }
 
