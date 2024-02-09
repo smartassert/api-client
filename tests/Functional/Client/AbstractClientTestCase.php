@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
@@ -72,9 +73,15 @@ abstract class AbstractClientTestCase extends TestCase
     ): void {
         $this->mockHandler->append($httpFixture);
 
-        $this->expectException($expectedExceptionClass);
+        $exception = null;
 
-        ($this->createClientActionCallable())();
+        try {
+            ($this->createClientActionCallable())();
+        } catch (\Throwable $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf($expectedExceptionClass, $exception->getInnerException());
     }
 
     /**
@@ -89,13 +96,18 @@ abstract class AbstractClientTestCase extends TestCase
     {
         $this->mockHandler->append($httpFixture);
 
+        $exception = null;
+
         try {
             ($this->createClientActionCallable())();
-
-            self::fail(HttpException::class . ' not thrown');
-        } catch (HttpException $e) {
-            self::assertSame($httpFixture, $e->getResponse());
+        } catch (\Throwable $exception) {
         }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+
+        $httpException = $exception->getInnerException();
+        self::assertInstanceOf(HttpException::class, $httpException);
+        self::assertSame($httpFixture, $httpException->getResponse());
     }
 
     protected function getLastRequest(): RequestInterface

@@ -6,8 +6,9 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
-use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
 use SmartAssert\ApiClient\Exception\NotFoundException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
@@ -29,11 +30,18 @@ class UpdateTest extends AbstractIntegrationTestCase
 
     public function testUpdateUnauthorized(): void
     {
-        self::expectException(UnauthorizedException::class);
         $id = (string) new Ulid();
         \assert('' !== $id);
 
-        self::$fileSourceClient->update(md5((string) rand()), $id, md5((string) rand()));
+        $exception = null;
+
+        try {
+            self::$fileSourceClient->update(md5((string) rand()), $id, md5((string) rand()));
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
     public function testUpdateNotFound(): void
@@ -46,9 +54,15 @@ class UpdateTest extends AbstractIntegrationTestCase
         $id = (string) new Ulid();
         \assert('' !== $id);
 
-        self::expectException(NotFoundException::class);
+        $exception = null;
 
-        self::$fileSourceClient->update($apiKey->key, $id, $label);
+        try {
+            self::$fileSourceClient->update($apiKey->key, $id, $label);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(NotFoundException::class, $exception->getInnerException());
     }
 
     /**
@@ -65,12 +79,15 @@ class UpdateTest extends AbstractIntegrationTestCase
 
         try {
             self::$fileSourceClient->update($apiKey->key, $source->id, $label);
-        } catch (ErrorExceptionInterface $exception) {
+        } catch (ClientException $exception) {
         }
 
-        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+        self::assertInstanceOf(ClientException::class, $exception);
 
-        $error = $exception->getError();
+        $errorException = $exception->getInnerException();
+        self::assertInstanceOf(ErrorException::class, $errorException);
+
+        $error = $errorException->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
         self::assertEquals($expected, $error);
     }
@@ -89,12 +106,15 @@ class UpdateTest extends AbstractIntegrationTestCase
 
         try {
             self::$fileSourceClient->update($apiKey->key, $createdFileSource->id, $label);
-        } catch (ErrorExceptionInterface $exception) {
+        } catch (ClientException $exception) {
         }
 
-        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+        self::assertInstanceOf(ClientException::class, $exception);
 
-        $error = $exception->getError();
+        $errorException = $exception->getInnerException();
+        self::assertInstanceOf(ErrorException::class, $errorException);
+
+        $error = $errorException->getError();
         self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
         self::assertEquals(new DuplicateObjectError(new Parameter('label', $label)), $error);
     }
@@ -121,12 +141,15 @@ class UpdateTest extends AbstractIntegrationTestCase
 
         try {
             self::$fileSourceClient->update($apiKey->key, $source->id, md5((string) rand()));
-        } catch (ErrorExceptionInterface $exception) {
+        } catch (ClientException $exception) {
         }
 
-        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+        self::assertInstanceOf(ClientException::class, $exception);
 
-        $error = $exception->getError();
+        $errorException = $exception->getInnerException();
+        self::assertInstanceOf(ErrorException::class, $errorException);
+
+        $error = $errorException->getError();
         self::assertInstanceOf(ModifyReadOnlyEntityErrorInterface::class, $error);
         self::assertEquals(new ModifyReadOnlyEntityError($source->id, 'file-source'), $error);
     }

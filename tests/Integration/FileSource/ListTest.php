@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\FileClient;
@@ -17,13 +18,18 @@ class ListTest extends AbstractIntegrationTestCase
 {
     public function testListUnauthorized(): void
     {
-        self::expectException(UnauthorizedException::class);
         $id = (string) new Ulid();
         \assert('' !== $id);
 
-        self::expectException(UnauthorizedException::class);
+        $exception = null;
 
-        self::$fileSourceClient->list(md5((string) rand()), $id);
+        try {
+            self::$fileSourceClient->list(md5((string) rand()), $id);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
     /**

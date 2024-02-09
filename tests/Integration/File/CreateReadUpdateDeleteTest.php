@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
-use SmartAssert\ApiClient\Exception\ErrorExceptionInterface;
-use SmartAssert\ApiClient\Exception\File\NotFoundException;
+use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
+use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
@@ -19,13 +20,20 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
         $source = self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
 
-        self::expectException(UnauthorizedException::class);
-        self::$fileClient->create(
-            md5((string) rand()),
-            $source->getId(),
-            md5((string) rand()) . '.yaml',
-            md5((string) rand())
-        );
+        $exception = null;
+
+        try {
+            self::$fileClient->create(
+                md5((string) rand()),
+                $source->getId(),
+                md5((string) rand()) . '.yaml',
+                md5((string) rand())
+            );
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
     public function testReadUnauthorized(): void
@@ -37,8 +45,17 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
         $filename = md5((string) rand()) . '.yaml';
         self::$fileClient->create($apiKey->key, $source->getId(), $filename, md5((string) rand()));
 
-        self::expectException(NotFoundException::class);
-        self::$fileClient->read(md5((string) rand()), $source->getId(), $filename);
+        $exception = null;
+
+        try {
+            self::$fileClient->read(md5((string) rand()), $source->getId(), $filename);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+
+        $fileNotFoundException = $exception->getInnerException();
+        self::assertInstanceOf(FileNotFoundException::class, $fileNotFoundException);
     }
 
     public function testUpdateUnauthorized(): void
@@ -50,8 +67,17 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
         $filename = md5((string) rand()) . '.yaml';
         self::$fileClient->create($apiKey->key, $source->getId(), $filename, md5((string) rand()));
 
-        self::expectException(NotFoundException::class);
-        self::$fileClient->update(md5((string) rand()), $source->getId(), $filename, md5((string) rand()));
+        $exception = null;
+
+        try {
+            self::$fileClient->update(md5((string) rand()), $source->getId(), $filename, md5((string) rand()));
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+
+        $fileNotFoundException = $exception->getInnerException();
+        self::assertInstanceOf(FileNotFoundException::class, $fileNotFoundException);
     }
 
     public function testDeleteUnauthorized(): void
@@ -63,12 +89,17 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
         $filename = md5((string) rand()) . '.yaml';
         self::$fileClient->create($apiKey->key, $source->getId(), $filename, md5((string) rand()));
 
-        self::expectException(NotFoundException::class);
-        self::$fileClient->delete(
-            md5((string) rand()),
-            md5((string) rand()),
-            md5((string) rand()) . '.yaml'
-        );
+        $exception = null;
+
+        try {
+            self::$fileClient->delete(md5((string) rand()), md5((string) rand()), md5((string) rand()) . '.yaml');
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+
+        $fileNotFoundException = $exception->getInnerException();
+        self::assertInstanceOf(FileNotFoundException::class, $fileNotFoundException);
     }
 
     public function testCreateDuplicateFilename(): void
@@ -89,12 +120,15 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->create($apiKey->key, $fileSource->id, $filename, $content);
-        } catch (ErrorExceptionInterface $exception) {
+        } catch (ClientException $exception) {
         }
 
-        self::assertInstanceOf(ErrorExceptionInterface::class, $exception);
+        self::assertInstanceOf(ClientException::class, $exception);
 
-        $error = $exception->getError();
+        $errorException = $exception->getInnerException();
+        self::assertInstanceOf(ErrorException::class, $errorException);
+
+        $error = $errorException->getError();
         self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
         self::assertEquals(new DuplicateObjectError(new Parameter('filename', $filename)), $error);
     }
@@ -126,7 +160,16 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
 
         self::$fileClient->delete($apiKey->key, $fileSource->id, $filename);
 
-        self::expectException(NotFoundException::class);
-        self::$fileClient->read($apiKey->key, $fileSource->id, $filename);
+        $exception = null;
+
+        try {
+            self::$fileClient->read($apiKey->key, $fileSource->id, $filename);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+
+        $fileNotFoundException = $exception->getInnerException();
+        self::assertInstanceOf(FileNotFoundException::class, $fileNotFoundException);
     }
 }

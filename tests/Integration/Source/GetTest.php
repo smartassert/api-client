@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use Symfony\Component\Uid\Ulid;
@@ -12,11 +13,18 @@ class GetTest extends AbstractSourceTestCase
 {
     public function testGetUnauthorized(): void
     {
-        self::expectException(UnauthorizedException::class);
         $id = (string) new Ulid();
         \assert('' !== $id);
 
-        self::$sourceClient->get(md5((string) rand()), $id);
+        $exception = null;
+
+        try {
+            self::$sourceClient->get(md5((string) rand()), $id);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
     public function testGetNotFound(): void
@@ -27,9 +35,15 @@ class GetTest extends AbstractSourceTestCase
         $id = (string) new Ulid();
         \assert('' !== $id);
 
-        self::expectException(NotFoundException::class);
+        $exception = null;
 
-        self::$sourceClient->get($apiKey->key, $id);
+        try {
+            self::$sourceClient->get($apiKey->key, $id);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(NotFoundException::class, $exception->getInnerException());
     }
 
     public function testGetFileSourceSuccess(): void
