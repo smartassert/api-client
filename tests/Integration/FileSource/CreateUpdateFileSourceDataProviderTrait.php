@@ -25,7 +25,7 @@ trait CreateUpdateFileSourceDataProviderTrait
                 'expected' => new BadRequestError(
                     (new Parameter('label', $labelEmpty))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'empty'
+                    'wrong_size'
                 ),
             ],
             'too long' => [

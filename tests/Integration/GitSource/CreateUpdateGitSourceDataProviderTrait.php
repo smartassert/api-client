@@ -53,7 +53,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'expected' => new BadRequestError(
                     (new Parameter('label', ''))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'empty'
+                    'wrong_size'
                 ),
             ],
             'label too long' => [
@@ -75,7 +75,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'expected' => new BadRequestError(
                     (new Parameter('host-url', ''))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'empty'
+                    'wrong_size'
                 ),
             ],
             'host url too long' => [
@@ -97,7 +97,7 @@ trait CreateUpdateGitSourceDataProviderTrait
                 'expected' => new BadRequestError(
                     (new Parameter('path', ''))
                         ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'empty'
+                    'wrong_size'
                 ),
             ],
             'path too long' => [
