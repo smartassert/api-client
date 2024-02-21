@@ -26,7 +26,6 @@ readonly class FileClient
     /**
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
-     * @param non-empty-string $filename
      *
      * @throws ClientException
      */
@@ -43,7 +42,6 @@ readonly class FileClient
     /**
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
-     * @param non-empty-string $filename
      *
      * @throws ClientException
      */
@@ -74,7 +72,6 @@ readonly class FileClient
     /**
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
-     * @param non-empty-string $filename
      *
      * @throws ClientException
      */
@@ -101,7 +98,6 @@ readonly class FileClient
     /**
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
-     * @param non-empty-string $filename
      *
      * @throws ClientException
      */
