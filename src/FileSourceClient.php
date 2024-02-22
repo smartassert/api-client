@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
+use SmartAssert\ApiClient\Data\Source\File;
 use SmartAssert\ApiClient\Data\Source\FileSource;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
@@ -47,7 +48,7 @@ readonly class FileSourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @return non-empty-string[]
+     * @return File[]
      *
      * @throws ClientException
      */
@@ -59,14 +60,23 @@ readonly class FileSourceClient
             new ApiKeyAuthorizationHeader($apiKey),
         ));
 
-        $filenames = [];
-        foreach ($data as $filename) {
-            if (is_string($filename) && '' !== $filename) {
-                $filenames[] = $filename;
+        $files = [];
+
+        foreach ($data as $fileData) {
+            if (is_array($fileData)) {
+                $path = $fileData['path'] ?? null;
+                $path = is_string($path) ? trim($path) : null;
+
+                $size = $fileData['size'] ?? null;
+                $size = is_int($size) ? $size : null;
+
+                if (is_string($path) && '' !== $path && is_int($size)) {
+                    $files[] = new File($path, $size);
+                }
             }
         }
 
-        return $filenames;
+        return $files;
     }
 
     /**

@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Data\Source\File;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -35,10 +36,10 @@ class ListTest extends AbstractIntegrationTestCase
     /**
      * @dataProvider listSuccessDataProvider
      *
-     * @param non-empty-string[] $filenamesToCreate
-     * @param string[]           $expected
+     * @param array<array{path: non-empty-string, content: string}> $fileDataCollection
+     * @param string[]                                              $expected
      */
-    public function testListSuccess(array $filenamesToCreate, array $expected): void
+    public function testListSuccess(array $fileDataCollection, array $expected): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
@@ -56,13 +57,13 @@ class ListTest extends AbstractIntegrationTestCase
             ),
         );
 
-        foreach ($filenamesToCreate as $filename) {
-            $fileClient->create($apiKey->key, $fileSource->id, $filename, md5((string) rand()));
+        foreach ($fileDataCollection as $fileData) {
+            $fileClient->create($apiKey->key, $fileSource->id, $fileData['path'], $fileData['content']);
         }
 
         $list = self::$fileSourceClient->list($apiKey->key, $fileSource->id);
 
-        self::assertSame($expected, $list);
+        self::assertEquals($expected, $list);
     }
 
     /**
@@ -72,25 +73,39 @@ class ListTest extends AbstractIntegrationTestCase
     {
         return [
             'empty' => [
-                'filenamesToCreate' => [],
+                'fileDataCollection' => [],
                 'expected' => [],
             ],
-            'single' => [
-                'filenamesToCreate' => [
-                    'A.yaml'
-                ],
-                'expected' => ['A.yaml'],
-            ],
-            'multiple' => [
-                'filenamesToCreate' => [
-                    'A.yaml',
-                    'Z.yaml',
-                    'M.yaml',
+            'single file, size 1' => [
+                'fileDataCollection' => [
+                    [
+                        'path' => 'A.yaml',
+                        'content' => '.'
+                    ],
                 ],
                 'expected' => [
-                    'A.yaml',
-                    'M.yaml',
-                    'Z.yaml',
+                    new File('A.yaml', 1),
+                ],
+            ],
+            'multiple' => [
+                'fileDataCollection' => [
+                    [
+                        'path' => 'A.yaml',
+                        'content' => 'a'
+                    ],
+                    [
+                        'path' => 'Z.yaml',
+                        'content' => 'zzzzzzzzzzzzzzzzzzzzzzzzzz'
+                    ],
+                    [
+                        'path' => 'M.yaml',
+                        'content' => 'mmmmmmmmmmmmm'
+                    ],
+                ],
+                'expected' => [
+                    new File('A.yaml', 1),
+                    new File('M.yaml', 13),
+                    new File('Z.yaml', 26),
                 ],
             ],
         ];
