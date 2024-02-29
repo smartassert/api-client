@@ -42,10 +42,15 @@ class CreateTest extends AbstractIntegrationTestCase
 
     public function testCreateUnauthorized(): void
     {
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $source = self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
+
         $exception = null;
 
         try {
-            self::$suiteClient->create(md5((string) rand()), md5((string) rand()), md5((string) rand()), []);
+            self::$suiteClient->create(md5((string) rand()), $source->id, md5((string) rand()), []);
         } catch (ClientException $exception) {
         }
 
