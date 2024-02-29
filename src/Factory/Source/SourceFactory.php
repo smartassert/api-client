@@ -42,7 +42,7 @@ readonly class SourceFactory extends AbstractFactory
         return new FileSource(
             $this->getNonEmptyString($data, 'id'),
             $this->getNonEmptyString($data, 'label'),
-            $this->getSourceDeletedAt($data)
+            $this->getEntityDeletedAt($data)
         );
     }
 
@@ -61,21 +61,8 @@ readonly class SourceFactory extends AbstractFactory
         $hasCredentials = $data['has_credentials'] ?? null;
         $hasCredentials = is_bool($hasCredentials) ? $hasCredentials : false;
 
-        $deletedAt = $this->getSourceDeletedAt($data);
+        $deletedAt = $this->getEntityDeletedAt($data);
 
         return new GitSource($id, $label, $hostUrl, $path, $hasCredentials, $deletedAt);
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @return ?int<1, max>
-     */
-    private function getSourceDeletedAt(array $data): ?int
-    {
-        $deletedAt = $data['deleted_at'] ?? null;
-        $deletedAt = is_int($deletedAt) ? $deletedAt : null;
-
-        return $deletedAt > 0 ? $deletedAt : null;
     }
 }
