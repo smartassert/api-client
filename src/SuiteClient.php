@@ -75,6 +75,34 @@ readonly class SuiteClient
 
     /**
      * @param non-empty-string $apiKey
+     * @param string[]         $tests
+     *
+     * @throws ClientException
+     */
+    public function update(string $apiKey, string $id, string $sourceId, string $label, array $tests): Suite
+    {
+        $requestSpecification = new RequestSpecification(
+            'PUT',
+            new RouteRequirements('suite', ['suiteId' => $id]),
+            new ApiKeyAuthorizationHeader($apiKey),
+            new FormBody([
+                'source_id' => $sourceId,
+                'label' => $label,
+                'tests' => $tests,
+            ]),
+        );
+
+        try {
+            return $this->suiteFactory->create(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new ClientException($requestSpecification->getName(), $e);
+        }
+    }
+
+    /**
+     * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
      * @throws ClientException
