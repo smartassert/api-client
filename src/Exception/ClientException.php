@@ -21,6 +21,7 @@ class ClientException extends \Exception
         private readonly AlreadyExistsException|
         ErrorException|
         FileNotFoundException|
+        ForbiddenException|
         HttpException|
         IncompleteDataException|
         NotFoundException|
@@ -42,6 +43,7 @@ class ClientException extends \Exception
     public function getInnerException(): AlreadyExistsException|
     ErrorException|
     FileNotFoundException|
+    ForbiddenException|
     HttpException|
     IncompleteDataException|
     NotFoundException|

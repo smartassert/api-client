@@ -9,7 +9,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
-use SmartAssert\ApiClient\Exception\NotFoundException;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -62,7 +62,7 @@ class UpdateTest extends AbstractIntegrationTestCase
         }
 
         self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(NotFoundException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
     }
 
     /**

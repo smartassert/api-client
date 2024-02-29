@@ -13,6 +13,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
@@ -52,6 +53,10 @@ readonly class HttpHandler
         $statusCode = $response->getStatusCode();
         if (401 === $statusCode) {
             throw new ClientException($requestName, new UnauthorizedException());
+        }
+
+        if (403 === $statusCode) {
+            throw new ClientException($requestName, new ForbiddenException());
         }
 
         if (404 === $statusCode) {
