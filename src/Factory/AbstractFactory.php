@@ -39,4 +39,17 @@ abstract readonly class AbstractFactory
 
         return '' === $value || null === $value ? null : $value;
     }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return ?int<1, max>
+     */
+    protected function getEntityDeletedAt(array $data): ?int
+    {
+        $deletedAt = $data['deleted_at'] ?? null;
+        $deletedAt = is_int($deletedAt) ? $deletedAt : null;
+
+        return $deletedAt > 0 ? $deletedAt : null;
+    }
 }
