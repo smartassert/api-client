@@ -7,7 +7,10 @@ namespace SmartAssert\ApiClient\Tests\Integration;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
+use SmartAssert\ApiClient\Data\User\ApiKey;
+use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
@@ -70,5 +73,30 @@ abstract class AbstractIntegrationTestCase extends TestCase
         self::$gitSourceClient = new GitSourceClient(new SourceFactory(), $httpHandler);
 
         self::$sourceClient = new SourceClient(new SourceFactory(), $httpHandler);
+    }
+
+    /**
+     * @param callable(ApiKey $apiKey): ?object               $allowedAction
+     * @param callable(ApiKey $apiKey, ?object $object): void $forbiddenAction
+     */
+    protected function doForbiddenActionTest(callable $allowedAction, callable $forbiddenAction): void
+    {
+        $user1RefreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $user1ApiKey = self::$usersClient->getApiKey($user1RefreshableToken->token);
+
+        $object = $allowedAction($user1ApiKey);
+
+        $user2RefreshableToken = self::$usersClient->createToken(self::USER2_EMAIL, self::USER2_PASSWORD);
+        $user2ApiKey = self::$usersClient->getApiKey($user2RefreshableToken->token);
+
+        $exception = null;
+
+        try {
+            $forbiddenAction($user2ApiKey, $object);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
     }
 }
