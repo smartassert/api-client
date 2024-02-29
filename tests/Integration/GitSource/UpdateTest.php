@@ -27,15 +27,27 @@ class UpdateTest extends AbstractIntegrationTestCase
 
     public function testUpdateUnauthorized(): void
     {
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $source = self::$gitSourceClient->create(
+            $apiKey->key,
+            md5((string) rand()),
+            md5((string) rand()),
+            md5((string) rand()),
+            null
+        );
+
         $exception = null;
 
         try {
-            self::$gitSourceClient->create(
+            self::$gitSourceClient->update(
+                md5((string) rand()),
+                $source->id,
                 md5((string) rand()),
                 md5((string) rand()),
                 md5((string) rand()),
-                md5((string) rand()),
-                md5((string) rand()),
+                null
             );
         } catch (ClientException $exception) {
         }
