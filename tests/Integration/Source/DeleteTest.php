@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
 use SmartAssert\ApiClient\Exception\ClientException;
-use SmartAssert\ApiClient\Exception\NotFoundException;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use Symfony\Component\Uid\Ulid;
 
@@ -43,7 +43,7 @@ class DeleteTest extends AbstractSourceTestCase
         }
 
         self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(NotFoundException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
     }
 
     public function testDeleteFileSourceSuccess(): void
