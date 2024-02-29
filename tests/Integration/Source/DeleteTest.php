@@ -7,9 +7,10 @@ namespace SmartAssert\ApiClient\Tests\Integration\Source;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use Symfony\Component\Uid\Ulid;
 
-class DeleteTest extends AbstractSourceTestCase
+class DeleteTest extends AbstractIntegrationTestCase
 {
     public function testDeleteUnauthorized(): void
     {

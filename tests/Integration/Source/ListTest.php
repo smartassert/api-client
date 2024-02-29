@@ -6,9 +6,10 @@ namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ApiClient\Tests\Services\DataRepository;
 
-class ListTest extends AbstractSourceTestCase
+class ListTest extends AbstractIntegrationTestCase
 {
     public function testListUnauthorized(): void
     {

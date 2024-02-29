@@ -15,6 +15,7 @@ use SmartAssert\ApiClient\Factory\User\UserFactory;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
+use SmartAssert\ApiClient\SourceClient;
 use SmartAssert\ApiClient\UrlGeneratorFactory;
 use SmartAssert\ApiClient\UsersClient;
 use SmartAssert\ServiceRequest\Deserializer\Error\BadRequestErrorDeserializer;
@@ -36,6 +37,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
     protected static UsersClient $usersClient;
     protected static FileSourceClient $fileSourceClient;
     protected static GitSourceClient $gitSourceClient;
+    protected static SourceClient $sourceClient;
 
     protected static ErrorDeserializer $errorDeserializer;
 
@@ -66,5 +68,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
 
         self::$fileSourceClient = new FileSourceClient(new SourceFactory(), $httpHandler);
         self::$gitSourceClient = new GitSourceClient(new SourceFactory(), $httpHandler);
+
+        self::$sourceClient = new SourceClient(new SourceFactory(), $httpHandler);
     }
 }
