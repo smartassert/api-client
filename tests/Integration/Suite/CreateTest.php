@@ -15,14 +15,12 @@ use SmartAssert\ApiClient\Factory\Source\SuiteFactory;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\SuiteClient;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
-use SmartAssert\ServiceRequest\Error\BadRequestError;
 use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
-use SmartAssert\ServiceRequest\Parameter\Parameter;
-use SmartAssert\ServiceRequest\Parameter\Requirements;
-use SmartAssert\ServiceRequest\Parameter\Size;
 
 class CreateTest extends AbstractIntegrationTestCase
 {
+    use CreateUpdateSuiteDataProviderTrait;
+
     private static SuiteClient $suiteClient;
 
     protected function setUp(): void
@@ -75,7 +73,7 @@ class CreateTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @dataProvider createSuiteBadRequestDataProvider
+     * @dataProvider createUpdateSuiteBadRequestDataProvider
      *
      * @param string[] $tests
      */
@@ -104,55 +102,6 @@ class CreateTest extends AbstractIntegrationTestCase
         $error = $errorException->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
         self::assertEquals($expected, $error);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public static function createSuiteBadRequestDataProvider(): array
-    {
-        $labelTooLong = str_repeat('.', 256);
-
-        return [
-            'missing label' => [
-                'label' => '',
-                'tests' => [],
-                'expected' => new BadRequestError(
-                    (new Parameter('label', ''))
-                        ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'wrong_size'
-                ),
-            ],
-            'label length exceeds length limit' => [
-                'label' => $labelTooLong,
-                'tests' => [],
-                'expected' => new BadRequestError(
-                    (new Parameter('label', $labelTooLong))
-                        ->withRequirements(new Requirements('string', new Size(1, 255))),
-                    'wrong_size'
-                ),
-            ],
-            'invalid yaml filename within singular tests collection' => [
-                'label' => md5((string) rand()),
-                'tests' => ['test.txt'],
-                'expected' => new BadRequestError(
-                    (new Parameter('tests', ['test.txt']))
-                        ->withRequirements(new Requirements('yaml_filename_collection'))
-                        ->withErrorPosition(1),
-                    'invalid'
-                ),
-            ],
-            'invalid yaml filename within tests collection' => [
-                'label' => md5((string) rand()),
-                'tests' => ['test.yaml', 'test.txt', 'test.yml'],
-                'expected' => new BadRequestError(
-                    (new Parameter('tests', ['test.yaml', 'test.txt', 'test.yml']))
-                        ->withRequirements(new Requirements('yaml_filename_collection'))
-                        ->withErrorPosition(2),
-                    'invalid'
-                ),
-            ],
-        ];
     }
 
     /**
