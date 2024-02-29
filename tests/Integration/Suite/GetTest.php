@@ -54,27 +54,6 @@ class GetTest extends AbstractIntegrationTestCase
         self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
-    public function testGetSourceNotFound(): void
-    {
-        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
-        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
-
-        $source = self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
-        $suite = self::$suiteClient->create($apiKey->key, $source->id, md5((string) rand()), []);
-
-        self::$sourceClient->delete($apiKey->key, $source->id);
-
-        $exception = null;
-
-        try {
-            self::$suiteClient->get(md5((string) rand()), $suite->id);
-        } catch (ClientException $exception) {
-        }
-
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
-    }
-
     public function testGetSuiteNotFound(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
@@ -92,6 +71,21 @@ class GetTest extends AbstractIntegrationTestCase
 
         self::assertInstanceOf(ClientException::class, $exception);
         self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+    }
+
+    public function testGetSourceNotFound(): void
+    {
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $source = self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
+        $createdSuite = self::$suiteClient->create($apiKey->key, $source->id, md5((string) rand()), []);
+
+        self::$sourceClient->delete($apiKey->key, $source->id);
+
+        $suite = self::$suiteClient->get($apiKey->key, $createdSuite->id);
+
+        self::assertEquals($createdSuite, $suite);
     }
 
     /**
