@@ -172,6 +172,7 @@ class CreateTest extends AbstractIntegrationTestCase
         self::assertSame($source->id, $suite->sourceId);
         self::assertEquals($label, $suite->label);
         self::assertEquals(array_unique($tests), $suite->tests);
+        self::assertNull($suite->deletedAt);
     }
 
     /**
