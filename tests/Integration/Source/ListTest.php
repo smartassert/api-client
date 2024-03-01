@@ -8,6 +8,7 @@ use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ApiClient\Tests\Services\DataRepository;
+use SmartAssert\ApiClient\Tests\Services\SourcesRepository;
 
 class ListTest extends AbstractIntegrationTestCase
 {
@@ -26,10 +27,8 @@ class ListTest extends AbstractIntegrationTestCase
 
     public function testListSuccess(): void
     {
-        $sourcesDataRepository = new DataRepository(
-            'pgsql:host=localhost;port=5432;dbname=sources;user=postgres;password=password!'
-        );
-        $sourcesDataRepository->removeAllFor(['file_source', 'git_source', 'source', 'suite']);
+        $sourcesDataRepository = new SourcesRepository();
+        $sourcesDataRepository->removeAllSources();
 
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
