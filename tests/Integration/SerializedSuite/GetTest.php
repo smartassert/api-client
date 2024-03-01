@@ -14,9 +14,9 @@ use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\SuiteClient;
 use Symfony\Component\Uid\Ulid;
 
-class CreateTest extends AbstractSerializedSuiteTestCase
+class GetTest extends AbstractSerializedSuiteTestCase
 {
-    public function testCreateUnauthorized(): void
+    public function testGetUnauthorized(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
@@ -27,10 +27,12 @@ class CreateTest extends AbstractSerializedSuiteTestCase
         $serializedSuiteId = (string) new Ulid();
         \assert('' !== $serializedSuiteId);
 
+        $serializedSuite = self::$serializedSuiteClient->create($apiKey->key, $suite->id, $serializedSuiteId, []);
+
         $exception = null;
 
         try {
-            self::$serializedSuiteClient->create(md5((string) rand()), $suite->id, $serializedSuiteId, []);
+            self::$serializedSuiteClient->get(md5((string) rand()), $serializedSuite->id);
         } catch (ClientException $exception) {
         }
 
@@ -38,13 +40,10 @@ class CreateTest extends AbstractSerializedSuiteTestCase
         self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
-    public function testCreateSuiteNotFound(): void
+    public function testGetSerializedSuiteNotFound(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
-
-        $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $serializedSuiteId = (string) new Ulid();
         \assert('' !== $serializedSuiteId);
@@ -52,7 +51,7 @@ class CreateTest extends AbstractSerializedSuiteTestCase
         $exception = null;
 
         try {
-            self::$serializedSuiteClient->create($apiKey->key, $suiteId, $serializedSuiteId, []);
+            self::$serializedSuiteClient->get($apiKey->key, $serializedSuiteId);
         } catch (ClientException $exception) {
         }
 
@@ -61,13 +60,13 @@ class CreateTest extends AbstractSerializedSuiteTestCase
     }
 
     /**
-     * @dataProvider createSuccessDataProvider
+     * @dataProvider getSuccessDataProvider
      *
      * @param callable(ApiKey, FileSourceClient, GitSourceClient, SuiteClient): Suite $suiteCreator
      * @param array<string, scalar>                                                   $parameters
      * @param array<string, scalar>                                                   $expectedParameters
      */
-    public function testCreateSuccess(
+    public function testGetSuccess(
         callable $suiteCreator,
         array $parameters,
         array $expectedParameters
@@ -80,23 +79,23 @@ class CreateTest extends AbstractSerializedSuiteTestCase
         $serializedSuiteId = (string) new Ulid();
         \assert('' !== $serializedSuiteId);
 
-        $serializedSuite = self::$serializedSuiteClient->create(
-            $apiKey->key,
-            $suite->id,
-            $serializedSuiteId,
-            $parameters
-        );
+        self::$serializedSuiteClient->create($apiKey->key, $suite->id, $serializedSuiteId, $parameters);
+
+        $serializedSuite = self::$serializedSuiteClient->get($apiKey->key, $serializedSuiteId);
 
         self::assertSame($serializedSuiteId, $serializedSuite->id);
         self::assertSame($suite->id, $serializedSuite->suiteId);
-        self::assertSame('requested', $serializedSuite->state);
+        self::assertTrue(in_array(
+            $serializedSuite->state,
+            ['requested', 'preparing/running', 'preparing/halted', 'failed', 'prepared']
+        ));
         self::assertSame($expectedParameters, $serializedSuite->parameters);
     }
 
     /**
      * @return array<mixed>
      */
-    public static function createSuccessDataProvider(): array
+    public static function getSuccessDataProvider(): array
     {
         return [
             'file source, no parameters' => [

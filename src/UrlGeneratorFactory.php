@@ -25,6 +25,7 @@ readonly class UrlGeneratorFactory
         $routeCollection->add('suite', new Route('/source/suite/{suiteId}', ['suiteId' => null]));
         $routeCollection->add('suites', new Route('/source/suites'));
         $routeCollection->add('serialized-suite-create', new Route('/source/suite/{suiteId}/{serializedSuiteId}'));
+        $routeCollection->add('serialized-suite-get', new Route('/source/serialized_suite/{serializedSuiteId}'));
 
         return new UrlGenerator($routeCollection, new RequestContext($baseUrl));
     }
