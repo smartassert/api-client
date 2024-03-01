@@ -4,37 +4,13 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Exception\ClientException;
-use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
-use SmartAssert\ApiClient\Factory\Source\SuiteFactory;
-use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\SuiteClient;
-use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use Symfony\Component\Uid\Ulid;
 
-class DeleteTest extends AbstractIntegrationTestCase
+class DeleteTest extends AbstractSuiteTestCase
 {
-    private static SuiteClient $suiteClient;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        self::$suiteClient = new SuiteClient(
-            new SuiteFactory(),
-            new HttpHandler(
-                new HttpClient(),
-                new ExceptionFactory(self::$errorDeserializer),
-                new HttpFactory(),
-                self::$urlGenerator,
-            ),
-        );
-    }
-
     public function testDeleteUnauthorized(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

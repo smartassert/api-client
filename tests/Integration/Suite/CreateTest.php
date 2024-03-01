@@ -4,39 +4,15 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
-use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
-use SmartAssert\ApiClient\Factory\Source\SuiteFactory;
-use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\SuiteClient;
-use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 
-class CreateTest extends AbstractIntegrationTestCase
+class CreateTest extends AbstractSuiteTestCase
 {
     use CreateUpdateSuiteDataProviderTrait;
-
-    private static SuiteClient $suiteClient;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        self::$suiteClient = new SuiteClient(
-            new SuiteFactory(),
-            new HttpHandler(
-                new HttpClient(),
-                new ExceptionFactory(self::$errorDeserializer),
-                new HttpFactory(),
-                self::$urlGenerator,
-            ),
-        );
-    }
 
     public function testCreateUnauthorized(): void
     {
