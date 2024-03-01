@@ -123,4 +123,38 @@ readonly class SuiteClient
             throw new ClientException($requestSpecification->getName(), $e);
         }
     }
+
+    /**
+     * @param non-empty-string $apiKey
+     *
+     * @return Suite[]
+     *
+     * @throws ClientException
+     */
+    public function list(string $apiKey): array
+    {
+        $requestSpecification = new RequestSpecification(
+            'GET',
+            new RouteRequirements('suites'),
+            new ApiKeyAuthorizationHeader($apiKey),
+        );
+
+        $data = $this->httpHandler->getJson($requestSpecification);
+
+        $suites = [];
+        foreach ($data as $dataIndex => $suiteData) {
+            if (is_array($suiteData)) {
+                try {
+                    $suites[] = $this->suiteFactory->create($suiteData);
+                } catch (IncompleteDataException $e) {
+                    throw new ClientException(
+                        $requestSpecification->getName(),
+                        new IncompleteDataException($data, $dataIndex . '.' . $e->missingKey)
+                    );
+                }
+            }
+        }
+
+        return $suites;
+    }
 }

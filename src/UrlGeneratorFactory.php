@@ -23,6 +23,7 @@ readonly class UrlGeneratorFactory
         $routeCollection->add('sources', new Route('/source/sources'));
         $routeCollection->add('source', new Route('/source/{sourceId}', ['sourceId' => null]));
         $routeCollection->add('suite', new Route('/source/suite/{suiteId}', ['suiteId' => null]));
+        $routeCollection->add('suites', new Route('/source/suites'));
 
         return new UrlGenerator($routeCollection, new RequestContext($baseUrl));
     }

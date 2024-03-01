@@ -31,7 +31,7 @@ abstract class AbstractIntegrationTestCase extends TestCase
 {
     protected const USER1_EMAIL = 'user1@example.com';
     protected const USER1_PASSWORD = 'password';
-    protected const USER2_EMAIL = 'user1@example.com';
+    protected const USER2_EMAIL = 'user2@example.com';
     protected const USER2_PASSWORD = 'password';
     protected static UrlGeneratorInterface $urlGenerator;
     protected static UsersClient $usersClient;
