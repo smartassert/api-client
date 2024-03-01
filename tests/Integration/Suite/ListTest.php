@@ -4,42 +4,19 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Data\Source\Suite;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
-use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
-use SmartAssert\ApiClient\Factory\Source\SuiteFactory;
-use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\SuiteClient;
-use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ApiClient\Tests\Services\SourcesRepository;
 use SmartAssert\ApiClient\Tests\Services\SuitesRepository;
 use Symfony\Component\Uid\Ulid;
 
-class ListTest extends AbstractIntegrationTestCase
+class ListTest extends AbstractSuiteTestCase
 {
-    private static SuiteClient $suiteClient;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        self::$suiteClient = new SuiteClient(
-            new SuiteFactory(),
-            new HttpHandler(
-                new HttpClient(),
-                new ExceptionFactory(self::$errorDeserializer),
-                new HttpFactory(),
-                self::$urlGenerator,
-            ),
-        );
-    }
-
     public function testGetUnauthorized(): void
     {
         $exception = null;
