@@ -14,11 +14,12 @@ use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\GitSourceClient;
 use SmartAssert\ApiClient\SuiteClient;
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use Symfony\Component\Uid\Ulid;
 
-class UpdateTest extends AbstractSuiteTestCase
+class UpdateTest extends AbstractIntegrationTestCase
 {
     use CreateUpdateSuiteDataProviderTrait;
 
