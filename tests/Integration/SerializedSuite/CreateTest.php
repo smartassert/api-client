@@ -4,18 +4,42 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\SerializedSuite;
 
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Data\Source\Suite;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
+use SmartAssert\ApiClient\Factory\Source\SerializedSuiteFactory;
 use SmartAssert\ApiClient\FileSourceClient;
 use SmartAssert\ApiClient\GitSourceClient;
+use SmartAssert\ApiClient\SerializedSuiteClient;
+use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\SuiteClient;
+use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use Symfony\Component\Uid\Ulid;
 
-class CreateTest extends AbstractSerializedSuiteTestCase
+class CreateTest extends AbstractIntegrationTestCase
 {
+    private static SerializedSuiteClient $serializedSuiteClient;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        self::$serializedSuiteClient = new SerializedSuiteClient(
+            new SerializedSuiteFactory(),
+            new HttpHandler(
+                new HttpClient(),
+                new ExceptionFactory(self::$errorDeserializer),
+                new HttpFactory(),
+                self::$urlGenerator,
+            ),
+        );
+    }
+
     public function testCreateUnauthorized(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
