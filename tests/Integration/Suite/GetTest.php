@@ -7,10 +7,9 @@ namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
-use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use Symfony\Component\Uid\Ulid;
 
-class GetTest extends AbstractIntegrationTestCase
+class GetTest extends AbstractSuiteTestCase
 {
     public function testGetUnauthorized(): void
     {

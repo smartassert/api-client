@@ -63,7 +63,7 @@ readonly class HttpHandler
             throw new ClientException($requestName, new NotFoundException());
         }
 
-        if (!in_array($response->getStatusCode(), [200, 202])) {
+        if (200 !== $statusCode) {
             try {
                 $error = $this->errorFactory->createFromResponse($response);
 
