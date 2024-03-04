@@ -57,32 +57,4 @@ readonly class SerializedSuiteClient
             throw new ClientException($requestSpecification->getName(), $e);
         }
     }
-
-    /**
-     * @param non-empty-string $apiKey
-     * @param non-empty-string $serializedSuiteId
-     *
-     * @throws ClientException
-     */
-    public function get(string $apiKey, string $serializedSuiteId): SerializedSuite
-    {
-        $requestSpecification = new RequestSpecification(
-            'GET',
-            new RouteRequirements(
-                'serialized-suite-get',
-                [
-                    'serializedSuiteId' => $serializedSuiteId
-                ],
-            ),
-            new ApiKeyAuthorizationHeader($apiKey),
-        );
-
-        try {
-            return $this->serializedSuiteFactory->create(
-                $this->httpHandler->getJson($requestSpecification)
-            );
-        } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
-        }
-    }
 }
