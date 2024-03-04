@@ -11,12 +11,11 @@ use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\SuiteClient;
-use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ApiClient\Tests\Services\SourcesRepository;
 use SmartAssert\ApiClient\Tests\Services\SuitesRepository;
 use Symfony\Component\Uid\Ulid;
 
-class ListTest extends AbstractIntegrationTestCase
+class ListTest extends AbstractSuiteTestCase
 {
     public function testGetUnauthorized(): void
     {

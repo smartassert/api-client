@@ -8,10 +8,9 @@ use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
-use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 
-class CreateTest extends AbstractIntegrationTestCase
+class CreateTest extends AbstractSuiteTestCase
 {
     use CreateUpdateSuiteDataProviderTrait;
 
