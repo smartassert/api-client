@@ -14,6 +14,7 @@ use SmartAssert\ServiceRequest\Error\DuplicateObjectError;
 use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
 use SmartAssert\ServiceRequest\Parameter\Requirements;
+use Symfony\Component\Uid\Ulid;
 
 class CreateTest extends AbstractFileTestCase
 {
@@ -123,6 +124,25 @@ class CreateTest extends AbstractFileTestCase
                 md5((string) rand()) . '.yaml',
                 md5((string) rand())
             );
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+    }
+
+    public function testCreateSourceDoesNotExist(): void
+    {
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $sourceId = (string) new Ulid();
+        \assert('' !== $sourceId);
+
+        $exception = null;
+
+        try {
+            self::$fileClient->create($apiKey->key, $sourceId, md5((string) rand()) . '.yaml', md5((string) rand()));
         } catch (ClientException $exception) {
         }
 
