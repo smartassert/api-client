@@ -8,7 +8,6 @@ use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
-use SmartAssert\ApiClient\Tests\Services\SourcesRepository;
 use SmartAssert\ServiceRequest\Error\BadRequestError;
 use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
