@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
+use SmartAssert\ApiClient\Data\Source\FileSource;
+use SmartAssert\ApiClient\Data\Source\GitSource;
+use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -73,5 +76,43 @@ class GetTest extends AbstractIntegrationTestCase
         $retrievedSource = self::$sourceClient->get($apiKey->key, $createdSource->id);
 
         self::assertEquals($createdSource, $retrievedSource);
+    }
+
+    public function testGetFileSourceForbidden(): void
+    {
+        $this->doForbiddenActionTest(
+            function (ApiKey $apiKey) {
+                return self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
+            },
+            function (ApiKey $apiKey, ?object $source) {
+                if (!$source instanceof FileSource) {
+                    return;
+                }
+
+                self::$sourceClient->get($apiKey->key, $source->id);
+            },
+        );
+    }
+
+    public function testGetGitSourceForbidden(): void
+    {
+        $this->doForbiddenActionTest(
+            function (ApiKey $apiKey) {
+                return self::$gitSourceClient->create(
+                    $apiKey->key,
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    null
+                );
+            },
+            function (ApiKey $apiKey, ?object $source) {
+                if (!$source instanceof GitSource) {
+                    return;
+                }
+
+                self::$sourceClient->get($apiKey->key, $source->id);
+            },
+        );
     }
 }

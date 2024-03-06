@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Source;
 
+use SmartAssert\ApiClient\Data\Source\FileSource;
+use SmartAssert\ApiClient\Data\Source\GitSource;
+use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -78,5 +81,43 @@ class DeleteTest extends AbstractIntegrationTestCase
 
         self::assertSame($createdSource->getId(), $retrievedSource?->getId());
         self::assertNotNull($retrievedSource->getDeletedAt());
+    }
+
+    public function testDeleteFileSourceForbidden(): void
+    {
+        $this->doForbiddenActionTest(
+            function (ApiKey $apiKey) {
+                return self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
+            },
+            function (ApiKey $apiKey, ?object $source) {
+                if (!$source instanceof FileSource) {
+                    return;
+                }
+
+                self::$sourceClient->delete($apiKey->key, $source->id);
+            },
+        );
+    }
+
+    public function testDeleteGitSourceForbidden(): void
+    {
+        $this->doForbiddenActionTest(
+            function (ApiKey $apiKey) {
+                return self::$gitSourceClient->create(
+                    $apiKey->key,
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    null
+                );
+            },
+            function (ApiKey $apiKey, ?object $source) {
+                if (!$source instanceof GitSource) {
+                    return;
+                }
+
+                self::$sourceClient->delete($apiKey->key, $source->id);
+            },
+        );
     }
 }

@@ -7,8 +7,11 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Data\Source\File;
+use SmartAssert\ApiClient\Data\Source\FileSource;
+use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\FileClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -109,5 +112,40 @@ class ListTest extends AbstractIntegrationTestCase
                 ],
             ],
         ];
+    }
+
+    public function testListForbidden(): void
+    {
+        $this->doForbiddenActionTest(
+            function (ApiKey $apiKey) {
+                return self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
+            },
+            function (ApiKey $apiKey, ?object $source) {
+                if (!$source instanceof FileSource) {
+                    return;
+                }
+
+                self::$fileSourceClient->list($apiKey->key, $source->id);
+            },
+        );
+    }
+
+    public function testListNotFound(): void
+    {
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $id = (string) new Ulid();
+        \assert('' !== $id);
+
+        $exception = null;
+
+        try {
+            self::$fileSourceClient->list($apiKey->key, $id);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
     }
 }

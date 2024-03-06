@@ -6,6 +6,8 @@ namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Data\Source\GitSource;
+use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
@@ -20,6 +22,7 @@ use SmartAssert\ServiceRequest\Error\DuplicateObjectErrorInterface;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityError;
 use SmartAssert\ServiceRequest\Error\ModifyReadOnlyEntityErrorInterface;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
+use Symfony\Component\Uid\Ulid;
 
 class UpdateTest extends AbstractIntegrationTestCase
 {
@@ -212,5 +215,57 @@ class UpdateTest extends AbstractIntegrationTestCase
         self::assertSame($createdSource->hostUrl, $updatedSource->hostUrl);
         self::assertSame($createdSource->path, $updatedSource->path);
         self::assertSame($expectedHasCredentials, $updatedSource->hasCredentials);
+    }
+
+    public function testUpdateForbidden(): void
+    {
+        $this->doForbiddenActionTest(
+            function (ApiKey $apiKey) {
+                return self::$gitSourceClient->create(
+                    $apiKey->key,
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    null
+                );
+            },
+            function (ApiKey $apiKey, ?object $source) {
+                if (!$source instanceof GitSource) {
+                    return;
+                }
+
+                self::$gitSourceClient->update(
+                    $apiKey->key,
+                    $source->id,
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    md5((string) rand()),
+                    null
+                );
+            },
+        );
+    }
+
+    public function testUpdateNotFound(): void
+    {
+        $id = (string) new Ulid();
+        \assert('' !== $id);
+
+        $exception = null;
+
+        try {
+            self::$gitSourceClient->update(
+                md5((string) rand()),
+                $id,
+                md5((string) rand()),
+                md5((string) rand()),
+                md5((string) rand()),
+                null
+            );
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 }
