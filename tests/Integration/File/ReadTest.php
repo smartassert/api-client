@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\File;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
+use Symfony\Component\Uid\Ulid;
 
 class ReadTest extends AbstractFileTestCase
 {
@@ -66,6 +67,25 @@ class ReadTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->read($user1ApiKey->key, $source->getId(), $filename);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+    }
+
+    public function testReadSourceNotFound(): void
+    {
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $sourceId = (string) new Ulid();
+        \assert('' !== $sourceId);
+
+        $exception = null;
+
+        try {
+            self::$fileClient->read($apiKey->key, $sourceId, md5((string) rand()) . '.yaml');
         } catch (ClientException $exception) {
         }
 
