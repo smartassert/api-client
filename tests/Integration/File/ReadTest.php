@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\File;
 
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
 
 class ReadTest extends AbstractFileTestCase
 {
@@ -46,5 +47,29 @@ class ReadTest extends AbstractFileTestCase
 
         self::assertInstanceOf(ClientException::class, $exception);
         self::assertInstanceOf(FileNotFoundException::class, $exception->getInnerException());
+    }
+
+    public function testReadSourceForbidden(): void
+    {
+        $user1RefreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $user1ApiKey = self::$usersClient->getApiKey($user1RefreshableToken->token);
+
+        $user2RefreshableToken = self::$usersClient->createToken(self::USER2_EMAIL, self::USER2_PASSWORD);
+        $user2ApiKey = self::$usersClient->getApiKey($user2RefreshableToken->token);
+
+        $source = self::$fileSourceClient->create($user2ApiKey->key, md5((string) rand()));
+
+        $filename = md5((string) rand()) . '.yaml';
+        self::$fileClient->create($user2ApiKey->key, $source->id, $filename, md5((string) rand()));
+
+        $exception = null;
+
+        try {
+            self::$fileClient->read($user1ApiKey->key, $source->getId(), $filename);
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
     }
 }
