@@ -13,6 +13,7 @@ use SmartAssert\ServiceRequest\Error\BadRequestError;
 use SmartAssert\ServiceRequest\Error\BadRequestErrorInterface;
 use SmartAssert\ServiceRequest\Parameter\Parameter;
 use SmartAssert\ServiceRequest\Parameter\Requirements;
+use Symfony\Component\Uid\Ulid;
 
 class UpdateTest extends AbstractFileTestCase
 {
@@ -87,6 +88,25 @@ class UpdateTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->update($user1ApiKey->key, $source->id, $filename, md5((string) rand()));
+        } catch (ClientException $exception) {
+        }
+
+        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+    }
+
+    public function testUpdateSourceNotFound(): void
+    {
+        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+
+        $sourceId = (string) new Ulid();
+        \assert('' !== $sourceId);
+
+        $exception = null;
+
+        try {
+            self::$fileClient->update($apiKey->key, $sourceId, md5((string) rand()) . '.yaml', md5((string) rand()));
         } catch (ClientException $exception) {
         }
 
