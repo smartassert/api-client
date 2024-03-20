@@ -15,6 +15,7 @@ readonly class Job
         public string $id,
         public string $suiteId,
         public int $maximumDurationInSeconds,
+        public Preparation $preparation,
     ) {
     }
 }

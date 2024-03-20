@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
@@ -26,6 +27,41 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'maximum_duration_in_seconds');
         }
 
-        return new Job($id, $suiteId, $maximumDurationInSeconds);
+        $preparationData = $data['preparation'] ?? null;
+        if (!is_array($preparationData)) {
+            throw new IncompleteDataException($data, 'preparation');
+        }
+
+        try {
+            $preparation = $this->createPreparation($preparationData);
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteDataException($data, 'preparation.' . $e->missingKey);
+        }
+
+        return new Job($id, $suiteId, $maximumDurationInSeconds, $preparation);
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @throws IncompleteDataException
+     */
+    private function createPreparation(array $data): Preparation
+    {
+        $state = $this->getNonEmptyString($data, 'state');
+        $requestStates = $data['request_states'] ?? [];
+        $requestStates = is_array($requestStates) ? $requestStates : [];
+
+        $filteredRequestStates = [];
+        foreach ($requestStates as $componentName => $requestState) {
+            if (
+                is_string($componentName) && '' !== $componentName
+                && is_string($requestState) && '' !== $requestState
+            ) {
+                $filteredRequestStates[$componentName] = $requestState;
+            }
+        }
+
+        return new Preparation($state, $filteredRequestStates);
     }
 }

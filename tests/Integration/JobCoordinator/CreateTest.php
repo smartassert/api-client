@@ -124,6 +124,17 @@ class CreateTest extends AbstractIntegrationTestCase
 
         self::assertSame($suiteId, $job->suiteId);
         self::assertSame($maximumDurationInSeconds, $job->maximumDurationInSeconds);
+
+        self::assertSame('preparing', $job->preparation->state);
+        self::assertSame(
+            [
+                'results_job' => 'requesting',
+                'serialized_suite' => 'requesting',
+                'machine' => 'pending',
+                'worker_job' => 'pending',
+            ],
+            $job->preparation->requestStates,
+        );
     }
 
     /**
