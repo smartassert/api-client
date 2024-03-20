@@ -152,6 +152,7 @@ services:
     environment:
       AUTHENTICATION_BASE_URL: http://users-http
       SOURCES_BASE_URL: http://sources-http
+      JOB_COORDINATOR_BASE_URL: http://job-coordinator-http
       IS_READY: 1
     depends_on:
       - postgres
