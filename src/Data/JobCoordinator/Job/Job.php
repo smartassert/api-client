@@ -18,6 +18,7 @@ readonly class Job
         public Preparation $preparation,
         public ResultsJob $resultsJob,
         public SerializedSuite $serializedSuite,
+        public Machine $machine,
     ) {
     }
 }

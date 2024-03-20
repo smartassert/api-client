@@ -140,6 +140,9 @@ class CreateTest extends AbstractIntegrationTestCase
         self::assertNull($job->resultsJob->endState);
 
         self::assertNull($job->serializedSuite->state);
+
+        self::assertNull($job->machine->stateCategory);
+        self::assertNull($job->machine->ipAddress);
     }
 
     /**
