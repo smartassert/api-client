@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
@@ -46,7 +47,14 @@ readonly class JobFactory extends AbstractFactory
 
         $resultsJob = $this->createResultsJob($resultsJobData);
 
-        return new Job($id, $suiteId, $maximumDurationInSeconds, $preparation, $resultsJob);
+        $serializedSuiteData = $data['serialized_suite'] ?? null;
+        if (!is_array($serializedSuiteData)) {
+            throw new IncompleteDataException($data, 'serialized_suite');
+        }
+
+        $serializedSuite = $this->createSerializedSuite($serializedSuiteData);
+
+        return new Job($id, $suiteId, $maximumDurationInSeconds, $preparation, $resultsJob, $serializedSuite);
     }
 
     /**
@@ -82,5 +90,13 @@ readonly class JobFactory extends AbstractFactory
             $this->getNullableNonEmptyString($data, 'state'),
             $this->getNullableNonEmptyString($data, 'end_state'),
         );
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function createSerializedSuite(array $data): SerializedSuite
+    {
+        return new SerializedSuite($this->getNullableNonEmptyString($data, 'state'));
     }
 }

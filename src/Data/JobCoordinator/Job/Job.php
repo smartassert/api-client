@@ -17,6 +17,7 @@ readonly class Job
         public int $maximumDurationInSeconds,
         public Preparation $preparation,
         public ResultsJob $resultsJob,
+        public SerializedSuite $serializedSuite,
     ) {
     }
 }
