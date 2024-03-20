@@ -9,6 +9,8 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
@@ -62,6 +64,17 @@ readonly class JobFactory extends AbstractFactory
 
         $machine = $this->createMachine($machineData);
 
+        $workerJobData = $data['worker_job'] ?? null;
+        if (!is_array($workerJobData)) {
+            throw new IncompleteDataException($data, 'worker_job');
+        }
+
+        try {
+            $workerJob = $this->createWorkerJob($workerJobData);
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteDataException($data, 'worker_job.' . $e->missingKey);
+        }
+
         return new Job(
             $id,
             $suiteId,
@@ -69,7 +82,8 @@ readonly class JobFactory extends AbstractFactory
             $preparation,
             $resultsJob,
             $serializedSuite,
-            $machine
+            $machine,
+            $workerJob,
         );
     }
 
@@ -125,5 +139,46 @@ readonly class JobFactory extends AbstractFactory
             $this->getNullableNonEmptyString($data, 'state_category'),
             $this->getNullableNonEmptyString($data, 'ip_address'),
         );
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @throws IncompleteDataException
+     */
+    private function createWorkerJob(array $data): WorkerJob
+    {
+        $state = $this->getNonEmptyString($data, 'state');
+        $isEndState = $this->getIsEndState($data);
+
+        $componentDataCollection = $data['components'] ?? [];
+        $componentDataCollection = is_array($componentDataCollection) ? $componentDataCollection : [];
+
+        $components = [];
+
+        foreach ($componentDataCollection as $componentName => $componentData) {
+            if (is_string($componentName) && '' !== $componentName) {
+                try {
+                    $components[$componentName] = new WorkerJobComponent(
+                        $this->getNonEmptyString($componentData, 'state'),
+                        $this->getIsEndState($componentData),
+                    );
+                } catch (IncompleteDataException $e) {
+                    throw new IncompleteDataException($data, 'components.' . $componentName . '.' . $e->missingKey);
+                }
+            }
+        }
+
+        return new WorkerJob($state, $isEndState, $components);
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function getIsEndState(array $data): bool
+    {
+        $value = $data['is_end_state'] ?? false;
+
+        return is_bool($value) ? $value : false;
     }
 }

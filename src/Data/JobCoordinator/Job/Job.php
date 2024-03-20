@@ -19,6 +19,7 @@ readonly class Job
         public ResultsJob $resultsJob,
         public SerializedSuite $serializedSuite,
         public Machine $machine,
+        public WorkerJob $workerJob,
     ) {
     }
 }

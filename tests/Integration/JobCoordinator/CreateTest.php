@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
@@ -143,6 +144,17 @@ class CreateTest extends AbstractIntegrationTestCase
 
         self::assertNull($job->machine->stateCategory);
         self::assertNull($job->machine->ipAddress);
+
+        self::assertSame('pending', $job->workerJob->state);
+        self::assertFalse($job->workerJob->isEndState);
+        self::assertEquals(
+            [
+                'compilation' => new WorkerJobComponent('pending', false),
+                'execution' => new WorkerJobComponent('pending', false),
+                'event_delivery' => new WorkerJobComponent('pending', false),
+            ],
+            $job->workerJob->componentStates,
+        );
     }
 
     /**
