@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
@@ -38,7 +39,14 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'preparation.' . $e->missingKey);
         }
 
-        return new Job($id, $suiteId, $maximumDurationInSeconds, $preparation);
+        $resultsJobData = $data['results_job'] ?? null;
+        if (!is_array($resultsJobData)) {
+            throw new IncompleteDataException($data, 'results_job');
+        }
+
+        $resultsJob = $this->createResultsJob($resultsJobData);
+
+        return new Job($id, $suiteId, $maximumDurationInSeconds, $preparation, $resultsJob);
     }
 
     /**
@@ -63,5 +71,16 @@ readonly class JobFactory extends AbstractFactory
         }
 
         return new Preparation($state, $filteredRequestStates);
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function createResultsJob(array $data): ResultsJob
+    {
+        return new ResultsJob(
+            $this->getNullableNonEmptyString($data, 'state'),
+            $this->getNullableNonEmptyString($data, 'end_state'),
+        );
     }
 }

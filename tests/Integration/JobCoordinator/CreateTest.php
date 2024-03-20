@@ -135,6 +135,9 @@ class CreateTest extends AbstractIntegrationTestCase
             ],
             $job->preparation->requestStates,
         );
+
+        self::assertNull($job->resultsJob->state);
+        self::assertNull($job->resultsJob->endState);
     }
 
     /**
