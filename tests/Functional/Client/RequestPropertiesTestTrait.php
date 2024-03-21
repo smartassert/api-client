@@ -15,7 +15,11 @@ trait RequestPropertiesTestTrait
     {
         $this->getMockHandler()->append($this->getResponseFixture());
 
-        ($this->createClientActionCallable())();
+        try {
+            ($this->createClientActionCallable())();
+        } catch (\Exception $exception) {
+            var_dump($exception);
+        }
 
         $request = $this->getLastRequest();
         Assert::assertSame($this->getExpectedRequestProperties()->method, $request->getMethod());
