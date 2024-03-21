@@ -32,9 +32,32 @@ readonly class JobCoordinatorClient
     {
         $requestSpecification = new RequestSpecification(
             'POST',
-            new RouteRequirements('job-coordinator-job-create', ['suiteId' => $suiteId]),
+            new RouteRequirements('job-coordinator-job', ['entityId' => $suiteId]),
             new ApiKeyAuthorizationHeader($apiKey),
             new FormBody(['maximum_duration_in_seconds' => $maximumDurationInSeconds]),
+        );
+
+        try {
+            return $this->jobFactory->create(
+                $this->httpHandler->getJson($requestSpecification)
+            );
+        } catch (IncompleteDataException $e) {
+            throw new ClientException($requestSpecification->getName(), $e);
+        }
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $jobId
+     *
+     * @throws ClientException
+     */
+    public function get(string $apiKey, string $jobId): Job
+    {
+        $requestSpecification = new RequestSpecification(
+            'GET',
+            new RouteRequirements('job-coordinator-job', ['entityId' => $jobId]),
+            new ApiKeyAuthorizationHeader($apiKey),
         );
 
         try {
