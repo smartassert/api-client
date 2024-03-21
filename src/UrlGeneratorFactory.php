@@ -24,7 +24,7 @@ readonly class UrlGeneratorFactory
         $routeCollection->add('source', new Route('/source/{sourceId}', ['sourceId' => null]));
         $routeCollection->add('suite', new Route('/source/suite/{suiteId}', ['suiteId' => null]));
         $routeCollection->add('suites', new Route('/source/suites'));
-        $routeCollection->add('job-coordinator-job-create', new Route('/job-coordinator/{suiteId}'));
+        $routeCollection->add('job-coordinator-job', new Route('/job-coordinator/{entityId}'));
 
         return new UrlGenerator($routeCollection, new RequestContext($baseUrl));
     }

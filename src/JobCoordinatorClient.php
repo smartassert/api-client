@@ -8,6 +8,7 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
+use SmartAssert\ApiClient\Request\Body\BodyInterface;
 use SmartAssert\ApiClient\Request\Body\FormBody;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\Request\RequestSpecification;
@@ -30,11 +31,39 @@ readonly class JobCoordinatorClient
      */
     public function create(string $apiKey, string $suiteId, int $maximumDurationInSeconds): Job
     {
-        $requestSpecification = new RequestSpecification(
+        return $this->doAction(
             'POST',
-            new RouteRequirements('job-coordinator-job-create', ['suiteId' => $suiteId]),
+            $apiKey,
+            $suiteId,
+            new FormBody(['maximum_duration_in_seconds' => $maximumDurationInSeconds])
+        );
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $jobId
+     *
+     * @throws ClientException
+     */
+    public function get(string $apiKey, string $jobId): Job
+    {
+        return $this->doAction('GET', $apiKey, $jobId);
+    }
+
+    /**
+     * @param non-empty-string $method
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $entityId
+     *
+     * @throws ClientException
+     */
+    private function doAction(string $method, string $apiKey, string $entityId, ?BodyInterface $body = null): Job
+    {
+        $requestSpecification = new RequestSpecification(
+            $method,
+            new RouteRequirements('job-coordinator-job', ['entityId' => $entityId]),
             new ApiKeyAuthorizationHeader($apiKey),
-            new FormBody(['maximum_duration_in_seconds' => $maximumDurationInSeconds]),
+            $body
         );
 
         try {
