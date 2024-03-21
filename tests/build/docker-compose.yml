@@ -66,15 +66,101 @@ services:
       - ./http-config/caddy/index.php:/app/public/index.php
       - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
 
+  results-service:
+    image: ghcr.io/smartassert/results:3.0
+    container_name: results-service
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/results?serverVersion=12&charset=utf8
+      AUTHENTICATION_BASE_URL: http://users-http
+      IS_READY: 1
+    depends_on:
+      - postgres
+      - users-http
+
+  results-http:
+    image: caddy:2.4.5-alpine
+    container_name: results-http
+    restart: unless-stopped
+    ports:
+      - "9082:80"
+    links:
+      - results-service:app
+    volumes:
+      - ./http-config/caddy/index.php:/app/public/index.php
+      - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  worker-manager-service:
+    image: ghcr.io/smartassert/worker-manager:1.0
+    container_name: worker-manager-service
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/worker_manager?serverVersion=12&charset=utf8
+      AUTHENTICATION_BASE_URL: http://users-http
+      MESSENGER_TRANSPORT_DSN: doctrine://default
+      PRIMARY_DIGITALOCEAN_API_TOKEN: ${PRIMARY_DIGITALOCEAN_API_TOKEN}
+      SECONDARY_DIGITALOCEAN_API_TOKEN: ${SECONDARY_DIGITALOCEAN_API_TOKEN}
+      VERSION: 1.0
+      IS_READY: 1
+    depends_on:
+      - postgres
+      - users-http
+
+  worker-manager-http:
+    image: caddy:2.4.5-alpine
+    container_name: worker-manager-http
+    restart: unless-stopped
+    ports:
+      - "9083:80"
+    links:
+      - worker-manager-service:app
+    volumes:
+      - ./http-config/caddy/index.php:/app/public/index.php
+      - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  job-coordinator-service:
+    image: ghcr.io/smartassert/job-coordinator:2.0
+    container_name: job-coordinator-service
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/job-coordinator?serverVersion=12&charset=utf8
+      AUTHENTICATION_BASE_URL: http://users-http
+      RESULTS_BASE_URL: http://results-http
+      WORKER_MANAGER_BASE_URL: http://worker-manager-http
+      SOURCES_BASE_URL: http://sources-http
+      VERSION: 1.0
+      IS_READY: 1
+    depends_on:
+      - postgres
+      - users-http
+      - sources-http
+      - results-http
+      - worker-manager-http
+
+  job-coordinator-http:
+    image: caddy:2.4.5-alpine
+    container_name: job-coordinator-http
+    restart: unless-stopped
+    ports:
+      - "9084:80"
+    links:
+      - job-coordinator-service:app
+    volumes:
+      - ./http-config/caddy/index.php:/app/public/index.php
+      - ./http-config/caddy/Caddyfile:/etc/caddy/Caddyfile
+
   api-gateway-service:
-    image: ghcr.io/smartassert/api-gateway:9.0
+    image: ghcr.io/smartassert/api-gateway:10.0
     container_name: api-gateway-service
     environment:
       AUTHENTICATION_BASE_URL: http://users-http
       SOURCES_BASE_URL: http://sources-http
+      JOB_COORDINATOR_BASE_URL: http://job-coordinator-http
       IS_READY: 1
     depends_on:
       - postgres
+      - users-http
+      - sources-http
+      - results-http
+      - worker-manager-http
+      - job-coordinator-http
 
   api-gateway-http:
     image: caddy:2.4.5-alpine
