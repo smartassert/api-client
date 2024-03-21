@@ -10,6 +10,7 @@ readonly class Job
      * @param non-empty-string $id
      * @param non-empty-string $suiteId
      * @param positive-int     $maximumDurationInSeconds
+     * @param ServiceRequest[] $serviceRequests
      */
     public function __construct(
         public string $id,
@@ -20,6 +21,7 @@ readonly class Job
         public SerializedSuite $serializedSuite,
         public Machine $machine,
         public WorkerJob $workerJob,
+        public array $serviceRequests,
     ) {
     }
 }

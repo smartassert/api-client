@@ -9,6 +9,8 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
@@ -75,6 +77,17 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'worker_job.' . $e->missingKey);
         }
 
+        $serviceRequestDataCollection = $data['service_requests'] ?? null;
+        if (!is_array($serviceRequestDataCollection)) {
+            throw new IncompleteDataException($data, 'service_requests');
+        }
+
+        try {
+            $serviceRequests = $this->createServiceRequests($serviceRequestDataCollection);
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteDataException($data, 'service_requests.' . $e->missingKey);
+        }
+
         return new Job(
             $id,
             $suiteId,
@@ -84,6 +97,7 @@ readonly class JobFactory extends AbstractFactory
             $serializedSuite,
             $machine,
             $workerJob,
+            $serviceRequests,
         );
     }
 
@@ -180,5 +194,73 @@ readonly class JobFactory extends AbstractFactory
         $value = $data['is_end_state'] ?? false;
 
         return is_bool($value) ? $value : false;
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return ServiceRequest[]
+     *
+     * @throws IncompleteDataException
+     */
+    private function createServiceRequests(array $data): array
+    {
+        $serviceRequests = [];
+
+        foreach ($data as $serviceRequestIndex => $serviceRequestData) {
+            if (is_array($serviceRequestData)) {
+                try {
+                    $serviceRequests[] = $this->createServiceRequest($serviceRequestData);
+                } catch (IncompleteDataException $e) {
+                    throw new IncompleteDataException($data, $serviceRequestIndex . '.' . $e->missingKey);
+                }
+            }
+        }
+
+        return $serviceRequests;
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @throws IncompleteDataException
+     */
+    private function createServiceRequest(array $data): ServiceRequest
+    {
+        $type = $this->getNonEmptyString($data, 'type');
+
+        $attemptsData = $data['attempts'] ?? null;
+        $attemptsData = is_array($attemptsData) ? $attemptsData : null;
+        if (null === $attemptsData) {
+            throw new IncompleteDataException($data, 'attempts');
+        }
+
+        try {
+            $attempts = $this->createServiceRequestAttempts($attemptsData);
+        } catch (IncompleteDataException $e) {
+            throw new IncompleteDataException($data, 'attempts.' . $e->missingKey);
+        }
+
+        return new ServiceRequest($type, $attempts);
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return ServiceRequestAttempt[]
+     *
+     * @throws IncompleteDataException
+     */
+    private function createServiceRequestAttempts(array $data): array
+    {
+        $attempts = [];
+
+        foreach ($data as $attemptData) {
+            if (is_array($attemptData)) {
+                $attempts[] = new ServiceRequestAttempt($this->getNonEmptyString($attemptData, 'state'));
+            }
+        }
+
+        return $attempts;
     }
 }

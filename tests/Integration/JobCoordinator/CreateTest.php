@@ -6,6 +6,8 @@ namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
@@ -154,6 +156,24 @@ class CreateTest extends AbstractIntegrationTestCase
                 'event_delivery' => new WorkerJobComponent('pending', false),
             ],
             $job->workerJob->componentStates,
+        );
+
+        self::assertEquals(
+            [
+                new ServiceRequest(
+                    'results/create',
+                    [
+                        new ServiceRequestAttempt('requesting'),
+                    ]
+                ),
+                new ServiceRequest(
+                    'serialized-suite/create',
+                    [
+                        new ServiceRequestAttempt('requesting'),
+                    ]
+                ),
+            ],
+            $job->serviceRequests
         );
     }
 
