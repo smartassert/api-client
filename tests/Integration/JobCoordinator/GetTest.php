@@ -4,41 +4,14 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
-use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
-use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
-use SmartAssert\ApiClient\JobCoordinatorClient;
-use SmartAssert\ApiClient\ServiceClient\HttpHandler;
-use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
 use Symfony\Component\Uid\Ulid;
 
-class GetTest extends AbstractIntegrationTestCase
+class GetTest extends AbstractJobCoordinatorClientTestCase
 {
-    private JobCoordinatorClient $jobCoordinatorClient;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->jobCoordinatorClient = new JobCoordinatorClient(
-            new JobFactory(
-                new SummaryFactory(),
-            ),
-            new HttpHandler(
-                new HttpClient(),
-                new ExceptionFactory(self::$errorDeserializer),
-                new HttpFactory(),
-                self::$urlGenerator,
-            ),
-        );
-    }
-
     public function testGetUnauthorized(): void
     {
         $exception = null;

@@ -31,6 +31,7 @@ abstract class AbstractJobCoordinatorClientTestCase extends AbstractClientTestCa
             new JobFactory(
                 new SummaryFactory(),
             ),
+            new SummaryFactory(),
             new HttpHandler(
                 $this->httpClient,
                 $this->exceptionFactory,
