@@ -18,6 +18,11 @@ use SmartAssert\ApiClient\Factory\AbstractFactory;
 
 readonly class JobFactory extends AbstractFactory
 {
+    public function __construct(
+        private SummaryFactory $summaryFactory,
+    ) {
+    }
+
     /**
      * @param array<mixed> $data
      *
@@ -25,14 +30,7 @@ readonly class JobFactory extends AbstractFactory
      */
     public function create(array $data): Job
     {
-        $id = $this->getNonEmptyString($data, 'id');
-        $suiteId = $this->getNonEmptyString($data, 'suite_id');
-
-        $maximumDurationInSeconds = $data['maximum_duration_in_seconds'] ?? 0;
-        $maximumDurationInSeconds = is_int($maximumDurationInSeconds) ? $maximumDurationInSeconds : 0;
-        if ($maximumDurationInSeconds < 1) {
-            throw new IncompleteDataException($data, 'maximum_duration_in_seconds');
-        }
+        $summary = $this->summaryFactory->create($data);
 
         $preparationData = $data['preparation'] ?? null;
         if (!is_array($preparationData)) {
@@ -88,17 +86,7 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'service_requests.' . $e->missingKey);
         }
 
-        return new Job(
-            $id,
-            $suiteId,
-            $maximumDurationInSeconds,
-            $preparation,
-            $resultsJob,
-            $serializedSuite,
-            $machine,
-            $workerJob,
-            $serviceRequests,
-        );
+        return new Job($summary, $preparation, $resultsJob, $serializedSuite, $machine, $workerJob, $serviceRequests);
     }
 
     /**

@@ -14,6 +14,7 @@ use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
+use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
 use SmartAssert\ApiClient\JobCoordinatorClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
@@ -33,7 +34,9 @@ class CreateTest extends AbstractIntegrationTestCase
         parent::setUp();
 
         $this->jobCoordinatorClient = new JobCoordinatorClient(
-            new JobFactory(),
+            new JobFactory(
+                new SummaryFactory(),
+            ),
             new HttpHandler(
                 new HttpClient(),
                 new ExceptionFactory(self::$errorDeserializer),
@@ -125,8 +128,8 @@ class CreateTest extends AbstractIntegrationTestCase
 
         $job = $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
 
-        self::assertSame($suiteId, $job->suiteId);
-        self::assertSame($maximumDurationInSeconds, $job->maximumDurationInSeconds);
+        self::assertSame($suiteId, $job->summary->suiteId);
+        self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 
         self::assertSame('preparing', $job->preparation->state);
         self::assertSame(
