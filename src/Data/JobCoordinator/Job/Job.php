@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\JobCoordinator\Job;
 
+use Symfony\Component\Uid\Ulid;
+
 readonly class Job
 {
     /**
@@ -23,5 +25,10 @@ readonly class Job
         public WorkerJob $workerJob,
         public array $serviceRequests,
     ) {
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return (new Ulid($this->id))->getDateTime();
     }
 }
