@@ -11,7 +11,6 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\Summary;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
@@ -19,6 +18,11 @@ use SmartAssert\ApiClient\Factory\AbstractFactory;
 
 readonly class JobFactory extends AbstractFactory
 {
+    public function __construct(
+        private SummaryFactory $summaryFactory,
+    ) {
+    }
+
     /**
      * @param array<mixed> $data
      *
@@ -26,16 +30,7 @@ readonly class JobFactory extends AbstractFactory
      */
     public function create(array $data): Job
     {
-        $id = $this->getNonEmptyString($data, 'id');
-        $suiteId = $this->getNonEmptyString($data, 'suite_id');
-
-        $maximumDurationInSeconds = $data['maximum_duration_in_seconds'] ?? 0;
-        $maximumDurationInSeconds = is_int($maximumDurationInSeconds) ? $maximumDurationInSeconds : 0;
-        if ($maximumDurationInSeconds < 1) {
-            throw new IncompleteDataException($data, 'maximum_duration_in_seconds');
-        }
-
-        $summary = new Summary($id, $suiteId, $maximumDurationInSeconds);
+        $summary = $this->summaryFactory->create($data);
 
         $preparationData = $data['preparation'] ?? null;
         if (!is_array($preparationData)) {
