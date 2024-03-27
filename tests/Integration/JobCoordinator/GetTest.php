@@ -66,10 +66,10 @@ class GetTest extends AbstractIntegrationTestCase
         $createdJob = $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
         sleep(1);
 
-        $job = $this->jobCoordinatorClient->get($apiKey->key, $createdJob->id);
+        $job = $this->jobCoordinatorClient->get($apiKey->key, $createdJob->summary->id);
 
-        self::assertSame($suiteId, $job->suiteId);
-        self::assertSame($maximumDurationInSeconds, $job->maximumDurationInSeconds);
+        self::assertSame($suiteId, $job->summary->suiteId);
+        self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 
         $expectedRequestStates = ['pending', 'requesting', 'succeeded', 'failed'];
         self::assertTrue(in_array($job->preparation->state, ['preparing', 'failed']));

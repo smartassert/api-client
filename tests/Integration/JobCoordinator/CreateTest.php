@@ -125,8 +125,8 @@ class CreateTest extends AbstractIntegrationTestCase
 
         $job = $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
 
-        self::assertSame($suiteId, $job->suiteId);
-        self::assertSame($maximumDurationInSeconds, $job->maximumDurationInSeconds);
+        self::assertSame($suiteId, $job->summary->suiteId);
+        self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 
         self::assertSame('preparing', $job->preparation->state);
         self::assertSame(

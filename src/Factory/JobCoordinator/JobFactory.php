@@ -11,6 +11,7 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Summary;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
@@ -33,6 +34,8 @@ readonly class JobFactory extends AbstractFactory
         if ($maximumDurationInSeconds < 1) {
             throw new IncompleteDataException($data, 'maximum_duration_in_seconds');
         }
+
+        $summary = new Summary($id, $suiteId, $maximumDurationInSeconds);
 
         $preparationData = $data['preparation'] ?? null;
         if (!is_array($preparationData)) {
@@ -88,17 +91,7 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'service_requests.' . $e->missingKey);
         }
 
-        return new Job(
-            $id,
-            $suiteId,
-            $maximumDurationInSeconds,
-            $preparation,
-            $resultsJob,
-            $serializedSuite,
-            $machine,
-            $workerJob,
-            $serviceRequests,
-        );
+        return new Job($summary, $preparation, $resultsJob, $serializedSuite, $machine, $workerJob, $serviceRequests);
     }
 
     /**
