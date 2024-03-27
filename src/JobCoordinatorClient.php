@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Summary;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
+use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
 use SmartAssert\ApiClient\Request\Body\BodyInterface;
 use SmartAssert\ApiClient\Request\Body\FormBody;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
@@ -19,6 +21,7 @@ readonly class JobCoordinatorClient
 {
     public function __construct(
         private JobFactory $jobFactory,
+        private SummaryFactory $summaryFactory,
         private HttpHandler $httpHandler,
     ) {
     }
@@ -31,7 +34,7 @@ readonly class JobCoordinatorClient
      */
     public function create(string $apiKey, string $suiteId, int $maximumDurationInSeconds): Job
     {
-        return $this->doAction(
+        return $this->doJobAction(
             'POST',
             $apiKey,
             $suiteId,
@@ -47,7 +50,45 @@ readonly class JobCoordinatorClient
      */
     public function get(string $apiKey, string $jobId): Job
     {
-        return $this->doAction('GET', $apiKey, $jobId);
+        return $this->doJobAction('GET', $apiKey, $jobId);
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $suiteId
+     *
+     * @return Summary[]
+     *
+     * @throws ClientException
+     */
+    public function list(string $apiKey, string $suiteId): array
+    {
+        $requestSpecification = new RequestSpecification(
+            'GET',
+            new RouteRequirements('job-coordinator-list', ['suiteId' => $suiteId]),
+            new ApiKeyAuthorizationHeader($apiKey)
+        );
+
+        $jobSummaries = [];
+        $jobSummaryDataCollection = $this->httpHandler->getJson($requestSpecification);
+
+        foreach ($jobSummaryDataCollection as $jobSummaryIndex => $jobSummaryData) {
+            if (is_array($jobSummaryData)) {
+                try {
+                    $jobSummaries[] = $this->summaryFactory->create($jobSummaryData);
+                } catch (IncompleteDataException $e) {
+                    throw new ClientException(
+                        $requestSpecification->getName(),
+                        new IncompleteDataException(
+                            $jobSummaryDataCollection,
+                            $jobSummaryIndex . '.' . $e->missingKey
+                        )
+                    );
+                }
+            }
+        }
+
+        return $jobSummaries;
     }
 
     /**
@@ -57,7 +98,7 @@ readonly class JobCoordinatorClient
      *
      * @throws ClientException
      */
-    private function doAction(string $method, string $apiKey, string $entityId, ?BodyInterface $body = null): Job
+    private function doJobAction(string $method, string $apiKey, string $entityId, ?BodyInterface $body = null): Job
     {
         $requestSpecification = new RequestSpecification(
             $method,
