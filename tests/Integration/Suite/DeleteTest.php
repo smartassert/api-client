@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -72,10 +73,9 @@ class DeleteTest extends AbstractSuiteTestCase
     }
 
     /**
-     * @dataProvider deleteSuccessDataProvider
-     *
      * @param string[] $tests
      */
+    #[DataProvider('deleteSuccessDataProvider')]
     public function testDeleteSuccess(string $label, array $tests): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

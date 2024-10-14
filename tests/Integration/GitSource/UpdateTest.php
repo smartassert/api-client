@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
@@ -59,9 +60,7 @@ class UpdateTest extends AbstractIntegrationTestCase
         self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
-    /**
-     * @dataProvider badRequestDataProvider
-     */
+    #[DataProvider('badRequestDataProvider')]
     public function testUpdateBadRequest(
         string $label,
         string $hostUrl,
@@ -186,9 +185,7 @@ class UpdateTest extends AbstractIntegrationTestCase
         self::assertEquals(new ModifyReadOnlyEntityError($source->id, 'git-source'), $error);
     }
 
-    /**
-     * @dataProvider successDataProvider
-     */
+    #[DataProvider('successDataProvider')]
     public function testUpdateSuccess(
         string $label,
         string $hostUrl,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
@@ -35,9 +36,7 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
         self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
-    /**
-     * @dataProvider createJobBadRequestDataProvider
-     */
+    #[DataProvider('createJobBadRequestDataProvider')]
     public function testCreateBadRequest(int $maximumDurationInSeconds, BadRequestErrorInterface $expected): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
@@ -88,9 +87,7 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider createSuccessDataProvider
-     */
+    #[DataProvider('createSuccessDataProvider')]
     public function testCreateSuccess(int $maximumDurationInSeconds): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

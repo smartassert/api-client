@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\Source\FileSource;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
@@ -67,9 +68,7 @@ class UpdateTest extends AbstractIntegrationTestCase
         self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
     }
 
-    /**
-     * @dataProvider createUpdateFileSourceBadRequestDataProvider
-     */
+    #[DataProvider('createUpdateFileSourceBadRequestDataProvider')]
     public function testUpdateBadRequest(string $label, BadRequestError $expected): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

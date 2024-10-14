@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
@@ -28,9 +29,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
-    /**
-     * @dataProvider getSuccessDataProvider
-     */
+    #[DataProvider('getSuccessDataProvider')]
     public function testGetSuccess(int $maximumDurationInSeconds): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

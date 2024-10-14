@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\GitSource;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -37,11 +38,10 @@ class CreateTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @dataProvider badRequestDataProvider
-     *
      * @param non-empty-string  $path
      * @param ?non-empty-string $credentials
      */
+    #[DataProvider('badRequestDataProvider')]
     public function testCreateBadRequest(
         string $label,
         string $hostUrl,
@@ -95,9 +95,7 @@ class CreateTest extends AbstractIntegrationTestCase
         self::assertEquals(new DuplicateObjectError(new Parameter('label', $label)), $error);
     }
 
-    /**
-     * @dataProvider successDataProvider
-     */
+    #[DataProvider('successDataProvider')]
     public function testCreateSuccess(
         string $label,
         string $hostUrl,

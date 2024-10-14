@@ -8,6 +8,7 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
@@ -63,10 +64,9 @@ abstract class AbstractClientTestCase extends TestCase
     }
 
     /**
-     * @dataProvider clientActionThrowsExceptionDataProvider
-     *
      * @param class-string<\Throwable> $expectedExceptionClass
      */
+    #[DataProvider('clientActionThrowsExceptionDataProvider')]
     public function testClientActionThrowsException(
         ClientExceptionInterface|ResponseInterface $httpFixture,
         string $expectedExceptionClass,
@@ -89,9 +89,7 @@ abstract class AbstractClientTestCase extends TestCase
      */
     abstract public static function clientActionThrowsExceptionDataProvider(): array;
 
-    /**
-     * @dataProvider commonNonSuccessResponseDataProvider
-     */
+    #[DataProvider('commonNonSuccessResponseDataProvider')]
     public function testClientActionThrowsHttpException(ResponseInterface $httpFixture): void
     {
         $this->mockHandler->append($httpFixture);
