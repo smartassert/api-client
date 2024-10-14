@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -27,9 +28,7 @@ class CreateTest extends AbstractIntegrationTestCase
         self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
     }
 
-    /**
-     * @dataProvider createUpdateFileSourceBadRequestDataProvider
-     */
+    #[DataProvider('createUpdateFileSourceBadRequestDataProvider')]
     public function testCreateBadRequest(string $label, BadRequestErrorInterface $expected): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

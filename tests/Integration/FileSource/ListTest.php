@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\Source\File;
 use SmartAssert\ApiClient\Data\Source\FileSource;
 use SmartAssert\ApiClient\Data\User\ApiKey;
@@ -37,11 +38,10 @@ class ListTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @dataProvider listSuccessDataProvider
-     *
      * @param array<array{path: non-empty-string, content: string}> $fileDataCollection
      * @param string[]                                              $expected
      */
+    #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(array $fileDataCollection, array $expected): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

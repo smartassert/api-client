@@ -92,7 +92,7 @@
     },
     "require-dev": {
         "ext-pdo": "*",
-        "phpunit/phpunit": "^10.1",
+        "phpunit/phpunit": "^11",
         "squizlabs/php_codesniffer": "dev-master#5798f29bc985e7ad4470d4488db2cda8cd3f8109",
         "phpstan/phpstan": "^1.10",
         "phpstan/extension-installer": "^1.3",

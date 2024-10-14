@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Data\Source\Suite;
 use SmartAssert\ApiClient\Data\User\ApiKey;
@@ -65,11 +66,10 @@ class ListTest extends AbstractSuiteTestCase
     }
 
     /**
-     * @dataProvider listSuccessDataProvider
-     *
      * @param callable(ApiKey, ApiKey, SourceInterface[], SourceInterface[], SuiteClient): Suite[] $suitesCreator
      * @param callable(SourceInterface[], Suite[]): Suite[]                                        $expectedCreator
      */
+    #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(int $sourceCount, callable $suitesCreator, callable $expectedCreator): void
     {
         $sourcesDataRepository = new SourcesRepository();

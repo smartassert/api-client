@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
@@ -70,10 +71,9 @@ class CreateTest extends AbstractSuiteTestCase
     }
 
     /**
-     * @dataProvider createUpdateSuiteBadRequestDataProvider
-     *
      * @param string[] $tests
      */
+    #[DataProvider('createUpdateSuiteBadRequestDataProvider')]
     public function testCreateBadRequest(
         string $label,
         array $tests,
@@ -102,10 +102,9 @@ class CreateTest extends AbstractSuiteTestCase
     }
 
     /**
-     * @dataProvider createSuccessDataProvider
-     *
      * @param string[] $tests
      */
+    #[DataProvider('createSuccessDataProvider')]
     public function testCreateSuccess(string $label, array $tests): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

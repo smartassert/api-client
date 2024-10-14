@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -119,10 +120,9 @@ class GetTest extends AbstractSuiteTestCase
     }
 
     /**
-     * @dataProvider getSuccessDataProvider
-     *
      * @param string[] $tests
      */
+    #[DataProvider('getSuccessDataProvider')]
     public function testGetSuccess(string $label, array $tests): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);

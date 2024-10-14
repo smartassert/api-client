@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client;
 
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 
 trait ClientActionThrowsIncompleteDataExceptionTestTrait
 {
     /**
-     * @dataProvider incompleteResponseDataExceptionDataProvider
-     *
      * @param array<mixed>     $payload
      * @param non-empty-string $expectedMissingKey
      */
+    #[DataProvider('incompleteResponseDataExceptionDataProvider')]
     public function testClientActionThrowsIncompleteDataException(
         array $payload,
         string $expectedRequestName,

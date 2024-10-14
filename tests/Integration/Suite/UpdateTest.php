@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Data\Source\Suite;
 use SmartAssert\ApiClient\Data\User\ApiKey;
@@ -155,10 +156,9 @@ class UpdateTest extends AbstractSuiteTestCase
     }
 
     /**
-     * @dataProvider createUpdateSuiteBadRequestDataProvider
-     *
      * @param string[] $tests
      */
+    #[DataProvider('createUpdateSuiteBadRequestDataProvider')]
     public function testUpdateBadRequest(
         string $label,
         array $tests,
@@ -188,14 +188,13 @@ class UpdateTest extends AbstractSuiteTestCase
     }
 
     /**
-     * @dataProvider updateSuccessDataProvider
-     *
      * @param callable(ApiKey, FileSourceClient, GitSourceClient): SourceInterface                  $sourceCreator
      * @param callable(ApiKey, SuiteClient, SourceInterface): Suite                                 $suiteCreator
      * @param callable(ApiKey, SourceInterface, FileSourceClient, GitSourceClient): SourceInterface $updateSourceCreator
      * @param callable(string, string): Suite                                                       $expectedCreator
      * @param string[]                                                                              $tests
      */
+    #[DataProvider('updateSuccessDataProvider')]
     public function testUpdateSuccess(
         callable $sourceCreator,
         callable $suiteCreator,
@@ -251,7 +250,7 @@ class UpdateTest extends AbstractSuiteTestCase
                 },
                 'label' => $label1,
                 'tests' => [],
-                'expected' => function (string $suiteId, string $sourceId) use ($label1) {
+                'expectedCreator' => function (string $suiteId, string $sourceId) use ($label1) {
                     \assert('' !== $suiteId);
 
                     return new Suite($suiteId, $sourceId, $label1, [], null);
@@ -279,7 +278,7 @@ class UpdateTest extends AbstractSuiteTestCase
                 },
                 'label' => $label2,
                 'tests' => [],
-                'expected' => function (string $suiteId, string $sourceId) use ($label2) {
+                'expectedCreator' => function (string $suiteId, string $sourceId) use ($label2) {
                     \assert('' !== $suiteId);
 
                     return new Suite($suiteId, $sourceId, $label2, [], null);
@@ -303,7 +302,7 @@ class UpdateTest extends AbstractSuiteTestCase
                 },
                 'label' => $label4,
                 'tests' => [],
-                'expected' => function (string $suiteId, string $sourceId) use ($label4) {
+                'expectedCreator' => function (string $suiteId, string $sourceId) use ($label4) {
                     \assert('' !== $suiteId);
 
                     return new Suite($suiteId, $sourceId, $label4, [], null);
@@ -327,7 +326,7 @@ class UpdateTest extends AbstractSuiteTestCase
                 },
                 'label' => $label5,
                 'tests' => ['test1.yaml', 'test2.yml'],
-                'expected' => function (string $suiteId, string $sourceId) use ($label5) {
+                'expectedCreator' => function (string $suiteId, string $sourceId) use ($label5) {
                     \assert('' !== $suiteId);
 
                     return new Suite($suiteId, $sourceId, $label5, ['test1.yaml', 'test2.yml'], null);
@@ -351,7 +350,7 @@ class UpdateTest extends AbstractSuiteTestCase
                 },
                 'label' => $label6,
                 'tests' => ['test4.yaml', 'test5.yml'],
-                'expected' => function (string $suiteId, string $sourceId) use ($label6) {
+                'expectedCreator' => function (string $suiteId, string $sourceId) use ($label6) {
                     \assert('' !== $suiteId);
 
                     return new Suite($suiteId, $sourceId, $label6, ['test4.yaml', 'test5.yml'], null);
@@ -375,7 +374,7 @@ class UpdateTest extends AbstractSuiteTestCase
                 },
                 'label' => $label7,
                 'tests' => [],
-                'expected' => function (string $suiteId, string $sourceId) use ($label7) {
+                'expectedCreator' => function (string $suiteId, string $sourceId) use ($label7) {
                     \assert('' !== $suiteId);
 
                     return new Suite($suiteId, $sourceId, $label7, [], null);
@@ -410,7 +409,7 @@ class UpdateTest extends AbstractSuiteTestCase
                 },
                 'label' => $label8,
                 'tests' => [],
-                'expected' => function (string $suiteId, string $sourceId) use ($label8) {
+                'expectedCreator' => function (string $suiteId, string $sourceId) use ($label8) {
                     \assert('' !== $suiteId);
 
                     return new Suite($suiteId, $sourceId, $label8, [], null);
