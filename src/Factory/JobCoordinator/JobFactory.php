@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
@@ -134,10 +135,36 @@ readonly class JobFactory extends AbstractFactory
      */
     private function createMachine(array $data): Machine
     {
+        $actionFailureData = $data['action_failure'] ?? [];
+        $actionFailureData = is_array($actionFailureData) ? $actionFailureData : [];
+
         return new Machine(
             $this->getNullableNonEmptyString($data, 'state_category'),
             $this->getNullableNonEmptyString($data, 'ip_address'),
+            $this->createMachineActionFailure($actionFailureData)
         );
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function createMachineActionFailure(array $data): ?MachineActionFailure
+    {
+        $action = $this->getNullableNonEmptyString($data, 'action');
+        if (null === $action) {
+            return null;
+        }
+
+        $type = $this->getNullableNonEmptyString($data, 'type');
+        if (null === $type) {
+            return null;
+        }
+
+        $context = $data['context'] ?? null;
+        $context = is_array($context) ? $context : null;
+        $context = [] === $context ? null : $context;
+
+        return new MachineActionFailure($action, $type, $context);
     }
 
     /**

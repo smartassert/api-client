@@ -13,6 +13,7 @@ readonly class Machine
     public function __construct(
         public ?string $stateCategory,
         public ?string $ipAddress,
+        public ?MachineActionFailure $actionFailure,
     ) {
     }
 }
