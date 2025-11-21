@@ -182,7 +182,7 @@ readonly class JobFactory extends AbstractFactory
         $components = [];
 
         foreach ($componentDataCollection as $componentName => $componentData) {
-            if (is_string($componentName) && '' !== $componentName) {
+            if (is_string($componentName) && '' !== $componentName && is_array($componentData)) {
                 try {
                     $components[$componentName] = new WorkerJobComponent(
                         $this->getNonEmptyString($componentData, 'state'),
