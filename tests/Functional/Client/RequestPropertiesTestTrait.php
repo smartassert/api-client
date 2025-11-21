@@ -17,8 +17,7 @@ trait RequestPropertiesTestTrait
 
         try {
             ($this->createClientActionCallable())();
-        } catch (\Exception $exception) {
-            var_dump($exception);
+        } catch (\Exception) {
         }
 
         $request = $this->getLastRequest();
