@@ -99,7 +99,7 @@
         "phpunit/phpunit": "^11",
         "squizlabs/php_codesniffer": "^4.0",
         "symfony/uid": "^7.3",
-        "webignition/http-history-container": "^3.0"
+        "webignition/http-history-container": "^4.0"
     },
     "minimum-stability":"stable",
     "prefer-stable":true,
