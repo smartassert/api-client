@@ -10,7 +10,7 @@ class ApiKeyAuthorizationHeader extends HeaderCollection
     {
         parent::__construct([
             new Header('translate-authorization-to', 'api-token'),
-            new BearerAuthorizationHeader($apiKey)
+            new BearerAuthorizationHeader($apiKey),
         ]);
     }
 }

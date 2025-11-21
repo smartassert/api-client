@@ -15,8 +15,7 @@ abstract readonly class AbstractSource implements SourceInterface
         public string $id,
         public string $label,
         public ?int $deletedAt,
-    ) {
-    }
+    ) {}
 
     public function getId(): string
     {

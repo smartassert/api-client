@@ -9,8 +9,7 @@ readonly class Body implements BodyInterface
     public function __construct(
         private string $contentType,
         private string $content,
-    ) {
-    }
+    ) {}
 
     public function getContentType(): string
     {

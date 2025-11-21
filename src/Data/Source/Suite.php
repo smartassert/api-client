@@ -18,6 +18,5 @@ readonly class Suite
         public string $label,
         public array $tests,
         public ?int $deletedAt,
-    ) {
-    }
+    ) {}
 }

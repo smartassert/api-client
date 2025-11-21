@@ -14,6 +14,5 @@ readonly class WorkerJob
         public string $state,
         public bool $isEndState,
         public array $componentStates,
-    ) {
-    }
+    ) {}
 }

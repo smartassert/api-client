@@ -29,8 +29,7 @@ readonly class UsersClient
         private TokenFactory $tokenFactory,
         private UserFactory $userFactory,
         private ApiKeyFactory $apiKeyFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ClientException

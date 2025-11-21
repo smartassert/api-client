@@ -62,7 +62,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                 'compiled',
                 'executing',
                 'executed',
-                'ended'
+                'ended',
             ]
         ));
         self::assertNull($job->resultsJob->endState);

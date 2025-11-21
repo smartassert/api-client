@@ -20,8 +20,7 @@ readonly class FileClient
 {
     public function __construct(
         private HttpHandler $httpHandler,
-    ) {
-    }
+    ) {}
 
     /**
      * @param non-empty-string $apiKey
@@ -53,7 +52,7 @@ readonly class FileClient
                 $this->createRouteRequirements($sourceId, $filename),
                 new HeaderCollection([
                     new ApiKeyAuthorizationHeader($apiKey),
-                    new AcceptableContentTypesHeader(['application/yaml', 'text/x-yaml'])
+                    new AcceptableContentTypesHeader(['application/yaml', 'text/x-yaml']),
                 ]),
             ));
         } catch (ClientException $e) {
@@ -126,7 +125,7 @@ readonly class FileClient
             'file-source-file',
             [
                 'sourceId' => $sourceId,
-                'filename' => $filename
+                'filename' => $filename,
             ]
         );
     }

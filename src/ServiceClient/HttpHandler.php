@@ -33,8 +33,7 @@ readonly class HttpHandler
         private Factory $errorFactory,
         private StreamFactoryInterface $streamFactory,
         private UrlGeneratorInterface $urlGenerator,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ClientException

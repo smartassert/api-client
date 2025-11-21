@@ -83,7 +83,7 @@ class ListTest extends AbstractIntegrationTestCase
                 'fileDataCollection' => [
                     [
                         'path' => 'A.yaml',
-                        'content' => '.'
+                        'content' => '.',
                     ],
                 ],
                 'expected' => [
@@ -94,15 +94,15 @@ class ListTest extends AbstractIntegrationTestCase
                 'fileDataCollection' => [
                     [
                         'path' => 'A.yaml',
-                        'content' => 'a'
+                        'content' => 'a',
                     ],
                     [
                         'path' => 'Z.yaml',
-                        'content' => 'zzzzzzzzzzzzzzzzzzzzzzzzzz'
+                        'content' => 'zzzzzzzzzzzzzzzzzzzzzzzzzz',
                     ],
                     [
                         'path' => 'M.yaml',
-                        'content' => 'mmmmmmmmmmmmm'
+                        'content' => 'mmmmmmmmmmmmm',
                     ],
                 ],
                 'expected' => [

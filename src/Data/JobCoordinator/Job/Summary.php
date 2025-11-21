@@ -17,8 +17,7 @@ readonly class Summary
         public string $id,
         public string $suiteId,
         public int $maximumDurationInSeconds,
-    ) {
-    }
+    ) {}
 
     public function getCreatedAt(): \DateTimeImmutable
     {
