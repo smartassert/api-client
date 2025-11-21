@@ -7,13 +7,12 @@ on:
   pull_request:
 
 jobs:
-  unit:
+  tests:
     name: Integration tests - PHP ${{ matrix.php }}
     strategy:
       matrix:
-        operating-system: [ubuntu-latest]
         php: ['8.4']
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -30,4 +29,4 @@ jobs:
         run: composer integration-setup
 
       - name: Run integration tests
-        run: composer test
+        run: composer test-integration
