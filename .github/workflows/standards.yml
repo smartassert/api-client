@@ -33,7 +33,7 @@ jobs:
     name: PHPCS - PHP ${{ matrix.php }}
     strategy:
       matrix:
-        php: ['8.3']
+        php: ['8.4']
     runs-on: ubuntu-latest
 
     steps:
