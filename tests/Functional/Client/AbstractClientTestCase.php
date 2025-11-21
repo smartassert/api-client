@@ -7,7 +7,6 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -25,6 +24,7 @@ use SmartAssert\ServiceRequest\Deserializer\Error\ModifyReadOnlyEntityDeserializ
 use SmartAssert\ServiceRequest\Deserializer\Error\StorageErrorDeserializer;
 use SmartAssert\ServiceRequest\Deserializer\Parameter\Deserializer as ParameterDeserializer;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
+use webignition\HttpHistoryContainer\MiddlewareFactory;
 
 abstract class AbstractClientTestCase extends TestCase
 {
@@ -47,7 +47,7 @@ abstract class AbstractClientTestCase extends TestCase
         $handlerStack = HandlerStack::create($this->mockHandler);
 
         $this->httpHistoryContainer = new HttpHistoryContainer();
-        $handlerStack->push(Middleware::history($this->httpHistoryContainer));
+        $handlerStack->push(MiddlewareFactory::create($this->httpHistoryContainer));
 
         $this->httpClient = new HttpClient(['handler' => $handlerStack]);
 
