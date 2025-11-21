@@ -18,8 +18,6 @@ class GetTest extends AbstractIntegrationTestCase
     public function testGetUnauthorized(): void
     {
         $id = (string) new Ulid();
-        \assert('' !== $id);
-
         $exception = null;
 
         try {
@@ -37,8 +35,6 @@ class GetTest extends AbstractIntegrationTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $id = (string) new Ulid();
-        \assert('' !== $id);
-
         $exception = null;
 
         try {

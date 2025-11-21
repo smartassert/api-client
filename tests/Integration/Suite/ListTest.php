@@ -37,9 +37,7 @@ class ListTest extends AbstractSuiteTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $exception = null;
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         try {
             self::$suiteClient->get($apiKey->key, $suiteId);

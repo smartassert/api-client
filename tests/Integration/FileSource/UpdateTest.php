@@ -34,8 +34,6 @@ class UpdateTest extends AbstractIntegrationTestCase
     public function testUpdateUnauthorized(): void
     {
         $id = (string) new Ulid();
-        \assert('' !== $id);
-
         $exception = null;
 
         try {
@@ -53,10 +51,7 @@ class UpdateTest extends AbstractIntegrationTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $label = md5((string) rand());
-
         $id = (string) new Ulid();
-        \assert('' !== $id);
-
         $exception = null;
 
         try {

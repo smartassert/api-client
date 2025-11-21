@@ -23,9 +23,7 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
     public function testCreateUnauthorized(): void
     {
         $exception = null;
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         try {
             $this->jobCoordinatorClient->create(md5((string) rand()), $suiteId, rand(1, 1000));
@@ -43,8 +41,6 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
-
         $exception = null;
 
         try {
@@ -94,7 +90,6 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $job = $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
 

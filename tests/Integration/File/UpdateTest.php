@@ -100,8 +100,6 @@ class UpdateTest extends AbstractFileTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $sourceId = (string) new Ulid();
-        \assert('' !== $sourceId);
-
         $exception = null;
 
         try {

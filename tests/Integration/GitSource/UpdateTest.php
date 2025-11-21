@@ -206,7 +206,6 @@ class UpdateTest extends AbstractIntegrationTestCase
             $credentials
         );
 
-        self::assertNotNull($createdSource->id);
         self::assertSame($createdSource->id, $updatedSource->id);
         self::assertSame($createdSource->label, $updatedSource->label);
         self::assertSame($createdSource->hostUrl, $updatedSource->hostUrl);
@@ -246,8 +245,6 @@ class UpdateTest extends AbstractIntegrationTestCase
     public function testUpdateNotFound(): void
     {
         $id = (string) new Ulid();
-        \assert('' !== $id);
-
         $exception = null;
 
         try {

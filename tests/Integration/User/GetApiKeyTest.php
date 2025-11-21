@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\User;
 
-use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
@@ -27,8 +26,8 @@ class GetApiKeyTest extends AbstractIntegrationTestCase
     public function testGetUserApiKeySuccess(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
-        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+        self::$usersClient->getApiKey($refreshableToken->token);
 
-        self::assertInstanceOf(ApiKey::class, $apiKey);
+        self::expectNotToPerformAssertions();
     }
 }

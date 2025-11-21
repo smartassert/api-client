@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -16,9 +15,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
     public function testGetUnauthorized(): void
     {
         $exception = null;
-
         $jobId = (string) new Ulid();
-        \assert('' !== $jobId);
 
         try {
             $this->jobCoordinatorClient->get(md5((string) rand()), $jobId);
@@ -36,7 +33,6 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         $createdJob = $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
         sleep(1);
@@ -83,12 +79,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
             $job->workerJob->componentStates,
         );
 
-        self::assertIsArray($job->serviceRequests);
-        self::assertTrue(count($job->serviceRequests) > 0);
-
-        foreach ($job->serviceRequests as $serviceRequest) {
-            self::assertInstanceOf(ServiceRequest::class, $serviceRequest);
-        }
+        self::assertNotEmpty($job->serviceRequests);
     }
 
     /**
