@@ -27,8 +27,8 @@ class GetApiKeyTest extends AbstractIntegrationTestCase
     public function testGetUserApiKeySuccess(): void
     {
         $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
-        $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
+        self::$usersClient->getApiKey($refreshableToken->token);
 
-        self::assertInstanceOf(ApiKey::class, $apiKey);
+        self::expectNotToPerformAssertions();
     }
 }

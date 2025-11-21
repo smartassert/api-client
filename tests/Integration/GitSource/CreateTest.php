@@ -108,7 +108,6 @@ class CreateTest extends AbstractIntegrationTestCase
 
         $source = self::$gitSourceClient->create($apiKey->key, $label, $hostUrl, $path, $credentials);
 
-        self::assertNotNull($source->id);
         self::assertSame($label, $source->label);
         self::assertSame($hostUrl, $source->hostUrl);
         self::assertSame($path, $source->path);

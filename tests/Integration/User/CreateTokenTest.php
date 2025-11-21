@@ -26,8 +26,8 @@ class CreateTokenTest extends AbstractIntegrationTestCase
 
     public function testCreateSuccess(): void
     {
-        $refreshableToken = self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
+        self::$usersClient->createToken(self::USER1_EMAIL, self::USER1_PASSWORD);
 
-        self::assertInstanceOf(Token::class, $refreshableToken);
+        self::expectNotToPerformAssertions();
     }
 }

@@ -37,9 +37,7 @@ class DeleteTest extends AbstractSuiteTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $exception = null;
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         try {
             self::$suiteClient->delete($apiKey->key, $suiteId);

@@ -13,9 +13,7 @@ class ListTest extends AbstractJobCoordinatorClientTestCase
     public function testListUnauthorized(): void
     {
         $exception = null;
-
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
 
         try {
             $this->jobCoordinatorClient->list(md5((string) rand()), $suiteId);
@@ -35,10 +33,7 @@ class ListTest extends AbstractJobCoordinatorClientTestCase
         $user2ApiKey = self::$usersClient->getApiKey($user2RefreshableToken->token);
 
         $suite1Id = (string) new Ulid();
-        \assert('' !== $suite1Id);
-
         $suite2Id = (string) new Ulid();
-        \assert('' !== $suite2Id);
 
         $jobSummaries = [];
 

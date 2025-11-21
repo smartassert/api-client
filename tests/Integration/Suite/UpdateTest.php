@@ -51,8 +51,6 @@ class UpdateTest extends AbstractSuiteTestCase
         $suite = self::$suiteClient->create($apiKey->key, $source->id, md5((string) rand()), []);
 
         $sourceId = (string) new Ulid();
-        \assert('' !== $sourceId);
-
         $exception = null;
 
         try {
@@ -72,8 +70,6 @@ class UpdateTest extends AbstractSuiteTestCase
         $source = self::$fileSourceClient->create($apiKey->key, md5((string) rand()));
 
         $suiteId = (string) new Ulid();
-        \assert('' !== $suiteId);
-
         $exception = null;
 
         try {

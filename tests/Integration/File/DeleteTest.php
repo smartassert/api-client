@@ -73,10 +73,7 @@ class DeleteTest extends AbstractFileTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $filename = md5((string) rand()) . '.yaml';
-
         $sourceId = (string) new Ulid();
-        \assert('' !== $sourceId);
-
         $exception = null;
 
         try {

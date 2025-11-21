@@ -24,8 +24,6 @@ class ListTest extends AbstractIntegrationTestCase
     public function testListUnauthorized(): void
     {
         $id = (string) new Ulid();
-        \assert('' !== $id);
-
         $exception = null;
 
         try {
@@ -136,8 +134,6 @@ class ListTest extends AbstractIntegrationTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $id = (string) new Ulid();
-        \assert('' !== $id);
-
         $exception = null;
 
         try {
