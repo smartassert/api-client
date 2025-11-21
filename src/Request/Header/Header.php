@@ -9,8 +9,7 @@ readonly class Header implements HeaderInterface
     public function __construct(
         public string $name,
         public string $value,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, string>

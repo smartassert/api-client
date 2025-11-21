@@ -20,8 +20,7 @@ readonly class FileSourceClient
     public function __construct(
         private SourceFactory $sourceFactory,
         private HttpHandler $httpHandler,
-    ) {
-    }
+    ) {}
 
     /**
      * @param non-empty-string $apiKey

@@ -14,8 +14,7 @@ readonly class RequestSpecification
         public RouteRequirements $routeRequirements,
         public ?HeaderInterface $header = null,
         public ?BodyInterface $body = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @return non-empty-string

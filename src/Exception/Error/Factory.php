@@ -14,8 +14,7 @@ readonly class Factory
 {
     public function __construct(
         private Deserializer $errorDeserializer,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ErrorDeserializationException

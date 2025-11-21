@@ -15,6 +15,5 @@ readonly class MachineActionFailure
         public string $action,
         public string $type,
         public ?array $context,
-    ) {
-    }
+    ) {}
 }

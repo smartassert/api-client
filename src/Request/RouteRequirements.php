@@ -12,6 +12,5 @@ readonly class RouteRequirements
     public function __construct(
         public string $name,
         public array $parameters = [],
-    ) {
-    }
+    ) {}
 }

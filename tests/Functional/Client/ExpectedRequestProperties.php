@@ -13,6 +13,5 @@ readonly class ExpectedRequestProperties
     public function __construct(
         public string $method,
         public string $url,
-    ) {
-    }
+    ) {}
 }

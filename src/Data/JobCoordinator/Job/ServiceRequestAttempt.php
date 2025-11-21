@@ -11,6 +11,5 @@ readonly class ServiceRequestAttempt
      */
     public function __construct(
         public string $state,
-    ) {
-    }
+    ) {}
 }

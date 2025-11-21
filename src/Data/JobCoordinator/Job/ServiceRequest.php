@@ -13,6 +13,5 @@ readonly class ServiceRequest
     public function __construct(
         public string $type,
         public array $attempts,
-    ) {
-    }
+    ) {}
 }

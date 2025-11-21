@@ -19,8 +19,7 @@ readonly class SuiteClient
     public function __construct(
         private SuiteFactory $suiteFactory,
         private HttpHandler $httpHandler,
-    ) {
-    }
+    ) {}
 
     /**
      * @param non-empty-string $apiKey

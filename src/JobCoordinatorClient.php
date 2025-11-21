@@ -23,8 +23,7 @@ readonly class JobCoordinatorClient
         private JobFactory $jobFactory,
         private SummaryFactory $summaryFactory,
         private HttpHandler $httpHandler,
-    ) {
-    }
+    ) {}
 
     /**
      * @param non-empty-string $apiKey

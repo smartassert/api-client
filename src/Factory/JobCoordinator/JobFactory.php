@@ -21,8 +21,7 @@ readonly class JobFactory extends AbstractFactory
 {
     public function __construct(
         private SummaryFactory $summaryFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<mixed> $data

@@ -13,6 +13,5 @@ readonly class ApiKey
     public function __construct(
         public ?string $label,
         public string $key,
-    ) {
-    }
+    ) {}
 }

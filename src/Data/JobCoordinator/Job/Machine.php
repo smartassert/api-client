@@ -14,6 +14,5 @@ readonly class Machine
         public ?string $stateCategory,
         public ?string $ipAddress,
         public ?MachineActionFailure $actionFailure,
-    ) {
-    }
+    ) {}
 }

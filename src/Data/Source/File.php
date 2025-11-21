@@ -12,6 +12,5 @@ readonly class File
     public function __construct(
         public string $path,
         public int $size,
-    ) {
-    }
+    ) {}
 }
