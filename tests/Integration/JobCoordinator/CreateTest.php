@@ -97,12 +97,12 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
         self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 
         self::assertSame('preparing', $job->preparation->state);
-        self::assertSame(
+        self::assertEquals(
             [
-                'results_job' => 'requesting',
-                'serialized_suite' => 'requesting',
+                'results-job' => 'requesting',
+                'serialized-suite' => 'requesting',
                 'machine' => 'pending',
-                'worker_job' => 'pending',
+                'worker-job' => 'pending',
             ],
             $job->preparation->requestStates,
         );
@@ -129,7 +129,7 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
         self::assertEquals(
             [
                 new ServiceRequest(
-                    'results/create',
+                    'results-job/create',
                     [
                         new ServiceRequestAttempt('requesting'),
                     ]

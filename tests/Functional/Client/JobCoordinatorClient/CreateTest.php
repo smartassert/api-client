@@ -62,10 +62,10 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
                 'preparation' => [
                     'state' => 'requesting',
                 ],
-                'results_job' => [],
-                'serialized_suite' => [],
+                'results-job' => [],
+                'serialized-suite' => [],
                 'machine' => [],
-                'worker_job' => [
+                'worker-job' => [
                     'state' => 'pending',
                 ],
                 'service_requests' => [],

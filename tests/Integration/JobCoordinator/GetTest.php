@@ -44,10 +44,10 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
 
         $expectedRequestStates = ['pending', 'requesting', 'succeeded', 'failed'];
         self::assertTrue(in_array($job->preparation->state, ['preparing', 'failed']));
-        self::assertTrue(in_array($job->preparation->requestStates['results_job'], $expectedRequestStates));
-        self::assertTrue(in_array($job->preparation->requestStates['serialized_suite'], $expectedRequestStates));
+        self::assertTrue(in_array($job->preparation->requestStates['results-job'], $expectedRequestStates));
+        self::assertTrue(in_array($job->preparation->requestStates['serialized-suite'], $expectedRequestStates));
         self::assertTrue(in_array($job->preparation->requestStates['machine'], $expectedRequestStates));
-        self::assertTrue(in_array($job->preparation->requestStates['worker_job'], $expectedRequestStates));
+        self::assertTrue(in_array($job->preparation->requestStates['worker-job'], $expectedRequestStates));
 
         self::assertTrue(in_array(
             $job->resultsJob->state,

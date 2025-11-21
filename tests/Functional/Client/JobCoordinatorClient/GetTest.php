@@ -64,14 +64,14 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                 'preparation' => [
                     'state' => 'requesting',
                 ],
-                'results_job' => [],
-                'serialized_suite' => [],
+                'results-job' => [],
+                'serialized-suite' => [],
                 'machine' => [
                     'state_category' => 'failed',
                     'ip_address' => null,
                     'action_failure' => $responseMachineActionFailureData,
                 ],
-                'worker_job' => [
+                'worker-job' => [
                     'state' => 'pending',
                 ],
                 'service_requests' => [],
@@ -174,10 +174,10 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                 'preparation' => [
                     'state' => 'requesting',
                 ],
-                'results_job' => [],
-                'serialized_suite' => [],
+                'results-job' => [],
+                'serialized-suite' => [],
                 'machine' => [],
-                'worker_job' => [
+                'worker-job' => [
                     'state' => 'pending',
                 ],
                 'service_requests' => [],

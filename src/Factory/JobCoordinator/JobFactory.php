@@ -43,17 +43,17 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'preparation.' . $e->missingKey);
         }
 
-        if (!array_key_exists('results_job', $data)) {
-            throw new IncompleteDataException($data, 'results_job');
+        if (!array_key_exists('results-job', $data)) {
+            throw new IncompleteDataException($data, 'results-job');
         }
 
-        $resultsJob = $this->createResultsJob($data['results_job'] ?? []);
+        $resultsJob = $this->createResultsJob($data['results-job'] ?? []);
 
-        if (!array_key_exists('serialized_suite', $data)) {
-            throw new IncompleteDataException($data, 'serialized_suite');
+        if (!array_key_exists('serialized-suite', $data)) {
+            throw new IncompleteDataException($data, 'serialized-suite');
         }
 
-        $serializedSuite = $this->createSerializedSuite($data['serialized_suite'] ?? []);
+        $serializedSuite = $this->createSerializedSuite($data['serialized-suite'] ?? []);
 
         if (!array_key_exists('machine', $data)) {
             throw new IncompleteDataException($data, 'machine');
@@ -61,9 +61,9 @@ readonly class JobFactory extends AbstractFactory
 
         $machine = $this->createMachine($data['machine'] ?? []);
 
-        $workerJobData = $data['worker_job'] ?? null;
+        $workerJobData = $data['worker-job'] ?? null;
         if (!is_array($workerJobData)) {
-            throw new IncompleteDataException($data, 'worker_job');
+            throw new IncompleteDataException($data, 'worker-job');
         }
 
         try {
