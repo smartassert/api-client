@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;

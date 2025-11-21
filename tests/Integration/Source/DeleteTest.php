@@ -35,7 +35,7 @@ class DeleteTest extends AbstractIntegrationTestCase
         $apiKey = self::$usersClient->getApiKey($refreshableToken->token);
 
         $id = (string) new Ulid();
-         $exception = null;
+        $exception = null;
 
         try {
             self::$sourceClient->delete($apiKey->key, $id);
