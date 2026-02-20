@@ -107,8 +107,7 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
             $job->preparation->requestStates,
         );
 
-        self::assertNull($job->resultsJob->state);
-        self::assertNull($job->resultsJob->endState);
+        self::assertNull($job->resultsJob);
 
         self::assertNull($job->serializedSuite->state);
 

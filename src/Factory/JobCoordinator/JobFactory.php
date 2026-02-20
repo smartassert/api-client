@@ -113,10 +113,15 @@ readonly class JobFactory extends AbstractFactory
     /**
      * @param array<mixed> $data
      */
-    private function createResultsJob(array $data): ResultsJob
+    private function createResultsJob(array $data): ?ResultsJob
     {
+        $state = $this->getNullableNonEmptyString($data, 'state');
+        if (null === $state) {
+            return null;
+        }
+
         return new ResultsJob(
-            $this->getNullableNonEmptyString($data, 'state'),
+            $state,
             $this->getNullableNonEmptyString($data, 'end_state'),
         );
     }
