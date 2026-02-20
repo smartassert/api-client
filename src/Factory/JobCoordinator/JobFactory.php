@@ -138,7 +138,7 @@ readonly class JobFactory extends AbstractFactory
             return null;
         }
 
-        return new SerializedSuite($state);
+        return new SerializedSuite($state, $this->createMetaState($data));
     }
 
     /**
