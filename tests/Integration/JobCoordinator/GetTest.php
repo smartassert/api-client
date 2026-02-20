@@ -49,6 +49,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         self::assertTrue(in_array($job->preparation->requestStates['machine'], $expectedRequestStates));
         self::assertTrue(in_array($job->preparation->requestStates['worker-job'], $expectedRequestStates));
 
+        self::assertNotNull($job->resultsJob);
         self::assertTrue(in_array(
             $job->resultsJob->state,
             [

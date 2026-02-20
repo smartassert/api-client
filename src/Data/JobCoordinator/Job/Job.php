@@ -12,7 +12,7 @@ readonly class Job
     public function __construct(
         public Summary $summary,
         public Preparation $preparation,
-        public ResultsJob $resultsJob,
+        public ?ResultsJob $resultsJob,
         public SerializedSuite $serializedSuite,
         public Machine $machine,
         public WorkerJob $workerJob,
