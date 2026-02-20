@@ -71,7 +71,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         self::assertNull($job->machine);
 
         self::assertSame('pending', $job->workerJob->state);
-        self::assertFalse($job->workerJob->isEndState);
+        self::assertEquals(new MetaState(false, false), $job->workerJob->metaState);
         self::assertEquals(
             [
                 'compilation' => new WorkerJobComponent('pending', new MetaState(false, false)),

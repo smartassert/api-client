@@ -212,7 +212,7 @@ readonly class JobFactory extends AbstractFactory
             }
         }
 
-        return new WorkerJob($state, $isEndState, $components);
+        return new WorkerJob($state, $this->createMetaState($data), $components);
     }
 
     /**
