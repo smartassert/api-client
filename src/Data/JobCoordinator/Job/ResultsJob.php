@@ -13,5 +13,6 @@ readonly class ResultsJob
     public function __construct(
         public string $state,
         public ?string $endState,
+        public MetaState $metaState,
     ) {}
 }

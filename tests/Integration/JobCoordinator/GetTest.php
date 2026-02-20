@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -50,6 +51,8 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         self::assertTrue(in_array($job->preparation->requestStates['worker-job'], $expectedRequestStates));
 
         self::assertNotNull($job->resultsJob);
+        self::assertEquals(new MetaState(false, false), $job->resultsJob->metaState);
+
         self::assertTrue(in_array(
             $job->resultsJob->state,
             [

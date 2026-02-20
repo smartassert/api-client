@@ -10,5 +10,4 @@ readonly class MetaState
         public bool $ended,
         public bool $succeeded,
     ) {}
-
 }

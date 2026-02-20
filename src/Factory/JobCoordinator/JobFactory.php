@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
@@ -123,6 +124,7 @@ readonly class JobFactory extends AbstractFactory
         return new ResultsJob(
             $state,
             $this->getNullableNonEmptyString($data, 'end_state'),
+            $this->createMetaState($data),
         );
     }
 
@@ -288,5 +290,26 @@ readonly class JobFactory extends AbstractFactory
         }
 
         return $attempts;
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function createMetaState(array $data): MetaState
+    {
+        $metaStateData = $data['meta_state'] ?? null;
+        $metaStateData = is_array($metaStateData) ? $metaStateData : null;
+
+        if (null === $metaStateData) {
+            return new MetaState(false, false);
+        }
+
+        $ended = $metaStateData['ended'] ?? false;
+        $ended = is_bool($ended) ? $ended : false;
+
+        $succeeded = $metaStateData['succeeded'] ?? false;
+        $succeeded = is_bool($succeeded) ? $succeeded : false;
+
+        return new MetaState($ended, $succeeded);
     }
 }
