@@ -84,7 +84,16 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'service_requests.' . $e->missingKey);
         }
 
-        return new Job($summary, $preparation, $resultsJob, $serializedSuite, $machine, $workerJob, $serviceRequests);
+        return new Job(
+            $summary,
+            $preparation,
+            $resultsJob,
+            $serializedSuite,
+            $machine,
+            $workerJob,
+            $serviceRequests,
+            $this->createMetaState($data),
+        );
     }
 
     /**

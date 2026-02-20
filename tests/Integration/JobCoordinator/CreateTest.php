@@ -94,6 +94,7 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
 
         $job = $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
 
+        self::assertEquals(new MetaState(false, false), $job->metaState);
         self::assertSame($suiteId, $job->summary->suiteId);
         self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 

@@ -40,6 +40,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
 
         $job = $this->jobCoordinatorClient->get($apiKey->key, $createdJob->summary->id);
 
+        self::assertEquals(new MetaState(true, false), $job->metaState);
         self::assertSame($suiteId, $job->summary->suiteId);
         self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 
