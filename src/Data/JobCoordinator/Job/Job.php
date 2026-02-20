@@ -13,7 +13,7 @@ readonly class Job
         public Summary $summary,
         public Preparation $preparation,
         public ?ResultsJob $resultsJob,
-        public SerializedSuite $serializedSuite,
+        public ?SerializedSuite $serializedSuite,
         public Machine $machine,
         public WorkerJob $workerJob,
         public array $serviceRequests,

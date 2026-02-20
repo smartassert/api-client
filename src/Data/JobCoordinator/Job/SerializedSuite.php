@@ -7,9 +7,9 @@ namespace SmartAssert\ApiClient\Data\JobCoordinator\Job;
 readonly class SerializedSuite
 {
     /**
-     * @param ?non-empty-string $state
+     * @param non-empty-string $state
      */
     public function __construct(
-        public ?string $state,
+        public string $state,
     ) {}
 }

@@ -129,9 +129,14 @@ readonly class JobFactory extends AbstractFactory
     /**
      * @param array<mixed> $data
      */
-    private function createSerializedSuite(array $data): SerializedSuite
+    private function createSerializedSuite(array $data): ?SerializedSuite
     {
-        return new SerializedSuite($this->getNullableNonEmptyString($data, 'state'));
+        $state = $this->getNullableNonEmptyString($data, 'state');
+        if (null === $state) {
+            return null;
+        }
+
+        return new SerializedSuite($state);
     }
 
     /**
