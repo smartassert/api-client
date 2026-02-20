@@ -97,11 +97,11 @@
     },
     "require-dev": {
         "ext-pdo": "*",
-        "friendsofphp/php-cs-fixer": "^3.90",
+        "friendsofphp/php-cs-fixer": "^3.94",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-phpunit": "^2.0",
-        "phpunit/phpunit": "^11",
+        "phpunit/phpunit": "^13.0",
         "squizlabs/php_codesniffer": "^4.0",
         "symfony/uid": "^8",
         "webignition/http-history-container": "^4.0"
