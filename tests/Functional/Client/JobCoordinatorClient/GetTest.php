@@ -192,6 +192,29 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                         'ended' => false,
                         'succeeded' => false,
                     ],
+                    'components' => [
+                        'compilation' => [
+                            'state' => 'pending',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                        ],
+                        'execution' => [
+                            'state' => 'pending',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                        ],
+                        'event_delivery' => [
+                            'state' => 'pending',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                        ],
+                    ],
                 ],
                 'service_requests' => [],
             ])

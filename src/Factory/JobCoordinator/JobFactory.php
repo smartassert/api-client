@@ -203,7 +203,7 @@ readonly class JobFactory extends AbstractFactory
                 try {
                     $components[$componentName] = new WorkerJobComponent(
                         $this->getNonEmptyString($componentData, 'state'),
-                        $this->getIsEndState($componentData),
+                        $this->createMetaState($componentData),
                     );
                 } catch (IncompleteDataException $e) {
                     throw new IncompleteDataException($data, 'components.' . $componentName . '.' . $e->missingKey);
