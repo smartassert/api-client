@@ -157,7 +157,8 @@ readonly class JobFactory extends AbstractFactory
         return new Machine(
             $stateCategory,
             $this->getNullableNonEmptyString($data, 'ip_address'),
-            $this->createMachineActionFailure($actionFailureData)
+            $this->createMachineActionFailure($actionFailureData),
+            $this->createMetaState($data),
         );
     }
 

@@ -185,7 +185,15 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                 ],
                 'results-job' => null,
                 'serialized-suite' => null,
-                'machine' => null,
+                'machine' => [
+                    'state_category' => 'idle',
+                    'ip_address' => null,
+                    'action_failure' => null,
+                    'meta_state' => [
+                        'ended' => false,
+                        'succeeded' => false,
+                    ],
+                ],
                 'worker-job' => [
                     'state' => 'pending',
                     'meta_state' => [
