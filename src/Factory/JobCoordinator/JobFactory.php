@@ -108,7 +108,7 @@ readonly class JobFactory extends AbstractFactory
             }
         }
 
-        return new Preparation($state, $filteredRequestStates);
+        return new Preparation($state, $this->createMetaState($data), $filteredRequestStates);
     }
 
     /**

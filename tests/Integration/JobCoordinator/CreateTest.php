@@ -98,6 +98,7 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
         self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 
         self::assertSame('preparing', $job->preparation->state);
+        self::assertEquals(new MetaState(false, false), $job->preparation->metaState);
         self::assertEquals(
             [
                 'results-job' => 'requesting',
