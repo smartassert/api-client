@@ -142,13 +142,18 @@ readonly class JobFactory extends AbstractFactory
     /**
      * @param array<mixed> $data
      */
-    private function createMachine(array $data): Machine
+    private function createMachine(array $data): ?Machine
     {
+        $stateCategory = $this->getNullableNonEmptyString($data, 'state_category');
+        if (null === $stateCategory) {
+            return null;
+        }
+
         $actionFailureData = $data['action_failure'] ?? [];
         $actionFailureData = is_array($actionFailureData) ? $actionFailureData : [];
 
         return new Machine(
-            $this->getNullableNonEmptyString($data, 'state_category'),
+            $stateCategory,
             $this->getNullableNonEmptyString($data, 'ip_address'),
             $this->createMachineActionFailure($actionFailureData)
         );

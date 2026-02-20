@@ -65,9 +65,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         self::assertNull($job->resultsJob->endState);
 
         self::assertNull($job->serializedSuite);
-
-        self::assertNull($job->machine->stateCategory);
-        self::assertNull($job->machine->ipAddress);
+        self::assertNull($job->machine);
 
         self::assertSame('pending', $job->workerJob->state);
         self::assertFalse($job->workerJob->isEndState);
