@@ -12,7 +12,7 @@ readonly class WorkerJob
      */
     public function __construct(
         public string $state,
-        public bool $isEndState,
+        public MetaState $metaState,
         public array $componentStates,
     ) {}
 }

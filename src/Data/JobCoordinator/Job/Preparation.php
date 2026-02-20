@@ -12,6 +12,7 @@ readonly class Preparation
      */
     public function __construct(
         public string $state,
+        public MetaState $metaState,
         public array $requestStates,
     ) {}
 }

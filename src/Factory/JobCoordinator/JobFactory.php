@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
@@ -83,7 +84,16 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'service_requests.' . $e->missingKey);
         }
 
-        return new Job($summary, $preparation, $resultsJob, $serializedSuite, $machine, $workerJob, $serviceRequests);
+        return new Job(
+            $summary,
+            $preparation,
+            $resultsJob,
+            $serializedSuite,
+            $machine,
+            $workerJob,
+            $serviceRequests,
+            $this->createMetaState($data),
+        );
     }
 
     /**
@@ -107,7 +117,7 @@ readonly class JobFactory extends AbstractFactory
             }
         }
 
-        return new Preparation($state, $filteredRequestStates);
+        return new Preparation($state, $this->createMetaState($data), $filteredRequestStates);
     }
 
     /**
@@ -123,6 +133,7 @@ readonly class JobFactory extends AbstractFactory
         return new ResultsJob(
             $state,
             $this->getNullableNonEmptyString($data, 'end_state'),
+            $this->createMetaState($data),
         );
     }
 
@@ -136,7 +147,7 @@ readonly class JobFactory extends AbstractFactory
             return null;
         }
 
-        return new SerializedSuite($state);
+        return new SerializedSuite($state, $this->createMetaState($data));
     }
 
     /**
@@ -155,7 +166,8 @@ readonly class JobFactory extends AbstractFactory
         return new Machine(
             $stateCategory,
             $this->getNullableNonEmptyString($data, 'ip_address'),
-            $this->createMachineActionFailure($actionFailureData)
+            $this->createMachineActionFailure($actionFailureData),
+            $this->createMetaState($data),
         );
     }
 
@@ -201,7 +213,7 @@ readonly class JobFactory extends AbstractFactory
                 try {
                     $components[$componentName] = new WorkerJobComponent(
                         $this->getNonEmptyString($componentData, 'state'),
-                        $this->getIsEndState($componentData),
+                        $this->createMetaState($componentData),
                     );
                 } catch (IncompleteDataException $e) {
                     throw new IncompleteDataException($data, 'components.' . $componentName . '.' . $e->missingKey);
@@ -209,7 +221,7 @@ readonly class JobFactory extends AbstractFactory
             }
         }
 
-        return new WorkerJob($state, $isEndState, $components);
+        return new WorkerJob($state, $this->createMetaState($data), $components);
     }
 
     /**
@@ -288,5 +300,26 @@ readonly class JobFactory extends AbstractFactory
         }
 
         return $attempts;
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function createMetaState(array $data): MetaState
+    {
+        $metaStateData = $data['meta_state'] ?? null;
+        $metaStateData = is_array($metaStateData) ? $metaStateData : null;
+
+        if (null === $metaStateData) {
+            return new MetaState(false, false);
+        }
+
+        $ended = $metaStateData['ended'] ?? false;
+        $ended = is_bool($ended) ? $ended : false;
+
+        $succeeded = $metaStateData['succeeded'] ?? false;
+        $succeeded = is_bool($succeeded) ? $succeeded : false;
+
+        return new MetaState($ended, $succeeded);
     }
 }

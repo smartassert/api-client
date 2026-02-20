@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
@@ -93,10 +94,12 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
 
         $job = $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
 
+        self::assertEquals(new MetaState(false, false), $job->metaState);
         self::assertSame($suiteId, $job->summary->suiteId);
         self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 
         self::assertSame('preparing', $job->preparation->state);
+        self::assertEquals(new MetaState(false, false), $job->preparation->metaState);
         self::assertEquals(
             [
                 'results-job' => 'requesting',
@@ -112,12 +115,12 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
         self::assertNull($job->machine);
 
         self::assertSame('pending', $job->workerJob->state);
-        self::assertFalse($job->workerJob->isEndState);
+        self::assertEquals(new MetaState(false, false), $job->workerJob->metaState);
         self::assertEquals(
             [
-                'compilation' => new WorkerJobComponent('pending', false),
-                'execution' => new WorkerJobComponent('pending', false),
-                'event_delivery' => new WorkerJobComponent('pending', false),
+                'compilation' => new WorkerJobComponent('pending', new MetaState(false, false)),
+                'execution' => new WorkerJobComponent('pending', new MetaState(false, false)),
+                'event_delivery' => new WorkerJobComponent('pending', new MetaState(false, false)),
             ],
             $job->workerJob->componentStates,
         );

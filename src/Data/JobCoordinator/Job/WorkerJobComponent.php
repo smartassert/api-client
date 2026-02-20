@@ -11,6 +11,6 @@ readonly class WorkerJobComponent
      */
     public function __construct(
         public string $state,
-        public bool $isEndState,
+        public MetaState $metaState,
     ) {}
 }

@@ -59,14 +59,50 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
                 'id' => self::ID,
                 'suite_id' => self::SUITE_ID,
                 'maximum_duration_in_seconds' => self::MAXIMUM_DURATION_IN_SECONDS,
+                'created_at' => (int) new \DateTimeImmutable()->format('U'),
+                'meta_state' => [
+                    'ended' => false,
+                    'succeeded' => false,
+                ],
                 'preparation' => [
                     'state' => 'requesting',
+                    'meta_state' => [
+                        'ended' => false,
+                        'succeeded' => false,
+                    ],
                 ],
-                'results-job' => [],
-                'serialized-suite' => [],
-                'machine' => [],
+                'results-job' => null,
+                'serialized-suite' => null,
+                'machine' => null,
                 'worker-job' => [
                     'state' => 'pending',
+                    'meta_state' => [
+                        'ended' => false,
+                        'succeeded' => false,
+                    ],
+                    'components' => [
+                        'compilation' => [
+                            'state' => 'pending',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                        ],
+                        'execution' => [
+                            'state' => 'pending',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                        ],
+                        'event_delivery' => [
+                            'state' => 'pending',
+                            'meta_state' => [
+                                'ended' => false,
+                                'succeeded' => false,
+                            ],
+                        ],
+                    ],
                 ],
                 'service_requests' => [],
             ])

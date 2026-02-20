@@ -11,5 +11,6 @@ readonly class SerializedSuite
      */
     public function __construct(
         public string $state,
+        public MetaState $metaState,
     ) {}
 }
