@@ -30,7 +30,7 @@ jobs:
         run: composer cs-fixer-dry-run
 
   phpcs:
-    name: PHPCS - PHP ${{ matrix.php }} Symfony ${{ matrix.symfony }}
+    name: PHPCS - PHP ${{ matrix.php }}
     strategy:
       matrix:
         php: ['8.4']
