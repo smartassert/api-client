@@ -89,13 +89,13 @@ readonly class JobFactory extends AbstractFactory
             $summary,
             $preparation,
             new Components(
+                $this->createMetaState($data),
                 $resultsJob,
                 $serializedSuite,
                 $machine,
                 $workerJob,
             ),
             $serviceRequests,
-            $this->createMetaState($data),
         );
     }
 

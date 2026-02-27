@@ -14,6 +14,5 @@ readonly class Job
         public Preparation $preparation,
         public Components $components,
         public array $serviceRequests,
-        public MetaState $metaState,
     ) {}
 }

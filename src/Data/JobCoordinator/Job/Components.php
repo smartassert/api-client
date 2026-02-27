@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Data\JobCoordinator\Job;
 readonly class Components
 {
     public function __construct(
+        public MetaState $metaState,
         public ?ResultsJob $resultsJob,
         public ?SerializedSuite $serializedSuite,
         public ?Machine $machine,
