@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Components;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
@@ -87,12 +88,14 @@ readonly class JobFactory extends AbstractFactory
         return new Job(
             $summary,
             $preparation,
-            $resultsJob,
-            $serializedSuite,
-            $machine,
-            $workerJob,
+            new Components(
+                $this->createMetaState($data),
+                $resultsJob,
+                $serializedSuite,
+                $machine,
+                $workerJob,
+            ),
             $serviceRequests,
-            $this->createMetaState($data),
         );
     }
 

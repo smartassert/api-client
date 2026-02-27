@@ -80,7 +80,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
 
         $job = ($this->createClientActionCallable())();
 
-        self::assertEquals($expectedMachineActionFailure, $job->machine?->actionFailure);
+        self::assertEquals($expectedMachineActionFailure, $job->components->machine?->actionFailure);
     }
 
     /**
