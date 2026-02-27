@@ -17,5 +17,6 @@ readonly class Job
         public ?Machine $machine,
         public WorkerJob $workerJob,
         public array $serviceRequests,
+        public MetaState $metaState,
     ) {}
 }
