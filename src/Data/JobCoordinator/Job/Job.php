@@ -12,10 +12,7 @@ readonly class Job
     public function __construct(
         public Summary $summary,
         public Preparation $preparation,
-        public ?ResultsJob $resultsJob,
-        public ?SerializedSuite $serializedSuite,
-        public ?Machine $machine,
-        public WorkerJob $workerJob,
+        public Components $components,
         public array $serviceRequests,
         public MetaState $metaState,
     ) {}
