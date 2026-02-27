@@ -49,8 +49,8 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
     /**
      * @param null|array<mixed> $responseMachineActionFailureData
      */
-    #[DataProvider('fooDataProvider')]
-    public function testFoo(
+    #[DataProvider('getWithMachineActionFailureDataProvider')]
+    public function testGetWithMachineActionFailure(
         ?array $responseMachineActionFailureData,
         ?MachineActionFailure $expectedMachineActionFailure,
     ): void {
@@ -86,7 +86,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
     /**
      * @return array<mixed>
      */
-    public static function fooDataProvider(): array
+    public static function getWithMachineActionFailureDataProvider(): array
     {
         return [
             'without action failure' => [
