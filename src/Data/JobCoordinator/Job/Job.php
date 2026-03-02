@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\JobCoordinator\Job;
 
-readonly class Job
+readonly class Job implements HasMetastateInterface
 {
+    use HasMetaStateTrait;
+
     /**
      * @param ServiceRequest[] $serviceRequests
      */

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\JobCoordinator\Job;
 
-readonly class Machine
+readonly class Machine implements HasMetastateInterface
 {
+    use HasMetaStateTrait;
+
     /**
      * @param non-empty-string  $stateCategory
      * @param ?non-empty-string $ipAddress
