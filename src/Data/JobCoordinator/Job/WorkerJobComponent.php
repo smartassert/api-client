@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\JobCoordinator\Job;
 
-readonly class WorkerJobComponent
+readonly class WorkerJobComponent implements HasMetastateInterface
 {
+    use HasMetaStateTrait;
+
     /**
      * @param non-empty-string $state
      */
