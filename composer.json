@@ -20,9 +20,11 @@
             "@cs-phpcs"
         ],
         "static-analysis": "./vendor/bin/phpstan",
+        "test-unit": "./vendor/bin/phpunit --colors=always tests/Unit",
         "test-functional": "./vendor/bin/phpunit --colors=always tests/Functional",
         "test-integration": "./vendor/bin/phpunit --colors=always tests/Integration",
         "test": [
+            "@test-unit",
             "@test-functional",
             "@test-integration"
         ],
