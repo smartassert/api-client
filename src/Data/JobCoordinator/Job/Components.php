@@ -17,4 +17,23 @@ readonly class Components
     {
         return $this->components[$name] ?? null;
     }
+
+    public function filterByMetaState(MetaState $metaState): self
+    {
+        $components = [];
+
+        foreach ($this->components as $name => $component) {
+            if ($this->componentMatchesMetaState($component, $metaState)) {
+                $components[$name] = $component;
+            }
+        }
+
+        return new Components($components);
+    }
+
+    private function componentMatchesMetaState(IsComponentInterface $component, MetaState $metaState): bool
+    {
+        return $component->getMetaState()->ended === $metaState->ended
+            && $component->getMetaState()->succeeded === $metaState->succeeded;
+    }
 }

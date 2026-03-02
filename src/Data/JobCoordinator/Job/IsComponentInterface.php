@@ -4,4 +4,4 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\JobCoordinator\Job;
 
-interface IsComponentInterface {}
+interface IsComponentInterface extends HasMetastateInterface {}
