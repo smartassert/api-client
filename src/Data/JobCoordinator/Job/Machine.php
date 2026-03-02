@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\JobCoordinator\Job;
 
-readonly class Machine implements HasMetastateInterface
+readonly class Machine implements HasMetastateInterface, IsComponentInterface
 {
     use HasMetaStateTrait;
 

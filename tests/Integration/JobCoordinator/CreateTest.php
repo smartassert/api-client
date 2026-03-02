@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
@@ -110,19 +111,22 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
             $job->preparation->requestStates,
         );
 
-        self::assertNull($job->components->resultsJob);
-        self::assertNull($job->components->serializedSuite);
-        self::assertNull($job->components->machine);
+        self::assertNull($job->components->get('results-job'));
+        self::assertNull($job->components->get('serialized-suite'));
+        self::assertNull($job->components->get('machine'));
 
-        self::assertSame('pending', $job->components->workerJob->state);
-        self::assertEquals(new MetaState(false, false), $job->components->workerJob->metaState);
+        $workerJob = $job->components->get('worker-job');
+        self::assertInstanceOf(WorkerJob::class, $workerJob);
+
+        self::assertSame('pending', $workerJob->state);
+        self::assertEquals(new MetaState(false, false), $workerJob->metaState);
         self::assertEquals(
             [
                 'compilation' => new WorkerJobComponent('pending', new MetaState(false, false)),
                 'execution' => new WorkerJobComponent('pending', new MetaState(false, false)),
                 'event_delivery' => new WorkerJobComponent('pending', new MetaState(false, false)),
             ],
-            $job->components->workerJob->componentStates,
+            $workerJob->componentStates,
         );
 
         self::assertEquals(

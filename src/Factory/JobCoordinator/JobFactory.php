@@ -78,7 +78,7 @@ readonly class JobFactory extends AbstractFactory
         try {
             $workerJob = $this->createWorkerJob($workerJobData);
         } catch (IncompleteDataException $e) {
-            throw new IncompleteDataException($data, 'worker_job.' . $e->missingKey);
+            throw new IncompleteDataException($data, 'worker-job.' . $e->missingKey);
         }
 
         $serviceRequestDataCollection = $data['service_requests'] ?? null;
@@ -92,16 +92,26 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'service_requests.' . $e->missingKey);
         }
 
+        $components = [];
+        if (null !== $resultsJob) {
+            $components['results-job'] = $resultsJob;
+        }
+
+        if (null !== $serializedSuite) {
+            $components['serialized-suite'] = $serializedSuite;
+        }
+
+        if (null !== $machine) {
+            $components['machine'] = $machine;
+        }
+
+        $components['worker-job'] = $workerJob;
+
         return new Job(
             $summary,
             $preparation,
             $this->createMetaState($data),
-            new Components(
-                $resultsJob,
-                $serializedSuite,
-                $machine,
-                $workerJob,
-            ),
+            new Components($components),
             $serviceRequests,
         );
     }
