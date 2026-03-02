@@ -6,6 +6,8 @@ namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -52,11 +54,12 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         self::assertTrue(in_array($job->preparation->requestStates['machine'], $expectedRequestStates));
         self::assertTrue(in_array($job->preparation->requestStates['worker-job'], $expectedRequestStates));
 
-        self::assertNotNull($job->components->resultsJob);
-        self::assertEquals(new MetaState(false, false), $job->components->resultsJob->metaState);
+        $resultsJob = $job->components->get('results-job');
+        self::assertInstanceOf(ResultsJob::class, $resultsJob);
+        self::assertEquals(new MetaState(false, false), $resultsJob->metaState);
 
         self::assertTrue(in_array(
-            $job->components->resultsJob->state,
+            $resultsJob->state,
             [
                 'awaiting-events',
                 'started',
@@ -67,20 +70,23 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                 'ended',
             ]
         ));
-        self::assertNull($job->components->resultsJob->endState);
+        self::assertNull($resultsJob->endState);
 
-        self::assertNull($job->components->serializedSuite);
-        self::assertNull($job->components->machine);
+        self::assertNull($job->components->get('serialized-suite'));
+        self::assertNull($job->components->get('machine'));
 
-        self::assertSame('pending', $job->components->workerJob->state);
-        self::assertEquals(new MetaState(false, false), $job->components->workerJob->metaState);
+        $workerJob = $job->components->get('worker-job');
+        self::assertInstanceOf(WorkerJob::class, $workerJob);
+
+        self::assertSame('pending', $workerJob->state);
+        self::assertEquals(new MetaState(false, false), $workerJob->metaState);
         self::assertEquals(
             [
                 'compilation' => new WorkerJobComponent('pending', new MetaState(false, false)),
                 'execution' => new WorkerJobComponent('pending', new MetaState(false, false)),
                 'event_delivery' => new WorkerJobComponent('pending', new MetaState(false, false)),
             ],
-            $job->components->workerJob->componentStates,
+            $workerJob->componentStates,
         );
 
         self::assertNotEmpty($job->serviceRequests);

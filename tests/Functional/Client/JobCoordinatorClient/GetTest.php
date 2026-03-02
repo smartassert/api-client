@@ -8,6 +8,7 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
@@ -86,7 +87,10 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
 
         $job = ($this->createClientActionCallable())();
 
-        self::assertEquals($expectedMachineActionFailure, $job->components->machine?->actionFailure);
+        $machine = $job->components->get('machine');
+        \assert($machine instanceof Machine);
+
+        self::assertEquals($expectedMachineActionFailure, $machine->actionFailure);
     }
 
     /**
