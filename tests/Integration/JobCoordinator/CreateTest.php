@@ -110,19 +110,19 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
             $job->preparation->requestStates,
         );
 
-        self::assertNull($job->resultsJob);
-        self::assertNull($job->serializedSuite);
-        self::assertNull($job->machine);
+        self::assertNull($job->components->resultsJob);
+        self::assertNull($job->components->serializedSuite);
+        self::assertNull($job->components->machine);
 
-        self::assertSame('pending', $job->workerJob->state);
-        self::assertEquals(new MetaState(false, false), $job->workerJob->metaState);
+        self::assertSame('pending', $job->components->workerJob->state);
+        self::assertEquals(new MetaState(false, false), $job->components->workerJob->metaState);
         self::assertEquals(
             [
                 'compilation' => new WorkerJobComponent('pending', new MetaState(false, false)),
                 'execution' => new WorkerJobComponent('pending', new MetaState(false, false)),
                 'event_delivery' => new WorkerJobComponent('pending', new MetaState(false, false)),
             ],
-            $job->workerJob->componentStates,
+            $job->components->workerJob->componentStates,
         );
 
         self::assertEquals(

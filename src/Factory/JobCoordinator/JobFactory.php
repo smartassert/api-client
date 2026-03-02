@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Components;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
@@ -44,27 +45,34 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'preparation.' . $e->missingKey);
         }
 
-        if (!array_key_exists('results-job', $data)) {
-            throw new IncompleteDataException($data, 'results-job');
+        if (!array_key_exists('components', $data)) {
+            throw new IncompleteDataException($data, 'components');
         }
 
-        $resultsJob = $this->createResultsJob($data['results-job'] ?? []);
+        $componentsData = $data['components'] ?? [];
+        $componentsData = is_array($componentsData) ? $componentsData : [];
 
-        if (!array_key_exists('serialized-suite', $data)) {
-            throw new IncompleteDataException($data, 'serialized-suite');
+        if (!array_key_exists('results-job', $componentsData)) {
+            throw new IncompleteDataException($data, 'components.results-job');
         }
 
-        $serializedSuite = $this->createSerializedSuite($data['serialized-suite'] ?? []);
+        $resultsJob = $this->createResultsJob($componentsData['results-job'] ?? []);
 
-        if (!array_key_exists('machine', $data)) {
-            throw new IncompleteDataException($data, 'machine');
+        if (!array_key_exists('serialized-suite', $componentsData)) {
+            throw new IncompleteDataException($data, 'components.serialized-suite');
         }
 
-        $machine = $this->createMachine($data['machine'] ?? []);
+        $serializedSuite = $this->createSerializedSuite($componentsData['serialized-suite'] ?? []);
 
-        $workerJobData = $data['worker-job'] ?? null;
+        if (!array_key_exists('machine', $componentsData)) {
+            throw new IncompleteDataException($data, 'components.machine');
+        }
+
+        $machine = $this->createMachine($componentsData['machine'] ?? []);
+
+        $workerJobData = $componentsData['worker-job'] ?? null;
         if (!is_array($workerJobData)) {
-            throw new IncompleteDataException($data, 'worker-job');
+            throw new IncompleteDataException($data, 'components.worker-job');
         }
 
         try {
@@ -87,12 +95,14 @@ readonly class JobFactory extends AbstractFactory
         return new Job(
             $summary,
             $preparation,
-            $resultsJob,
-            $serializedSuite,
-            $machine,
-            $workerJob,
-            $serviceRequests,
             $this->createMetaState($data),
+            new Components(
+                $resultsJob,
+                $serializedSuite,
+                $machine,
+                $workerJob,
+            ),
+            $serviceRequests,
         );
     }
 

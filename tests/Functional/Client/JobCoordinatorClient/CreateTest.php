@@ -71,35 +71,37 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
                         'succeeded' => false,
                     ],
                 ],
-                'results-job' => null,
-                'serialized-suite' => null,
-                'machine' => null,
-                'worker-job' => [
-                    'state' => 'pending',
-                    'meta_state' => [
-                        'ended' => false,
-                        'succeeded' => false,
-                    ],
-                    'components' => [
-                        'compilation' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
-                            ],
+                'components' => [
+                    'results-job' => null,
+                    'serialized-suite' => null,
+                    'machine' => null,
+                    'worker-job' => [
+                        'state' => 'pending',
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
                         ],
-                        'execution' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
+                        'components' => [
+                            'compilation' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
                             ],
-                        ],
-                        'event_delivery' => [
-                            'state' => 'pending',
-                            'meta_state' => [
-                                'ended' => false,
-                                'succeeded' => false,
+                            'execution' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
+                            ],
+                            'event_delivery' => [
+                                'state' => 'pending',
+                                'meta_state' => [
+                                    'ended' => false,
+                                    'succeeded' => false,
+                                ],
                             ],
                         ],
                     ],
