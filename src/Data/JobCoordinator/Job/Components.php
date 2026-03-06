@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\JobCoordinator\Job;
 
-readonly class Components
+/**
+ * @implements \IteratorAggregate<string, IsComponentInterface>
+ */
+readonly class Components implements \IteratorAggregate
 {
     /**
      * @param array<string, IsComponentInterface> $components
@@ -29,6 +32,11 @@ readonly class Components
         }
 
         return new Components($components);
+    }
+
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->components);
     }
 
     private function componentMatchesMetaState(IsComponentInterface $component, MetaState $metaState): bool
