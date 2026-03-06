@@ -113,4 +113,72 @@ class ComponentsTest extends TestCase
             ],
         ];
     }
+
+    /**
+     * @param array<string, mixed> $expected
+     */
+    #[DataProvider('iteratorDataProvider')]
+    public function testIterator(Components $components, array $expected): void
+    {
+        foreach ($components as $name => $component) {
+            self::assertSame(key($expected), $name);
+            self::assertSame($expected[key($expected)], $component);
+            next($expected);
+        }
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function iteratorDataProvider(): array
+    {
+        $machine = new Machine(
+            'state-category',
+            null,
+            null,
+            new MetaState(true, true),
+        );
+
+        $workerJob = new WorkerJob(
+            'state',
+            new MetaState(true, true),
+            [],
+        );
+
+        $resultsJob = new ResultsJob(
+            'state',
+            'end-state',
+            new MetaState(true, true),
+        );
+
+        $serializedSuite = new SerializedSuite(
+            'state',
+            new MetaState(true, true),
+        );
+
+        return [
+            'single component' => [
+                'components' => new Components([
+                    'machine' => $machine,
+                ]),
+                'expected' => [
+                    'machine' => $machine,
+                ],
+            ],
+            'all components' => [
+                'components' => new Components([
+                    'results-job' => $resultsJob,
+                    'serialized-suite' => $serializedSuite,
+                    'machine' => $machine,
+                    'worker-job' => $workerJob,
+                ]),
+                'expected' => [
+                    'results-job' => $resultsJob,
+                    'serialized-suite' => $serializedSuite,
+                    'machine' => $machine,
+                    'worker-job' => $workerJob,
+                ],
+            ],
+        ];
+    }
 }
