@@ -8,8 +8,6 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\Components;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\PreparationFailure;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
@@ -25,6 +23,7 @@ readonly class JobFactory extends AbstractFactory
         private SummaryFactory $summaryFactory,
         private MetaStateFactory $metaStateFactory,
         private ResultsJobFactory $resultsJobFactory,
+        private PreparationFactory $preparationFactory,
     ) {}
 
     /**
@@ -42,7 +41,7 @@ readonly class JobFactory extends AbstractFactory
         }
 
         try {
-            $preparation = $this->createPreparation($preparationData);
+            $preparation = $this->preparationFactory->create($preparationData);
         } catch (IncompleteDataException $e) {
             throw new IncompleteDataException($data, 'preparation.' . $e->missingKey);
         }
@@ -116,73 +115,6 @@ readonly class JobFactory extends AbstractFactory
             new Components($components),
             $serviceRequests,
         );
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @throws IncompleteDataException
-     */
-    private function createPreparation(array $data): Preparation
-    {
-        $state = $this->getNonEmptyString($data, 'state');
-        $requestStates = $data['request_states'] ?? [];
-        $requestStates = is_array($requestStates) ? $requestStates : [];
-
-        $filteredRequestStates = [];
-        foreach ($requestStates as $componentName => $requestState) {
-            if (
-                is_string($componentName) && '' !== $componentName
-                && is_string($requestState) && '' !== $requestState
-            ) {
-                $filteredRequestStates[$componentName] = $requestState;
-            }
-        }
-
-        $componentFailures = $data['failures'] ?? [];
-        $componentFailures = is_array($componentFailures) ? $componentFailures : [];
-
-        $filteredComponentFailures = [];
-        foreach ($componentFailures as $componentName => $failureData) {
-            $failure = $this->createPreparationFailure(is_array($failureData) ? $failureData : []);
-
-            if (null !== $failure) {
-                $filteredComponentFailures[$componentName] = $failure;
-            }
-        }
-
-        return new Preparation(
-            $state,
-            $this->metaStateFactory->create($data),
-            $filteredRequestStates,
-            $filteredComponentFailures,
-        );
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createPreparationFailure(array $data): ?PreparationFailure
-    {
-        $type = $data['type'] ?? null;
-        $type = is_string($type) ? $type : null;
-        if (null === $type) {
-            return null;
-        }
-
-        $code = $data['code'] ?? null;
-        $code = is_int($code) ? $code : null;
-        if (null === $code) {
-            return null;
-        }
-
-        $message = $data['message'] ?? null;
-        $message = is_string($message) ? $message : null;
-        if (null === $message) {
-            return null;
-        }
-
-        return new PreparationFailure($type, $code, $message);
     }
 
     /**

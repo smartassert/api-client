@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\JobCoordinatorClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\Job\JobFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\Job\MetaStateFactory;
+use SmartAssert\ApiClient\Factory\JobCoordinator\Job\PreparationFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\Job\ResultsJobFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
 use SmartAssert\ApiClient\JobCoordinatorClient;
@@ -36,6 +37,7 @@ abstract class AbstractJobCoordinatorClientTestCase extends AbstractClientTestCa
                 new SummaryFactory(),
                 $metaStateFactory,
                 new ResultsJobFactory($metaStateFactory),
+                new PreparationFactory($metaStateFactory),
             ),
             new SummaryFactory(),
             new HttpHandler(
