@@ -49,7 +49,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([]),
@@ -63,7 +64,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -79,7 +81,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -95,7 +98,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -137,7 +141,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([]),
@@ -151,7 +156,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -167,7 +173,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -183,7 +190,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -227,7 +235,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([]),
@@ -241,7 +250,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -257,7 +267,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -273,7 +284,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -316,7 +328,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([]),
@@ -330,7 +343,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -346,7 +360,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([
@@ -362,7 +377,8 @@ class JobTest extends TestCase
                     new Preparation(
                         'state',
                         new MetaState(false, false),
-                        []
+                        [],
+                        [],
                     ),
                     new MetaState(false, false),
                     new Components([

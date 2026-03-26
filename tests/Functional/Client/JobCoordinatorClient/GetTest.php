@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\PreparationFailure;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
@@ -158,6 +159,154 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                         'provider' => 'provider name',
                     ],
                 ),
+            ],
+        ];
+    }
+
+    /**
+     * @param array<mixed>                      $responsePreparationFailureData
+     * @param array<string, PreparationFailure> $expectedPreparationFailures
+     */
+    #[DataProvider('getWithPreparationComponentFailureDataProvider')]
+    public function testGetWithPreparationComponentFailure(
+        array $responsePreparationFailureData,
+        array $expectedPreparationFailures,
+    ): void {
+        $this->getMockHandler()->append(new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode([
+                'id' => self::ID,
+                'suite_id' => self::SUITE_ID,
+                'maximum_duration_in_seconds' => self::MAXIMUM_DURATION_IN_SECONDS,
+                'meta_state' => [
+                    'ended' => false,
+                    'succeeded' => false,
+                ],
+                'preparation' => [
+                    'state' => 'not-relevant',
+                    'failures' => $responsePreparationFailureData,
+                ],
+                'components' => [
+                    'results-job' => null,
+                    'serialized-suite' => null,
+                    'machine' => null,
+                    'worker-job' => [
+                        'state' => 'pending',
+                    ],
+                ],
+                'service_requests' => [],
+            ])
+        ));
+
+        $job = ($this->createClientActionCallable())();
+
+        $failures = $job->preparation->componentFailures;
+        self::assertEquals($expectedPreparationFailures, $failures);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function getWithPreparationComponentFailureDataProvider(): array
+    {
+        return [
+            'no preparation component failure' => [
+                'responsePreparationFailureData' => [],
+                'expectedPreparationFailures' => [],
+            ],
+            'single invalid preparation component failure; not an array' => [
+                'responsePreparationFailureData' => [
+                    'foo' => 'bar',
+                ],
+                'expectedPreparationFailures' => [],
+            ],
+            'single invalid preparation component failure; array lacking "type"' => [
+                'responsePreparationFailureData' => [
+                    'foo' => [
+                        'code' => 7,
+                        'message' => 'message content',
+                    ],
+                ],
+                'expectedPreparationFailures' => [],
+            ],
+            'single invalid preparation component failure; invalid type' => [
+                'responsePreparationFailureData' => [
+                    'foo' => [
+                        'type' => true,
+                        'code' => 7,
+                        'message' => 'message content',
+                    ],
+                ],
+                'expectedPreparationFailures' => [],
+            ],
+            'single invalid preparation component failure; array lacking "code"' => [
+                'responsePreparationFailureData' => [
+                    'foo' => [
+                        'type' => 'network',
+                        'message' => 'message content',
+                    ],
+                ],
+                'expectedPreparationFailures' => [],
+            ],
+            'single invalid preparation component failure; invalid code' => [
+                'responsePreparationFailureData' => [
+                    'foo' => [
+                        'type' => 'network',
+                        'code' => 'foo',
+                        'message' => 'message content',
+                    ],
+                ],
+                'expectedPreparationFailures' => [],
+            ],
+            'single invalid preparation component failure; array lacking "message"' => [
+                'responsePreparationFailureData' => [
+                    'foo' => [
+                        'type' => 'network',
+                        'code' => 7,
+                    ],
+                ],
+                'expectedPreparationFailures' => [],
+            ],
+            'single invalid preparation component failure; invalid message' => [
+                'responsePreparationFailureData' => [
+                    'foo' => [
+                        'type' => 'network',
+                        'code' => 7,
+                        'message' => false,
+                    ],
+                ],
+                'expectedPreparationFailures' => [],
+            ],
+            'single preparation component failure' => [
+                'responsePreparationFailureData' => [
+                    'worker-job' => [
+                        'type' => 'network',
+                        'code' => 7,
+                        'message' => 'message content',
+                    ],
+                ],
+                'expectedPreparationFailures' => [
+                    'worker-job' => new PreparationFailure('network', 7, 'message content'),
+                ],
+            ],
+            'multiple preparation component failures' => [
+                'responsePreparationFailureData' => [
+                    'results-job' => [
+                        'type' => 'network',
+                        'code' => 123,
+                        'message' => 'results job message',
+                    ],
+                    'worker-job' => [
+                        'type' => 'the-ether',
+                        'code' => 456,
+                        'message' => 'worker job message',
+                    ],
+                ],
+                'expectedPreparationFailures' => [
+                    'results-job' => new PreparationFailure('network', 123, 'results job message'),
+                    'worker-job' => new PreparationFailure('the-ether', 456, 'worker job message'),
+                ],
             ],
         ];
     }
