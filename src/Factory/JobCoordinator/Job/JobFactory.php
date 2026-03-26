@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Factory\JobCoordinator;
+namespace SmartAssert\ApiClient\Factory\JobCoordinator\Job;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Components;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
@@ -19,6 +19,7 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
+use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
 
 readonly class JobFactory extends AbstractFactory
 {
