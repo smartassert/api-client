@@ -5,15 +5,8 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\JobCoordinatorClient;
 
 use GuzzleHttp\Psr7\HttpFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\MachineFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\MetaStateFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\PreparationFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\ResultsJobFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\SerializedSuiteFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\ServiceRequestFactory;
+use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactoryFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\WorkerJobFactory;
 use SmartAssert\ApiClient\JobCoordinatorClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
 use SmartAssert\ApiClient\Tests\Functional\Client\AbstractClientTestCase;
@@ -34,19 +27,8 @@ abstract class AbstractJobCoordinatorClientTestCase extends AbstractClientTestCa
     {
         parent::setUp();
 
-        $metaStateFactory = new MetaStateFactory();
-
         $this->client = new JobCoordinatorClient(
-            new JobFactory(
-                new SummaryFactory(),
-                $metaStateFactory,
-                new ResultsJobFactory($metaStateFactory),
-                new PreparationFactory($metaStateFactory),
-                new SerializedSuiteFactory($metaStateFactory),
-                new MachineFactory($metaStateFactory),
-                new WorkerJobFactory($metaStateFactory),
-                new ServiceRequestFactory(),
-            ),
+            new JobFactoryFactory()->create(),
             new SummaryFactory(),
             new HttpHandler(
                 $this->httpClient,
