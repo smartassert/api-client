@@ -7,7 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
+use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactoryFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
 use SmartAssert\ApiClient\JobCoordinatorClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -22,9 +22,7 @@ class AbstractJobCoordinatorClientTestCase extends AbstractIntegrationTestCase
         parent::setUp();
 
         $this->jobCoordinatorClient = new JobCoordinatorClient(
-            new JobFactory(
-                new SummaryFactory(),
-            ),
+            new JobFactoryFactory()->create(),
             new SummaryFactory(),
             new HttpHandler(
                 new HttpClient(),

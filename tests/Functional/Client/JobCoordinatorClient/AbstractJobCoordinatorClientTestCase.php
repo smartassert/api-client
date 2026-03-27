@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\JobCoordinatorClient;
 
 use GuzzleHttp\Psr7\HttpFactory;
-use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
+use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactoryFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
 use SmartAssert\ApiClient\JobCoordinatorClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -28,9 +28,7 @@ abstract class AbstractJobCoordinatorClientTestCase extends AbstractClientTestCa
         parent::setUp();
 
         $this->client = new JobCoordinatorClient(
-            new JobFactory(
-                new SummaryFactory(),
-            ),
+            new JobFactoryFactory()->create(),
             new SummaryFactory(),
             new HttpHandler(
                 $this->httpClient,

@@ -6,17 +6,6 @@ namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Components;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\Preparation;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\PreparationFailure;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
@@ -24,6 +13,13 @@ readonly class JobFactory extends AbstractFactory
 {
     public function __construct(
         private SummaryFactory $summaryFactory,
+        private MetaStateFactory $metaStateFactory,
+        private ResultsJobFactory $resultsJobFactory,
+        private PreparationFactory $preparationFactory,
+        private SerializedSuiteFactory $serializedSuiteFactory,
+        private MachineFactory $machineFactory,
+        private WorkerJobFactory $workerJobFactory,
+        private ServiceRequestFactory $serviceRequestFactory,
     ) {}
 
     /**
@@ -41,7 +37,7 @@ readonly class JobFactory extends AbstractFactory
         }
 
         try {
-            $preparation = $this->createPreparation($preparationData);
+            $preparation = $this->preparationFactory->create($preparationData);
         } catch (IncompleteDataException $e) {
             throw new IncompleteDataException($data, 'preparation.' . $e->missingKey);
         }
@@ -57,19 +53,19 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'components.results-job');
         }
 
-        $resultsJob = $this->createResultsJob($componentsData['results-job'] ?? []);
+        $resultsJob = $this->resultsJobFactory->create($componentsData['results-job'] ?? []);
 
         if (!array_key_exists('serialized-suite', $componentsData)) {
             throw new IncompleteDataException($data, 'components.serialized-suite');
         }
 
-        $serializedSuite = $this->createSerializedSuite($componentsData['serialized-suite'] ?? []);
+        $serializedSuite = $this->serializedSuiteFactory->create($componentsData['serialized-suite'] ?? []);
 
         if (!array_key_exists('machine', $componentsData)) {
             throw new IncompleteDataException($data, 'components.machine');
         }
 
-        $machine = $this->createMachine($componentsData['machine'] ?? []);
+        $machine = $this->machineFactory->create($componentsData['machine'] ?? []);
 
         $workerJobData = $componentsData['worker-job'] ?? null;
         if (!is_array($workerJobData)) {
@@ -77,7 +73,7 @@ readonly class JobFactory extends AbstractFactory
         }
 
         try {
-            $workerJob = $this->createWorkerJob($workerJobData);
+            $workerJob = $this->workerJobFactory->create($workerJobData);
         } catch (IncompleteDataException $e) {
             throw new IncompleteDataException($data, 'worker-job.' . $e->missingKey);
         }
@@ -88,7 +84,7 @@ readonly class JobFactory extends AbstractFactory
         }
 
         try {
-            $serviceRequests = $this->createServiceRequests($serviceRequestDataCollection);
+            $serviceRequests = $this->serviceRequestFactory->createCollection($serviceRequestDataCollection);
         } catch (IncompleteDataException $e) {
             throw new IncompleteDataException($data, 'service_requests.' . $e->missingKey);
         }
@@ -111,279 +107,9 @@ readonly class JobFactory extends AbstractFactory
         return new Job(
             $summary,
             $preparation,
-            $this->createMetaState($data),
+            $this->metaStateFactory->create($data),
             new Components($components),
             $serviceRequests,
         );
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @throws IncompleteDataException
-     */
-    private function createPreparation(array $data): Preparation
-    {
-        $state = $this->getNonEmptyString($data, 'state');
-        $requestStates = $data['request_states'] ?? [];
-        $requestStates = is_array($requestStates) ? $requestStates : [];
-
-        $filteredRequestStates = [];
-        foreach ($requestStates as $componentName => $requestState) {
-            if (
-                is_string($componentName) && '' !== $componentName
-                && is_string($requestState) && '' !== $requestState
-            ) {
-                $filteredRequestStates[$componentName] = $requestState;
-            }
-        }
-
-        $componentFailures = $data['failures'] ?? [];
-        $componentFailures = is_array($componentFailures) ? $componentFailures : [];
-
-        $filteredComponentFailures = [];
-        foreach ($componentFailures as $componentName => $failureData) {
-            $failure = $this->createPreparationFailure(is_array($failureData) ? $failureData : []);
-
-            if (null !== $failure) {
-                $filteredComponentFailures[$componentName] = $failure;
-            }
-        }
-
-        return new Preparation(
-            $state,
-            $this->createMetaState($data),
-            $filteredRequestStates,
-            $filteredComponentFailures,
-        );
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createPreparationFailure(array $data): ?PreparationFailure
-    {
-        $type = $data['type'] ?? null;
-        $type = is_string($type) ? $type : null;
-        if (null === $type) {
-            return null;
-        }
-
-        $code = $data['code'] ?? null;
-        $code = is_int($code) ? $code : null;
-        if (null === $code) {
-            return null;
-        }
-
-        $message = $data['message'] ?? null;
-        $message = is_string($message) ? $message : null;
-        if (null === $message) {
-            return null;
-        }
-
-        return new PreparationFailure($type, $code, $message);
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createResultsJob(array $data): ?ResultsJob
-    {
-        $state = $this->getNullableNonEmptyString($data, 'state');
-        if (null === $state) {
-            return null;
-        }
-
-        return new ResultsJob(
-            $state,
-            $this->getNullableNonEmptyString($data, 'end_state'),
-            $this->createMetaState($data),
-        );
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createSerializedSuite(array $data): ?SerializedSuite
-    {
-        $state = $this->getNullableNonEmptyString($data, 'state');
-        if (null === $state) {
-            return null;
-        }
-
-        return new SerializedSuite($state, $this->createMetaState($data));
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createMachine(array $data): ?Machine
-    {
-        $stateCategory = $this->getNullableNonEmptyString($data, 'state_category');
-        if (null === $stateCategory) {
-            return null;
-        }
-
-        $actionFailureData = $data['action_failure'] ?? [];
-        $actionFailureData = is_array($actionFailureData) ? $actionFailureData : [];
-
-        return new Machine(
-            $stateCategory,
-            $this->getNullableNonEmptyString($data, 'ip_address'),
-            $this->createMachineActionFailure($actionFailureData),
-            $this->createMetaState($data),
-        );
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createMachineActionFailure(array $data): ?MachineActionFailure
-    {
-        $action = $this->getNullableNonEmptyString($data, 'action');
-        if (null === $action) {
-            return null;
-        }
-
-        $type = $this->getNullableNonEmptyString($data, 'type');
-        if (null === $type) {
-            return null;
-        }
-
-        $context = $data['context'] ?? null;
-        $context = is_array($context) ? $context : null;
-        $context = [] === $context ? null : $context;
-
-        return new MachineActionFailure($action, $type, $context);
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @throws IncompleteDataException
-     */
-    private function createWorkerJob(array $data): WorkerJob
-    {
-        $state = $this->getNonEmptyString($data, 'state');
-        $isEndState = $this->getIsEndState($data);
-
-        $componentDataCollection = $data['components'] ?? [];
-        $componentDataCollection = is_array($componentDataCollection) ? $componentDataCollection : [];
-
-        $components = [];
-
-        foreach ($componentDataCollection as $componentName => $componentData) {
-            if (is_string($componentName) && '' !== $componentName && is_array($componentData)) {
-                try {
-                    $components[$componentName] = new WorkerJobComponent(
-                        $this->getNonEmptyString($componentData, 'state'),
-                        $this->createMetaState($componentData),
-                    );
-                } catch (IncompleteDataException $e) {
-                    throw new IncompleteDataException($data, 'components.' . $componentName . '.' . $e->missingKey);
-                }
-            }
-        }
-
-        return new WorkerJob($state, $this->createMetaState($data), $components);
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function getIsEndState(array $data): bool
-    {
-        $value = $data['is_end_state'] ?? false;
-
-        return is_bool($value) ? $value : false;
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @return ServiceRequest[]
-     *
-     * @throws IncompleteDataException
-     */
-    private function createServiceRequests(array $data): array
-    {
-        $serviceRequests = [];
-
-        foreach ($data as $serviceRequestIndex => $serviceRequestData) {
-            if (is_array($serviceRequestData)) {
-                try {
-                    $serviceRequests[] = $this->createServiceRequest($serviceRequestData);
-                } catch (IncompleteDataException $e) {
-                    throw new IncompleteDataException($data, $serviceRequestIndex . '.' . $e->missingKey);
-                }
-            }
-        }
-
-        return $serviceRequests;
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @throws IncompleteDataException
-     */
-    private function createServiceRequest(array $data): ServiceRequest
-    {
-        $type = $this->getNonEmptyString($data, 'type');
-
-        $attemptsData = $data['attempts'] ?? null;
-        $attemptsData = is_array($attemptsData) ? $attemptsData : null;
-        if (null === $attemptsData) {
-            throw new IncompleteDataException($data, 'attempts');
-        }
-
-        try {
-            $attempts = $this->createServiceRequestAttempts($attemptsData);
-        } catch (IncompleteDataException $e) {
-            throw new IncompleteDataException($data, 'attempts.' . $e->missingKey);
-        }
-
-        return new ServiceRequest($type, $attempts);
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @return ServiceRequestAttempt[]
-     *
-     * @throws IncompleteDataException
-     */
-    private function createServiceRequestAttempts(array $data): array
-    {
-        $attempts = [];
-
-        foreach ($data as $attemptData) {
-            if (is_array($attemptData)) {
-                $attempts[] = new ServiceRequestAttempt($this->getNonEmptyString($attemptData, 'state'));
-            }
-        }
-
-        return $attempts;
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createMetaState(array $data): MetaState
-    {
-        $metaStateData = $data['meta_state'] ?? null;
-        $metaStateData = is_array($metaStateData) ? $metaStateData : null;
-
-        if (null === $metaStateData) {
-            return new MetaState(false, false);
-        }
-
-        $ended = $metaStateData['ended'] ?? false;
-        $ended = is_bool($ended) ? $ended : false;
-
-        $succeeded = $metaStateData['succeeded'] ?? false;
-        $succeeded = is_bool($succeeded) ? $succeeded : false;
-
-        return new MetaState($ended, $succeeded);
     }
 }
