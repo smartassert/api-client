@@ -6,8 +6,6 @@ namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Components;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
@@ -23,6 +21,7 @@ readonly class JobFactory extends AbstractFactory
         private ResultsJobFactory $resultsJobFactory,
         private PreparationFactory $preparationFactory,
         private SerializedSuiteFactory $serializedSuiteFactory,
+        private MachineFactory $machineFactory,
     ) {}
 
     /**
@@ -68,7 +67,7 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'components.machine');
         }
 
-        $machine = $this->createMachine($componentsData['machine'] ?? []);
+        $machine = $this->machineFactory->create($componentsData['machine'] ?? []);
 
         $workerJobData = $componentsData['worker-job'] ?? null;
         if (!is_array($workerJobData)) {
@@ -114,49 +113,6 @@ readonly class JobFactory extends AbstractFactory
             new Components($components),
             $serviceRequests,
         );
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createMachine(array $data): ?Machine
-    {
-        $stateCategory = $this->getNullableNonEmptyString($data, 'state_category');
-        if (null === $stateCategory) {
-            return null;
-        }
-
-        $actionFailureData = $data['action_failure'] ?? [];
-        $actionFailureData = is_array($actionFailureData) ? $actionFailureData : [];
-
-        return new Machine(
-            $stateCategory,
-            $this->getNullableNonEmptyString($data, 'ip_address'),
-            $this->createMachineActionFailure($actionFailureData),
-            $this->metaStateFactory->create($data),
-        );
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createMachineActionFailure(array $data): ?MachineActionFailure
-    {
-        $action = $this->getNullableNonEmptyString($data, 'action');
-        if (null === $action) {
-            return null;
-        }
-
-        $type = $this->getNullableNonEmptyString($data, 'type');
-        if (null === $type) {
-            return null;
-        }
-
-        $context = $data['context'] ?? null;
-        $context = is_array($context) ? $context : null;
-        $context = [] === $context ? null : $context;
-
-        return new MachineActionFailure($action, $type, $context);
     }
 
     /**

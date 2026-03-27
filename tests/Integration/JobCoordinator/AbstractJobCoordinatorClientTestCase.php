@@ -8,6 +8,7 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
+use SmartAssert\ApiClient\Factory\JobCoordinator\MachineFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\MetaStateFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\PreparationFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\ResultsJobFactory;
@@ -34,6 +35,7 @@ class AbstractJobCoordinatorClientTestCase extends AbstractIntegrationTestCase
                 new ResultsJobFactory($metaStateFactory),
                 new PreparationFactory($metaStateFactory),
                 new SerializedSuiteFactory($metaStateFactory),
+                new MachineFactory($metaStateFactory),
             ),
             new SummaryFactory(),
             new HttpHandler(
