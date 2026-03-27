@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Factory\JobCoordinator\Job;
+namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
