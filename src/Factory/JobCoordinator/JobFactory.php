@@ -8,7 +8,6 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\Components;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
@@ -23,6 +22,7 @@ readonly class JobFactory extends AbstractFactory
         private MetaStateFactory $metaStateFactory,
         private ResultsJobFactory $resultsJobFactory,
         private PreparationFactory $preparationFactory,
+        private SerializedSuiteFactory $serializedSuiteFactory,
     ) {}
 
     /**
@@ -62,7 +62,7 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'components.serialized-suite');
         }
 
-        $serializedSuite = $this->createSerializedSuite($componentsData['serialized-suite'] ?? []);
+        $serializedSuite = $this->serializedSuiteFactory->create($componentsData['serialized-suite'] ?? []);
 
         if (!array_key_exists('machine', $componentsData)) {
             throw new IncompleteDataException($data, 'components.machine');
@@ -114,19 +114,6 @@ readonly class JobFactory extends AbstractFactory
             new Components($components),
             $serviceRequests,
         );
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function createSerializedSuite(array $data): ?SerializedSuite
-    {
-        $state = $this->getNullableNonEmptyString($data, 'state');
-        if (null === $state) {
-            return null;
-        }
-
-        return new SerializedSuite($state, $this->metaStateFactory->create($data));
     }
 
     /**

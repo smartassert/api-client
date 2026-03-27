@@ -11,6 +11,7 @@ use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\MetaStateFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\PreparationFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\ResultsJobFactory;
+use SmartAssert\ApiClient\Factory\JobCoordinator\SerializedSuiteFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
 use SmartAssert\ApiClient\JobCoordinatorClient;
 use SmartAssert\ApiClient\ServiceClient\HttpHandler;
@@ -32,6 +33,7 @@ class AbstractJobCoordinatorClientTestCase extends AbstractIntegrationTestCase
                 $metaStateFactory,
                 new ResultsJobFactory($metaStateFactory),
                 new PreparationFactory($metaStateFactory),
+                new SerializedSuiteFactory($metaStateFactory),
             ),
             new SummaryFactory(),
             new HttpHandler(
