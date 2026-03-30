@@ -13,6 +13,7 @@ readonly class WorkerJobFactory extends AbstractFactory
 {
     public function __construct(
         private MetaStateFactory $metaStateFactory,
+        private WorkerJobCreationFailureFactory $workerJobCreationFailureFactory,
     ) {}
 
     /**
@@ -42,6 +43,14 @@ readonly class WorkerJobFactory extends AbstractFactory
             }
         }
 
-        return new WorkerJob($state, $this->metaStateFactory->create($data), $components);
+        $creationFailureData = $data['creation_failure'] ?? null;
+        $creationFailureData = is_array($creationFailureData) ? $creationFailureData : null;
+
+        $creationFailure = null;
+        if (is_array($creationFailureData)) {
+            $creationFailure = $this->workerJobCreationFailureFactory->create($creationFailureData);
+        }
+
+        return new WorkerJob($state, $this->metaStateFactory->create($data), $components, $creationFailure);
     }
 }

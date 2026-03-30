@@ -318,7 +318,8 @@ class JobTest extends TestCase
         $workerJob = new WorkerJob(
             'state',
             new MetaState(false, false),
-            []
+            [],
+            null,
         );
 
         return [

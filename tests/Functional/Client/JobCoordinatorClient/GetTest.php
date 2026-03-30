@@ -7,10 +7,12 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\JobCoordinatorClient;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Exception;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\PreparationFailure;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobCreationFailure;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
@@ -312,6 +314,138 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
     }
 
     /**
+     * @param ?array<mixed> $responseWorkerJobCreationFailureData
+     */
+    #[DataProvider('getWithWorkerJobCreationFailureDataProvider')]
+    public function testGetWithWorkerJobCreationFailure(
+        ?array $responseWorkerJobCreationFailureData,
+        ?WorkerJobCreationFailure $expected,
+    ): void {
+        $this->getMockHandler()->append(new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode([
+                'id' => self::ID,
+                'suite_id' => self::SUITE_ID,
+                'maximum_duration_in_seconds' => self::MAXIMUM_DURATION_IN_SECONDS,
+                'meta_state' => [
+                    'ended' => false,
+                    'succeeded' => false,
+                ],
+                'preparation' => [
+                    'state' => 'not-relevant',
+                ],
+                'components' => [
+                    'results-job' => null,
+                    'serialized-suite' => null,
+                    'machine' => null,
+                    'worker-job' => [
+                        'state' => 'pending',
+                        'creation_failure' => $responseWorkerJobCreationFailureData,
+                    ],
+                ],
+                'service_requests' => [],
+            ])
+        ));
+
+        $job = ($this->createClientActionCallable())();
+
+        self::assertEquals($expected, $job->getWorkerJob()?->creationFailure);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function getWithWorkerJobCreationFailureDataProvider(): array
+    {
+        return [
+            'no worker job creation failure' => [
+                'responseWorkerJobCreationFailureData' => null,
+                'expected' => null,
+            ],
+            'has worker job creation failure; data empty' => [
+                'responseWorkerJobCreationFailureData' => [],
+                'expected' => null,
+            ],
+            'has worker job creation failure; array lacking "stage"' => [
+                'responseWorkerJobCreationFailureData' => [
+                    'exception' => [
+                        'class' => self::class,
+                        'code' => 123,
+                        'message' => 'message content',
+                    ],
+                ],
+                'expected' => new WorkerJobCreationFailure(
+                    '',
+                    new Exception(self::class, 123, 'message content'),
+                ),
+            ],
+            'has worker job creation failure; array lacking "exception"' => [
+                'responseWorkerJobCreationFailureData' => [
+                    'stage' => 'stage-content',
+                ],
+                'expected' => new WorkerJobCreationFailure(
+                    'stage-content',
+                    new Exception('', 0, ''),
+                ),
+            ],
+            'has worker job creation failure; array lacking "exception.class"' => [
+                'responseWorkerJobCreationFailureData' => [
+                    'stage' => 'stage-content',
+                    'exception' => [
+                        'code' => 123,
+                        'message' => 'message content',
+                    ],
+                ],
+                'expected' => new WorkerJobCreationFailure(
+                    'stage-content',
+                    new Exception('', 123, 'message content'),
+                ),
+            ],
+            'has worker job creation failure; array lacking "exception.code"' => [
+                'responseWorkerJobCreationFailureData' => [
+                    'stage' => 'stage-content',
+                    'exception' => [
+                        'class' => self::class,
+                        'message' => 'message content',
+                    ],
+                ],
+                'expected' => new WorkerJobCreationFailure(
+                    'stage-content',
+                    new Exception(self::class, 0, 'message content'),
+                ),
+            ],
+            'has worker job creation failure; array lacking "exception.message"' => [
+                'responseWorkerJobCreationFailureData' => [
+                    'stage' => 'stage-content',
+                    'exception' => [
+                        'class' => self::class,
+                        'code' => 123,
+                    ],
+                ],
+                'expected' => new WorkerJobCreationFailure(
+                    'stage-content',
+                    new Exception(self::class, 123, ''),
+                ),
+            ],
+            'has worker job creation failure; all parts present"' => [
+                'responseWorkerJobCreationFailureData' => [
+                    'stage' => 'stage-content',
+                    'exception' => [
+                        'class' => self::class,
+                        'code' => 123,
+                        'message' => 'message content',
+                    ],
+                ],
+                'expected' => new WorkerJobCreationFailure(
+                    'stage-content',
+                    new Exception(self::class, 123, 'message content'),
+                ),
+            ],
+        ];
+    }
+
+    /**
      * @return callable(): Job
      */
     protected function createClientActionCallable(): callable
@@ -357,8 +491,16 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                     'worker-job' => [
                         'state' => 'pending',
                         'meta_state' => [
-                            'ended' => false,
+                            'ended' => true,
                             'succeeded' => false,
+                        ],
+                        'creation_failure' => [
+                            'stage' => 'stage-content',
+                            'exception' => [
+                                'class' => self::class,
+                                'code' => 123,
+                                'message' => 'message content',
+                            ],
                         ],
                         'components' => [
                             'compilation' => [
