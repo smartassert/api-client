@@ -40,6 +40,7 @@ class ComponentsTest extends TestCase
             'state',
             new MetaState(true, true),
             [],
+            null,
         );
 
         $endedSucceededResultsJob = new ResultsJob(
@@ -66,6 +67,7 @@ class ComponentsTest extends TestCase
                         'state',
                         new MetaState(false, false),
                         [],
+                        null,
                     ),
                 ]),
                 'metaState' => new MetaState(true, true),
@@ -78,6 +80,7 @@ class ComponentsTest extends TestCase
                         'state',
                         new MetaState(false, false),
                         [],
+                        null,
                     ),
                 ]),
                 'metaState' => new MetaState(true, true),
@@ -143,6 +146,7 @@ class ComponentsTest extends TestCase
             'state',
             new MetaState(true, true),
             [],
+            null,
         );
 
         $resultsJob = new ResultsJob(

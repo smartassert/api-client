@@ -16,5 +16,6 @@ readonly class WorkerJob implements HasMetastateInterface, IsComponentInterface
         public string $state,
         public MetaState $metaState,
         public array $componentStates,
+        public ?WorkerJobCreationFailure $creationFailure,
     ) {}
 }
