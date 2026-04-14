@@ -9,13 +9,16 @@ readonly class Machine implements HasMetastateInterface, IsComponentInterface
     use HasMetaStateTrait;
 
     /**
-     * @param non-empty-string  $stateCategory
+     * @param ?non-empty-string $stateCategory
      * @param ?non-empty-string $ipAddress
+     * @param ServiceRequest[]  $serviceRequests
      */
     public function __construct(
-        public string $stateCategory,
+        public ?string $stateCategory,
         public ?string $ipAddress,
         public ?MachineActionFailure $actionFailure,
         public MetaState $metaState,
+        public ComponentPreparation $preparation,
+        public array $serviceRequests,
     ) {}
 }

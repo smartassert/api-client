@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ComponentPreparation;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
@@ -101,25 +105,57 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
 
         self::assertSame('preparing', $job->preparation->state);
         self::assertEquals(new MetaState(false, false), $job->preparation->metaState);
+
+        $resultsJob = $job->components->get('results-job');
+        self::assertInstanceOf(ResultsJob::class, $resultsJob);
+        self::assertNull($resultsJob->state);
+        self::assertNull($resultsJob->endState);
+        self::assertEquals(new MetaState(false, false), $resultsJob->metaState);
+        self::assertEquals(new ComponentPreparation('preparing', 'requesting'), $resultsJob->preparation);
         self::assertEquals(
             [
-                'results-job' => 'requesting',
-                'serialized-suite' => 'requesting',
-                'machine' => 'pending',
-                'worker-job' => 'pending',
+                new ServiceRequest(
+                    'results-job/create',
+                    [
+                        new ServiceRequestAttempt('requesting'),
+                    ],
+                ),
             ],
-            $job->preparation->requestStates,
+            $resultsJob->serviceRequests,
         );
 
-        self::assertNull($job->components->get('results-job'));
-        self::assertNull($job->components->get('serialized-suite'));
-        self::assertNull($job->components->get('machine'));
+        $serializedSuite = $job->components->get('serialized-suite');
+        self::assertInstanceOf(SerializedSuite::class, $serializedSuite);
+        self::assertNull($serializedSuite->state);
+        self::assertEquals(new MetaState(false, false), $serializedSuite->metaState);
+        self::assertEquals(new ComponentPreparation('preparing', 'requesting'), $serializedSuite->preparation);
+        self::assertEquals(
+            [
+                new ServiceRequest(
+                    'serialized-suite/create',
+                    [
+                        new ServiceRequestAttempt('requesting'),
+                    ],
+                ),
+            ],
+            $serializedSuite->serviceRequests,
+        );
+
+        $machine = $job->components->get('machine');
+        self::assertInstanceOf(Machine::class, $machine);
+        self::assertNull($machine->stateCategory);
+        self::assertNull($machine->ipAddress);
+        self::assertNull($machine->actionFailure);
+        self::assertEquals(new MetaState(false, false), $machine->metaState);
+        self::assertEquals(new ComponentPreparation('pending', 'pending'), $machine->preparation);
+        self::assertEquals([], $machine->serviceRequests);
 
         $workerJob = $job->components->get('worker-job');
         self::assertInstanceOf(WorkerJob::class, $workerJob);
-
         self::assertSame('pending', $workerJob->state);
         self::assertEquals(new MetaState(false, false), $workerJob->metaState);
+        self::assertEquals(new ComponentPreparation('pending', 'pending'), $workerJob->preparation);
+        self::assertEquals([], $workerJob->serviceRequests);
         self::assertEquals(
             [
                 'compilation' => new WorkerJobComponent('pending', new MetaState(false, false)),
@@ -127,24 +163,6 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
                 'event_delivery' => new WorkerJobComponent('pending', new MetaState(false, false)),
             ],
             $workerJob->componentStates,
-        );
-
-        self::assertEquals(
-            [
-                new ServiceRequest(
-                    'results-job/create',
-                    [
-                        new ServiceRequestAttempt('requesting'),
-                    ]
-                ),
-                new ServiceRequest(
-                    'serialized-suite/create',
-                    [
-                        new ServiceRequestAttempt('requesting'),
-                    ]
-                ),
-            ],
-            $job->serviceRequests
         );
     }
 

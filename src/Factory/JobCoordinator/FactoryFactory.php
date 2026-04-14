@@ -9,24 +9,24 @@ readonly class FactoryFactory
     public static function createJobFactory(): JobFactory
     {
         $metaStateFactory = new MetaStateFactory();
+        $serviceRequestFactory = new ServiceRequestFactory();
+        $componentPreparationFactory = new ComponentPreparationFactory(
+            new ComponentPreparationFailureFactory()
+        );
 
         return new JobFactory(
             new SummaryFactory(),
             $metaStateFactory,
-            new ResultsJobFactory($metaStateFactory),
+            new ResultsJobFactory($metaStateFactory, $serviceRequestFactory, $componentPreparationFactory),
             new PreparationFactory($metaStateFactory),
-            new SerializedSuiteFactory($metaStateFactory),
-            new MachineFactory($metaStateFactory),
-            self::createWorkerJobFactory(),
-            new ServiceRequestFactory(),
-        );
-    }
-
-    public static function createWorkerJobFactory(): WorkerJobFactory
-    {
-        return new WorkerJobFactory(
-            new MetaStateFactory(),
-            self::createWorkerJobCreationFailureFactory(),
+            new SerializedSuiteFactory($metaStateFactory, $serviceRequestFactory, $componentPreparationFactory),
+            new MachineFactory($metaStateFactory, $serviceRequestFactory, $componentPreparationFactory),
+            new WorkerJobFactory(
+                $metaStateFactory,
+                $serviceRequestFactory,
+                $componentPreparationFactory,
+                self::createWorkerJobCreationFailureFactory(),
+            )
         );
     }
 

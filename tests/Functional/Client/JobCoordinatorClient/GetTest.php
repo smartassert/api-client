@@ -7,11 +7,11 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\JobCoordinatorClient;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ComponentPreparationFailure;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Exception;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
-use SmartAssert\ApiClient\Data\JobCoordinator\Job\PreparationFailure;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobCreationFailure;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
@@ -73,18 +73,35 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                     'state' => 'requesting',
                 ],
                 'components' => [
-                    'results-job' => null,
-                    'serialized-suite' => null,
+                    'results-job' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
+                    'serialized-suite' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
                     'machine' => [
                         'state_category' => 'failed',
                         'ip_address' => null,
                         'action_failure' => $responseMachineActionFailureData,
+                        'preparation' => [
+                            'state' => 'succeeded',
+                            'request_state' => 'succeeded',
+                        ],
                     ],
                     'worker-job' => [
                         'state' => 'pending',
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
                     ],
                 ],
-                'service_requests' => [],
             ])
         ));
 
@@ -166,149 +183,142 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
     }
 
     /**
-     * @param array<mixed>                      $responsePreparationFailureData
-     * @param array<string, PreparationFailure> $expectedPreparationFailures
+     * @param ?array<mixed> $componentPreparationFailureData
      */
-    #[DataProvider('getWithPreparationComponentFailureDataProvider')]
-    public function testGetWithPreparationComponentFailure(
-        array $responsePreparationFailureData,
-        array $expectedPreparationFailures,
+    #[DataProvider('jobComponentPreparationFailureDataDataProvider')]
+    public function testGetWithResultsJobPreparationFailure(
+        ?array $componentPreparationFailureData,
+        ?ComponentPreparationFailure $expected,
     ): void {
+        $responseData = $this->createResponseData([
+            'components' => [
+                'results-job' => [
+                    'preparation' => [
+                        'failure' => $componentPreparationFailureData,
+                    ],
+                ],
+            ],
+        ]);
+
         $this->getMockHandler()->append(new Response(
             200,
             ['content-type' => 'application/json'],
-            (string) json_encode([
-                'id' => self::ID,
-                'suite_id' => self::SUITE_ID,
-                'maximum_duration_in_seconds' => self::MAXIMUM_DURATION_IN_SECONDS,
-                'meta_state' => [
-                    'ended' => false,
-                    'succeeded' => false,
-                ],
-                'preparation' => [
-                    'state' => 'not-relevant',
-                    'failures' => $responsePreparationFailureData,
-                ],
-                'components' => [
-                    'results-job' => null,
-                    'serialized-suite' => null,
-                    'machine' => null,
-                    'worker-job' => [
-                        'state' => 'pending',
-                    ],
-                ],
-                'service_requests' => [],
-            ])
+            (string) json_encode($responseData)
         ));
 
         $job = ($this->createClientActionCallable())();
 
-        $failures = $job->preparation->componentFailures;
-        self::assertEquals($expectedPreparationFailures, $failures);
+        self::assertEquals($expected, $job->getResultsJob()?->preparation->failure);
+    }
+
+    /**
+     * @param ?array<mixed> $componentPreparationFailureData
+     */
+    #[DataProvider('jobComponentPreparationFailureDataDataProvider')]
+    public function testGetWithSerializedSuitePreparationFailure(
+        ?array $componentPreparationFailureData,
+        ?ComponentPreparationFailure $expected,
+    ): void {
+        $responseData = $this->createResponseData([
+            'components' => [
+                'serialized-suite' => [
+                    'preparation' => [
+                        'failure' => $componentPreparationFailureData,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->getMockHandler()->append(new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode($responseData)
+        ));
+
+        $job = ($this->createClientActionCallable())();
+
+        self::assertEquals($expected, $job->getSerializedSuite()?->preparation->failure);
+    }
+
+    /**
+     * @param ?array<mixed> $componentPreparationFailureData
+     */
+    #[DataProvider('jobComponentPreparationFailureDataDataProvider')]
+    public function testGetWithMachinePreparationFailure(
+        ?array $componentPreparationFailureData,
+        ?ComponentPreparationFailure $expected,
+    ): void {
+        $responseData = $this->createResponseData([
+            'components' => [
+                'machine' => [
+                    'preparation' => [
+                        'failure' => $componentPreparationFailureData,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->getMockHandler()->append(new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode($responseData)
+        ));
+
+        $job = ($this->createClientActionCallable())();
+
+        self::assertEquals($expected, $job->getMachine()?->preparation->failure);
+    }
+
+    /**
+     * @param ?array<mixed> $componentPreparationFailureData
+     */
+    #[DataProvider('jobComponentPreparationFailureDataDataProvider')]
+    public function testGetWithWorkerJobPreparationFailure(
+        ?array $componentPreparationFailureData,
+        ?ComponentPreparationFailure $expected,
+    ): void {
+        $responseData = $this->createResponseData([
+            'components' => [
+                'worker-job' => [
+                    'preparation' => [
+                        'failure' => $componentPreparationFailureData,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->getMockHandler()->append(new Response(
+            200,
+            ['content-type' => 'application/json'],
+            (string) json_encode($responseData)
+        ));
+
+        $job = ($this->createClientActionCallable())();
+
+        self::assertEquals($expected, $job->getWorkerJob()?->preparation->failure);
     }
 
     /**
      * @return array<mixed>
      */
-    public static function getWithPreparationComponentFailureDataProvider(): array
+    public static function jobComponentPreparationFailureDataDataProvider(): array
     {
         return [
-            'no preparation component failure' => [
-                'responsePreparationFailureData' => [],
-                'expectedPreparationFailures' => [],
+            'no failure' => [
+                'componentPreparationFailureData' => [],
+                'expected' => null,
             ],
-            'single invalid preparation component failure; not an array' => [
-                'responsePreparationFailureData' => [
-                    'foo' => 'bar',
+            'has failure' => [
+                'componentPreparationFailureData' => [
+                    'type' => 'network',
+                    'code' => 6,
+                    'message' => 'hostname lookup failed',
                 ],
-                'expectedPreparationFailures' => [],
-            ],
-            'single invalid preparation component failure; array lacking "type"' => [
-                'responsePreparationFailureData' => [
-                    'foo' => [
-                        'code' => 7,
-                        'message' => 'message content',
-                    ],
-                ],
-                'expectedPreparationFailures' => [],
-            ],
-            'single invalid preparation component failure; invalid type' => [
-                'responsePreparationFailureData' => [
-                    'foo' => [
-                        'type' => true,
-                        'code' => 7,
-                        'message' => 'message content',
-                    ],
-                ],
-                'expectedPreparationFailures' => [],
-            ],
-            'single invalid preparation component failure; array lacking "code"' => [
-                'responsePreparationFailureData' => [
-                    'foo' => [
-                        'type' => 'network',
-                        'message' => 'message content',
-                    ],
-                ],
-                'expectedPreparationFailures' => [],
-            ],
-            'single invalid preparation component failure; invalid code' => [
-                'responsePreparationFailureData' => [
-                    'foo' => [
-                        'type' => 'network',
-                        'code' => 'foo',
-                        'message' => 'message content',
-                    ],
-                ],
-                'expectedPreparationFailures' => [],
-            ],
-            'single invalid preparation component failure; array lacking "message"' => [
-                'responsePreparationFailureData' => [
-                    'foo' => [
-                        'type' => 'network',
-                        'code' => 7,
-                    ],
-                ],
-                'expectedPreparationFailures' => [],
-            ],
-            'single invalid preparation component failure; invalid message' => [
-                'responsePreparationFailureData' => [
-                    'foo' => [
-                        'type' => 'network',
-                        'code' => 7,
-                        'message' => false,
-                    ],
-                ],
-                'expectedPreparationFailures' => [],
-            ],
-            'single preparation component failure' => [
-                'responsePreparationFailureData' => [
-                    'worker-job' => [
-                        'type' => 'network',
-                        'code' => 7,
-                        'message' => 'message content',
-                    ],
-                ],
-                'expectedPreparationFailures' => [
-                    'worker-job' => new PreparationFailure('network', 7, 'message content'),
-                ],
-            ],
-            'multiple preparation component failures' => [
-                'responsePreparationFailureData' => [
-                    'results-job' => [
-                        'type' => 'network',
-                        'code' => 123,
-                        'message' => 'results job message',
-                    ],
-                    'worker-job' => [
-                        'type' => 'the-ether',
-                        'code' => 456,
-                        'message' => 'worker job message',
-                    ],
-                ],
-                'expectedPreparationFailures' => [
-                    'results-job' => new PreparationFailure('network', 123, 'results job message'),
-                    'worker-job' => new PreparationFailure('the-ether', 456, 'worker job message'),
-                ],
+                'expected' => new ComponentPreparationFailure(
+                    'network',
+                    6,
+                    'hostname lookup failed',
+                ),
             ],
         ];
     }
@@ -336,11 +346,30 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                     'state' => 'not-relevant',
                 ],
                 'components' => [
-                    'results-job' => null,
-                    'serialized-suite' => null,
-                    'machine' => null,
+                    'results-job' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
+                    'serialized-suite' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
+                    'machine' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
                     'worker-job' => [
                         'state' => 'pending',
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
                         'creation_failure' => $responseWorkerJobCreationFailureData,
                     ],
                 ],
@@ -477,8 +506,18 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                     ],
                 ],
                 'components' => [
-                    'results-job' => null,
-                    'serialized-suite' => null,
+                    'results-job' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
+                    'serialized-suite' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
                     'machine' => [
                         'state_category' => 'idle',
                         'ip_address' => null,
@@ -487,12 +526,20 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                             'ended' => false,
                             'succeeded' => false,
                         ],
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
                     ],
                     'worker-job' => [
                         'state' => 'pending',
                         'meta_state' => [
                             'ended' => true,
                             'succeeded' => false,
+                        ],
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
                         ],
                         'creation_failure' => [
                             'stage' => 'stage-content',
@@ -535,5 +582,55 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
     protected function getExpectedRequestProperties(): ExpectedRequestProperties
     {
         return new ExpectedRequestProperties('GET', '/job-coordinator/' . self::ID);
+    }
+
+    /**
+     * @param array<mixed> $modifications
+     *
+     * @return array<mixed>
+     */
+    private function createResponseData(array $modifications): array
+    {
+        $template = [
+            'id' => self::ID,
+            'suite_id' => self::SUITE_ID,
+            'maximum_duration_in_seconds' => self::MAXIMUM_DURATION_IN_SECONDS,
+            'meta_state' => [
+                'ended' => false,
+                'succeeded' => false,
+            ],
+            'preparation' => [
+                'state' => 'not-relevant',
+            ],
+            'components' => [
+                'results-job' => [
+                    'preparation' => [
+                        'state' => 'pending',
+                        'request_state' => 'pending',
+                    ],
+                ],
+                'serialized-suite' => [
+                    'preparation' => [
+                        'state' => 'pending',
+                        'request_state' => 'pending',
+                    ],
+                ],
+                'machine' => [
+                    'preparation' => [
+                        'state' => 'pending',
+                        'request_state' => 'pending',
+                    ],
+                ],
+                'worker-job' => [
+                    'state' => 'pending',
+                    'preparation' => [
+                        'state' => 'pending',
+                        'request_state' => 'pending',
+                    ],
+                ],
+            ],
+        ];
+
+        return array_merge_recursive($template, $modifications);
     }
 }

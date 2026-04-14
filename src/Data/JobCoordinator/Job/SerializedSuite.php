@@ -9,10 +9,13 @@ readonly class SerializedSuite implements HasMetastateInterface, IsComponentInte
     use HasMetaStateTrait;
 
     /**
-     * @param non-empty-string $state
+     * @param ?non-empty-string $state
+     * @param ServiceRequest[]  $serviceRequests
      */
     public function __construct(
-        public string $state,
+        public ?string $state,
         public MetaState $metaState,
+        public ComponentPreparation $preparation,
+        public array $serviceRequests,
     ) {}
 }

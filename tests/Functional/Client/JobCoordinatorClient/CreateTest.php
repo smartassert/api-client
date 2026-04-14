@@ -72,14 +72,33 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
                     ],
                 ],
                 'components' => [
-                    'results-job' => null,
-                    'serialized-suite' => null,
-                    'machine' => null,
+                    'results-job' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
+                    'serialized-suite' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
+                    'machine' => [
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
+                        ],
+                    ],
                     'worker-job' => [
                         'state' => 'pending',
                         'meta_state' => [
                             'ended' => false,
                             'succeeded' => false,
+                        ],
+                        'preparation' => [
+                            'state' => 'pending',
+                            'request_state' => 'pending',
                         ],
                         'components' => [
                             'compilation' => [
@@ -106,7 +125,6 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
                         ],
                     ],
                 ],
-                'service_requests' => [],
             ])
         );
     }
