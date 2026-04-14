@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ComponentPreparation;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
 use SmartAssert\ApiClient\Exception\ClientException;
@@ -46,13 +51,8 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         self::assertSame($suiteId, $job->summary->suiteId);
         self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 
-        $expectedRequestStates = ['pending', 'requesting', 'succeeded', 'failed'];
         self::assertTrue(in_array($job->preparation->state, ['preparing', 'failed']));
         self::assertEquals(new MetaState(true, false), $job->preparation->metaState);
-        self::assertTrue(in_array($job->preparation->requestStates['results-job'], $expectedRequestStates));
-        self::assertTrue(in_array($job->preparation->requestStates['serialized-suite'], $expectedRequestStates));
-        self::assertTrue(in_array($job->preparation->requestStates['machine'], $expectedRequestStates));
-        self::assertTrue(in_array($job->preparation->requestStates['worker-job'], $expectedRequestStates));
 
         $resultsJob = $job->components->get('results-job');
         self::assertInstanceOf(ResultsJob::class, $resultsJob);
@@ -71,15 +71,39 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
             ]
         ));
         self::assertNull($resultsJob->endState);
+        self::assertEquals(new ComponentPreparation('succeeded', 'succeeded'), $resultsJob->preparation);
 
-        self::assertNull($job->components->get('serialized-suite'));
-        self::assertNull($job->components->get('machine'));
+        $serializedSuite = $job->components->get('serialized-suite');
+        self::assertInstanceOf(SerializedSuite::class, $serializedSuite);
+        self::assertNull($serializedSuite->state);
+        self::assertEquals(new MetaState(false, false), $serializedSuite->metaState);
+        self::assertEquals(new ComponentPreparation('failed', 'failed'), $serializedSuite->preparation);
+        self::assertEquals(
+            [
+                new ServiceRequest(
+                    'serialized-suite/create',
+                    [
+                        new ServiceRequestAttempt('failed'),
+                    ]
+                ),
+            ],
+            $serializedSuite->serviceRequests
+        );
+        self::assertEquals(new ComponentPreparation('failed', 'failed'), $serializedSuite->preparation);
+
+        $machine = $job->components->get('machine');
+        self::assertInstanceOf(Machine::class, $machine);
+        self::assertNull($machine->stateCategory);
+        self::assertNull($machine->ipAddress);
+        self::assertNull($machine->actionFailure);
+        self::assertEquals(new MetaState(false, false), $machine->metaState);
+        self::assertNotEmpty($machine->serviceRequests);
 
         $workerJob = $job->components->get('worker-job');
         self::assertInstanceOf(WorkerJob::class, $workerJob);
-
         self::assertSame('pending', $workerJob->state);
         self::assertEquals(new MetaState(false, false), $workerJob->metaState);
+        self::assertEmpty($workerJob->serviceRequests);
         self::assertEquals(
             [
                 'compilation' => new WorkerJobComponent('pending', new MetaState(false, false)),
@@ -88,8 +112,6 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
             ],
             $workerJob->componentStates,
         );
-
-        self::assertNotEmpty($job->serviceRequests);
     }
 
     /**

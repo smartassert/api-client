@@ -19,7 +19,6 @@ readonly class JobFactory extends AbstractFactory
         private SerializedSuiteFactory $serializedSuiteFactory,
         private MachineFactory $machineFactory,
         private WorkerJobFactory $workerJobFactory,
-        private ServiceRequestFactory $serviceRequestFactory,
     ) {}
 
     /**
@@ -78,38 +77,16 @@ readonly class JobFactory extends AbstractFactory
             throw new IncompleteDataException($data, 'worker-job.' . $e->missingKey);
         }
 
-        $serviceRequestDataCollection = $data['service_requests'] ?? null;
-        if (!is_array($serviceRequestDataCollection)) {
-            throw new IncompleteDataException($data, 'service_requests');
-        }
-
-        try {
-            $serviceRequests = $this->serviceRequestFactory->createCollection($serviceRequestDataCollection);
-        } catch (IncompleteDataException $e) {
-            throw new IncompleteDataException($data, 'service_requests.' . $e->missingKey);
-        }
-
-        $components = [];
-        if (null !== $resultsJob) {
-            $components['results-job'] = $resultsJob;
-        }
-
-        if (null !== $serializedSuite) {
-            $components['serialized-suite'] = $serializedSuite;
-        }
-
-        if (null !== $machine) {
-            $components['machine'] = $machine;
-        }
-
-        $components['worker-job'] = $workerJob;
-
         return new Job(
             $summary,
             $preparation,
             $this->metaStateFactory->create($data),
-            new Components($components),
-            $serviceRequests,
+            new Components([
+                'results-job' => $resultsJob,
+                'serialized-suite' => $serializedSuite,
+                'machine' => $machine,
+                'worker-job' => $workerJob,
+            ]),
         );
     }
 }

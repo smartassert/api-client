@@ -6,32 +6,40 @@ namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MachineActionFailure;
+use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
 readonly class MachineFactory extends AbstractFactory
 {
     public function __construct(
         private MetaStateFactory $metaStateFactory,
+        private ServiceRequestFactory $serviceRequestFactory,
+        private ComponentPreparationFactory $componentPreparationFactory,
     ) {}
 
     /**
      * @param array<mixed> $data
+     *
+     * @throws IncompleteDataException
      */
-    public function create(array $data): ?Machine
+    public function create(array $data): Machine
     {
-        $stateCategory = $this->getNullableNonEmptyString($data, 'state_category');
-        if (null === $stateCategory) {
-            return null;
-        }
-
         $actionFailureData = $data['action_failure'] ?? [];
         $actionFailureData = is_array($actionFailureData) ? $actionFailureData : [];
 
+        $serviceRequestData = $data['requests'] ?? [];
+        $serviceRequestData = is_array($serviceRequestData) ? $serviceRequestData : [];
+
+        $preparationData = $data['preparation'] ?? [];
+        $preparationData = is_array($preparationData) ? $preparationData : [];
+
         return new Machine(
-            $stateCategory,
+            $this->getNullableNonEmptyString($data, 'state_category'),
             $this->getNullableNonEmptyString($data, 'ip_address'),
             $this->createMachineActionFailure($actionFailureData),
             $this->metaStateFactory->create($data),
+            $this->componentPreparationFactory->create($preparationData),
+            $this->serviceRequestFactory->createCollection($serviceRequestData),
         );
     }
 

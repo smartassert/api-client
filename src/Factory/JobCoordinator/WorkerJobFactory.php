@@ -13,6 +13,8 @@ readonly class WorkerJobFactory extends AbstractFactory
 {
     public function __construct(
         private MetaStateFactory $metaStateFactory,
+        private ServiceRequestFactory $serviceRequestFactory,
+        private ComponentPreparationFactory $componentPreparationFactory,
         private WorkerJobCreationFailureFactory $workerJobCreationFailureFactory,
     ) {}
 
@@ -51,6 +53,19 @@ readonly class WorkerJobFactory extends AbstractFactory
             $creationFailure = $this->workerJobCreationFailureFactory->create($creationFailureData);
         }
 
-        return new WorkerJob($state, $this->metaStateFactory->create($data), $components, $creationFailure);
+        $serviceRequestData = $data['requests'] ?? [];
+        $serviceRequestData = is_array($serviceRequestData) ? $serviceRequestData : [];
+
+        $preparationData = $data['preparation'] ?? [];
+        $preparationData = is_array($preparationData) ? $preparationData : [];
+
+        return new WorkerJob(
+            $state,
+            $this->metaStateFactory->create($data),
+            $this->componentPreparationFactory->create($preparationData),
+            $this->serviceRequestFactory->createCollection($serviceRequestData),
+            $components,
+            $creationFailure,
+        );
     }
 }

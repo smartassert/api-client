@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Unit\Data\JobCoordinator\Job;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\ComponentPreparation;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Components;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
@@ -30,15 +31,19 @@ class ComponentsTest extends TestCase
     public static function filterByMetaStateDataProvider(): array
     {
         $endedSucceededMachine = new Machine(
-            'state-category',
+            null,
             null,
             null,
             new MetaState(true, true),
+            new ComponentPreparation('state', 'request-state'),
+            [],
         );
 
         $endedSucceededWorkerJob = new WorkerJob(
             'state',
             new MetaState(true, true),
+            new ComponentPreparation('state', 'request-state'),
+            [],
             [],
             null,
         );
@@ -47,25 +52,33 @@ class ComponentsTest extends TestCase
             'state',
             'end-state',
             new MetaState(true, true),
+            new ComponentPreparation('state', 'request-state'),
+            [],
         );
 
         $endedSucceededSerializedSuite = new SerializedSuite(
             'state',
             new MetaState(true, true),
+            new ComponentPreparation('state', 'request-state'),
+            [],
         );
 
         return [
             'no matching components' => [
                 'components' => new Components([
                     'machine' => new Machine(
-                        'state-category',
+                        null,
                         null,
                         null,
                         new MetaState(false, false),
+                        new ComponentPreparation('state', 'request-state'),
+                        [],
                     ),
                     'worker-job' => new WorkerJob(
                         'state',
                         new MetaState(false, false),
+                        new ComponentPreparation('state', 'request-state'),
+                        [],
                         [],
                         null,
                     ),
@@ -79,6 +92,8 @@ class ComponentsTest extends TestCase
                     'worker-job' => new WorkerJob(
                         'state',
                         new MetaState(false, false),
+                        new ComponentPreparation('state', 'request-state'),
+                        [],
                         [],
                         null,
                     ),
@@ -140,11 +155,15 @@ class ComponentsTest extends TestCase
             null,
             null,
             new MetaState(true, true),
+            new ComponentPreparation('state', 'request-state'),
+            [],
         );
 
         $workerJob = new WorkerJob(
             'state',
             new MetaState(true, true),
+            new ComponentPreparation('state', 'request-state'),
+            [],
             [],
             null,
         );
@@ -153,11 +172,15 @@ class ComponentsTest extends TestCase
             'state',
             'end-state',
             new MetaState(true, true),
+            new ComponentPreparation('state', 'request-state'),
+            [],
         );
 
         $serializedSuite = new SerializedSuite(
             'state',
             new MetaState(true, true),
+            new ComponentPreparation('state', 'request-state'),
+            [],
         );
 
         return [
