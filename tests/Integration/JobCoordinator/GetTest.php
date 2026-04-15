@@ -75,8 +75,8 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
 
         $serializedSuite = $job->components->get('serialized-suite');
         self::assertInstanceOf(SerializedSuite::class, $serializedSuite);
-        self::assertNull($serializedSuite->state);
-        self::assertEquals(new MetaState(false, false), $serializedSuite->metaState);
+        self::assertSame('failed', $serializedSuite->state);
+        self::assertEquals(new MetaState(true, false), $serializedSuite->metaState);
         self::assertEquals(new ComponentPreparation('failed', 'failed'), $serializedSuite->preparation);
         self::assertEquals(
             [
@@ -93,10 +93,10 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
 
         $machine = $job->components->get('machine');
         self::assertInstanceOf(Machine::class, $machine);
-        self::assertNull($machine->stateCategory);
+        self::assertSame('end', $machine->stateCategory);
         self::assertNull($machine->ipAddress);
         self::assertNull($machine->actionFailure);
-        self::assertEquals(new MetaState(false, false), $machine->metaState);
+        self::assertEquals(new MetaState(true, false), $machine->metaState);
         self::assertNotEmpty($machine->serviceRequests);
 
         $workerJob = $job->components->get('worker-job');
