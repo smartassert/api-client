@@ -17,7 +17,7 @@ readonly class MetaStateFactory
         $metaStateData = is_array($metaStateData) ? $metaStateData : null;
 
         if (null === $metaStateData) {
-            return new MetaState(false, false);
+            return new MetaState(ended: false, succeeded: false, pending: true);
         }
 
         $ended = $metaStateData['ended'] ?? false;
@@ -26,6 +26,9 @@ readonly class MetaStateFactory
         $succeeded = $metaStateData['succeeded'] ?? false;
         $succeeded = is_bool($succeeded) ? $succeeded : false;
 
-        return new MetaState($ended, $succeeded);
+        $pending = $metaStateData['pending'] ?? true;
+        $pending = is_bool($pending) ? $pending : true;
+
+        return new MetaState(ended: $ended, succeeded: $succeeded, pending: $pending);
     }
 }

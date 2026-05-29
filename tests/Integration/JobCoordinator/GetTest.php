@@ -48,16 +48,16 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         $createdJob = $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
         $job = $this->getJobAndWaitForSerializedSuiteToReachEndState($apiKey->key, $createdJob->summary->id);
 
-        self::assertEquals(new MetaState(true, false), $job->metaState);
+        self::assertEquals(new MetaState(true, false, false), $job->metaState);
         self::assertSame($suiteId, $job->summary->suiteId);
         self::assertSame($maximumDurationInSeconds, $job->summary->maximumDurationInSeconds);
 
         self::assertTrue(in_array($job->preparation->state, ['preparing', 'failed']));
-        self::assertEquals(new MetaState(true, false), $job->preparation->metaState);
+        self::assertEquals(new MetaState(true, false, false), $job->preparation->metaState);
 
         $resultsJob = $job->components->get('results-job');
         self::assertInstanceOf(ResultsJob::class, $resultsJob);
-        self::assertEquals(new MetaState(false, false), $resultsJob->metaState);
+        self::assertEquals(new MetaState(false, false, true), $resultsJob->metaState);
 
         self::assertTrue(in_array(
             $resultsJob->state,
@@ -77,7 +77,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         $serializedSuite = $job->components->get('serialized-suite');
         self::assertInstanceOf(SerializedSuite::class, $serializedSuite);
         self::assertSame('failed', $serializedSuite->state);
-        self::assertEquals(new MetaState(true, false), $serializedSuite->metaState);
+        self::assertEquals(new MetaState(true, false, false), $serializedSuite->metaState);
         self::assertEquals(new ComponentPreparation('failed', 'failed'), $serializedSuite->preparation);
         self::assertEquals(
             [
@@ -101,7 +101,10 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         $machineHasEnded = 'end' === $machine->stateCategory;
         if ($machineHasEnded) {
             self::assertSame('end', $machine->stateCategory);
-            self::assertEquals(new MetaState(true, false), $machine->metaState);
+            self::assertEquals(new MetaState(true, false, false), $machine->metaState);
+            self::assertNull($machine->ipAddress);
+            self::assertNull($machine->actionFailure);
+            self::assertEquals(new MetaState(true, false, false), $machine->metaState);
             self::assertNotEmpty($machine->serviceRequests);
             self::assertEquals(new ComponentPreparation('failed', 'failed'), $machine->preparation);
         }
@@ -110,7 +113,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
             $machineHasServiceRequests = [] !== $machine->serviceRequests;
 
             self::assertNull($machine->stateCategory);
-            self::assertEquals(new MetaState(false, false), $machine->metaState);
+            self::assertEquals(new MetaState(false, false, true), $machine->metaState);
 
             if ($machineHasServiceRequests) {
                 self::assertNotEmpty($machine->serviceRequests);
@@ -134,13 +137,13 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         $workerJob = $job->components->get('worker-job');
         self::assertInstanceOf(WorkerJob::class, $workerJob);
         self::assertSame('pending', $workerJob->state);
-        self::assertEquals(new MetaState(false, false), $workerJob->metaState);
+        self::assertEquals(new MetaState(false, false, true), $workerJob->metaState);
         self::assertEmpty($workerJob->serviceRequests);
         self::assertEquals(
             [
-                'compilation' => new WorkerJobComponent('pending', new MetaState(false, false)),
-                'execution' => new WorkerJobComponent('pending', new MetaState(false, false)),
-                'event_delivery' => new WorkerJobComponent('pending', new MetaState(false, false)),
+                'compilation' => new WorkerJobComponent('pending', new MetaState(false, false, true)),
+                'execution' => new WorkerJobComponent('pending', new MetaState(false, false, true)),
+                'event_delivery' => new WorkerJobComponent('pending', new MetaState(false, false, true)),
             ],
             $workerJob->componentStates,
         );

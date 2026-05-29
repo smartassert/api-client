@@ -33,7 +33,7 @@ class JobTest extends TestCase
         $resultsJob = new ResultsJob(
             'state',
             null,
-            new MetaState(false, false),
+            new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
@@ -42,7 +42,7 @@ class JobTest extends TestCase
             'state-category',
             null,
             null,
-            new MetaState(false, false),
+            new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
@@ -51,8 +51,8 @@ class JobTest extends TestCase
             'no components' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([]),
                 ),
                 'expected' => null,
@@ -60,8 +60,8 @@ class JobTest extends TestCase
             'no results job component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'machine' => $machine,
                     ]),
@@ -71,8 +71,8 @@ class JobTest extends TestCase
             'incorrectly-named results job component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'results-job' => $machine,
                     ]),
@@ -82,8 +82,8 @@ class JobTest extends TestCase
             'has results job component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'results-job' => $resultsJob,
                     ]),
@@ -107,14 +107,14 @@ class JobTest extends TestCase
         $resultsJob = new ResultsJob(
             'state',
             null,
-            new MetaState(false, false),
+            new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
 
         $serializedSuite = new SerializedSuite(
             'state',
-            new MetaState(false, false),
+            new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
@@ -123,8 +123,8 @@ class JobTest extends TestCase
             'no components' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([]),
                 ),
                 'expected' => null,
@@ -132,8 +132,8 @@ class JobTest extends TestCase
             'no serialized suite component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'results-job' => $resultsJob,
                     ]),
@@ -143,8 +143,8 @@ class JobTest extends TestCase
             'incorrectly-named serialized suite component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'serialized-suite' => $resultsJob,
                     ]),
@@ -154,8 +154,8 @@ class JobTest extends TestCase
             'has serialized suite component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'serialized-suite' => $serializedSuite,
                     ]),
@@ -179,7 +179,7 @@ class JobTest extends TestCase
         $resultsJob = new ResultsJob(
             'state',
             null,
-            new MetaState(false, false),
+            new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
@@ -188,7 +188,7 @@ class JobTest extends TestCase
             'state-category',
             null,
             null,
-            new MetaState(false, false),
+            new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
@@ -197,8 +197,8 @@ class JobTest extends TestCase
             'no components' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([]),
                 ),
                 'expected' => null,
@@ -206,8 +206,8 @@ class JobTest extends TestCase
             'no machine component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'results-job' => $resultsJob,
                     ]),
@@ -217,8 +217,8 @@ class JobTest extends TestCase
             'incorrectly-named machine component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'machine' => $resultsJob,
                     ]),
@@ -228,8 +228,8 @@ class JobTest extends TestCase
             'has machine component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'machine' => $machine,
                     ]),
@@ -253,14 +253,14 @@ class JobTest extends TestCase
         $resultsJob = new ResultsJob(
             'state',
             null,
-            new MetaState(false, false),
+            new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
 
         $workerJob = new WorkerJob(
             'state',
-            new MetaState(false, false),
+            new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
             [],
@@ -271,8 +271,8 @@ class JobTest extends TestCase
             'no components' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([]),
                 ),
                 'expected' => null,
@@ -280,8 +280,8 @@ class JobTest extends TestCase
             'no worker job component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'results-job' => $resultsJob,
                     ]),
@@ -291,8 +291,8 @@ class JobTest extends TestCase
             'incorrectly-named worker job component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'worker-job' => $resultsJob,
                     ]),
@@ -302,8 +302,8 @@ class JobTest extends TestCase
             'has worker job component' => [
                 'job' => new Job(
                     new Summary('id', 'suiteId', 600),
-                    new Preparation('state', new MetaState(false, false)),
-                    new MetaState(false, false),
+                    new Preparation('state', new MetaState(false, false, true)),
+                    new MetaState(false, false, true),
                     new Components([
                         'worker-job' => $workerJob,
                     ]),
