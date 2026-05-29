@@ -95,11 +95,12 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         $machine = $job->components->get('machine');
         self::assertInstanceOf(Machine::class, $machine);
 
+        self::assertNull($machine->ipAddress);
+        self::assertNull($machine->actionFailure);
+
         $machineHasEnded = 'end' === $machine->stateCategory;
         if ($machineHasEnded) {
             self::assertSame('end', $machine->stateCategory);
-            self::assertNull($machine->ipAddress);
-            self::assertNull($machine->actionFailure);
             self::assertEquals(new MetaState(true, false), $machine->metaState);
             self::assertNotEmpty($machine->serviceRequests);
             self::assertEquals(new ComponentPreparation('failed', 'failed'), $machine->preparation);
@@ -108,11 +109,10 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         if (!$machineHasEnded) {
             $machineHasServiceRequests = [] !== $machine->serviceRequests;
 
+            self::assertNull($machine->stateCategory);
+            self::assertEquals(new MetaState(false, false), $machine->metaState);
+
             if ($machineHasServiceRequests) {
-                self::assertNull($machine->stateCategory);
-                self::assertNull($machine->ipAddress);
-                self::assertNull($machine->actionFailure);
-                self::assertEquals(new MetaState(false, false), $machine->metaState);
                 self::assertNotEmpty($machine->serviceRequests);
                 self::assertTrue(
                     $this->isComponentPreparationIsOneOf(
@@ -126,10 +126,6 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
             }
 
             if (!$machineHasServiceRequests) {
-                self::assertNull($machine->stateCategory);
-                self::assertNull($machine->ipAddress);
-                self::assertNull($machine->actionFailure);
-                self::assertEquals(new MetaState(false, false), $machine->metaState);
                 self::assertEmpty($machine->serviceRequests);
                 self::assertEquals(new ComponentPreparation('pending', 'pending'), $machine->preparation);
             }
