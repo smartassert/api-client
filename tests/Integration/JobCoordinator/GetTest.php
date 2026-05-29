@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\JobCoordinator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ComponentPreparation;
+use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Machine;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\MetaState;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ResultsJob;
@@ -20,6 +21,8 @@ use Symfony\Component\Uid\Ulid;
 
 class GetTest extends AbstractJobCoordinatorClientTestCase
 {
+    private const int MICROSECONDS_PER_SECOND = 1000000;
+
     public function testGetUnauthorized(): void
     {
         $exception = null;
@@ -43,9 +46,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         $suiteId = (string) new Ulid();
 
         $createdJob = $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
-        sleep(1);
-
-        $job = $this->jobCoordinatorClient->get($apiKey->key, $createdJob->summary->id);
+        $job = $this->getJobAndWaitForSerializedSuiteToReachEndState($apiKey->key, $createdJob->summary->id);
 
         self::assertEquals(new MetaState(true, false), $job->metaState);
         self::assertSame($suiteId, $job->summary->suiteId);
@@ -93,11 +94,46 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
 
         $machine = $job->components->get('machine');
         self::assertInstanceOf(Machine::class, $machine);
-        self::assertSame('end', $machine->stateCategory);
-        self::assertNull($machine->ipAddress);
-        self::assertNull($machine->actionFailure);
-        self::assertEquals(new MetaState(true, false), $machine->metaState);
-        self::assertNotEmpty($machine->serviceRequests);
+
+        $machineHasEnded = 'end' === $machine->stateCategory;
+        if ($machineHasEnded) {
+            self::assertSame('end', $machine->stateCategory);
+            self::assertNull($machine->ipAddress);
+            self::assertNull($machine->actionFailure);
+            self::assertEquals(new MetaState(true, false), $machine->metaState);
+            self::assertNotEmpty($machine->serviceRequests);
+            self::assertEquals(new ComponentPreparation('failed', 'failed'), $machine->preparation);
+        }
+
+        if (!$machineHasEnded) {
+            $machineHasServiceRequests = [] !== $machine->serviceRequests;
+
+            if ($machineHasServiceRequests) {
+                self::assertNull($machine->stateCategory);
+                self::assertNull($machine->ipAddress);
+                self::assertNull($machine->actionFailure);
+                self::assertEquals(new MetaState(false, false), $machine->metaState);
+                self::assertNotEmpty($machine->serviceRequests);
+                self::assertTrue(
+                    $this->isComponentPreparationIsOneOf(
+                        [
+                            new ComponentPreparation('preparing', 'requesting'),
+                            new ComponentPreparation('preparing', 'halted'),
+                        ],
+                        $machine->preparation
+                    )
+                );
+            }
+
+            if (!$machineHasServiceRequests) {
+                self::assertNull($machine->stateCategory);
+                self::assertNull($machine->ipAddress);
+                self::assertNull($machine->actionFailure);
+                self::assertEquals(new MetaState(false, false), $machine->metaState);
+                self::assertEmpty($machine->serviceRequests);
+                self::assertEquals(new ComponentPreparation('pending', 'pending'), $machine->preparation);
+            }
+        }
 
         $workerJob = $job->components->get('worker-job');
         self::assertInstanceOf(WorkerJob::class, $workerJob);
@@ -124,5 +160,63 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                 'maximumDurationInSeconds' => 600,
             ],
         ];
+    }
+
+    /**
+     * @param ComponentPreparation[] $values
+     */
+    private function isComponentPreparationIsOneOf(array $values, ComponentPreparation $componentPreparation): bool
+    {
+        foreach ($values as $value) {
+            if (
+                $value->state === $componentPreparation->state
+                && $value->requestState === $componentPreparation->requestState
+                && (
+                    null === $value->failure
+                    || (
+                        $value->failure->type === $componentPreparation->failure?->type
+                        && $value->failure->code === $componentPreparation->failure?->code
+                        && $value->failure->message === $componentPreparation->failure?->message
+                    )
+                )
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param non-empty-string $apiKey
+     * @param non-empty-string $jobId
+     */
+    private function getJobAndWaitForSerializedSuiteToReachEndState(string $apiKey, string $jobId): Job
+    {
+        $waitThreshold = self::MICROSECONDS_PER_SECOND * 5;
+        $totalWaitTime = 0;
+        $period = (int) (self::MICROSECONDS_PER_SECOND * 0.5);
+
+        $job = $this->jobCoordinatorClient->get($apiKey, $jobId);
+        $serializedSuite = $job->components->get('serialized-suite');
+        \assert($serializedSuite instanceof SerializedSuite);
+        $has = 'failed' === $serializedSuite->state;
+
+        while (false === $has && $totalWaitTime < $waitThreshold) {
+            $totalWaitTime += $period;
+            usleep($period);
+
+            $job = $this->jobCoordinatorClient->get($apiKey, $jobId);
+            $serializedSuite = $job->components->get('serialized-suite');
+            \assert($serializedSuite instanceof SerializedSuite);
+
+            $has = 'failed' === $serializedSuite->state;
+        }
+
+        if ($totalWaitTime >= $waitThreshold) {
+            throw new \RuntimeException('Exceeded threshold waiting for serialized suite to end.');
+        }
+
+        return $job;
     }
 }
