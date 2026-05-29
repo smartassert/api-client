@@ -171,8 +171,8 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                     null === $value->failure
                     || (
                         $value->failure->type === $componentPreparation->failure?->type
-                        && $value->failure->code === $componentPreparation->failure?->code
-                        && $value->failure->message === $componentPreparation->failure?->message
+                        && $value->failure->code === $componentPreparation->failure->code
+                        && $value->failure->message === $componentPreparation->failure->message
                     )
                 )
             ) {
