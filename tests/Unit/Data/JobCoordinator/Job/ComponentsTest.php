@@ -34,14 +34,14 @@ class ComponentsTest extends TestCase
             null,
             null,
             null,
-            new MetaState(true, true),
+            new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
 
         $endedSucceededWorkerJob = new WorkerJob(
             'state',
-            new MetaState(true, true),
+            new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
             [],
@@ -51,14 +51,14 @@ class ComponentsTest extends TestCase
         $endedSucceededResultsJob = new ResultsJob(
             'state',
             'end-state',
-            new MetaState(true, true),
+            new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
 
         $endedSucceededSerializedSuite = new SerializedSuite(
             'state',
-            new MetaState(true, true),
+            new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
@@ -70,20 +70,20 @@ class ComponentsTest extends TestCase
                         null,
                         null,
                         null,
-                        new MetaState(false, false),
+                        new MetaState(false, false, true),
                         new ComponentPreparation('state', 'request-state'),
                         [],
                     ),
                     'worker-job' => new WorkerJob(
                         'state',
-                        new MetaState(false, false),
+                        new MetaState(false, false, true),
                         new ComponentPreparation('state', 'request-state'),
                         [],
                         [],
                         null,
                     ),
                 ]),
-                'metaState' => new MetaState(true, true),
+                'metaState' => new MetaState(true, true, false),
                 'expected' => new Components([]),
             ],
             'single matching component' => [
@@ -91,14 +91,14 @@ class ComponentsTest extends TestCase
                     'machine' => $endedSucceededMachine,
                     'worker-job' => new WorkerJob(
                         'state',
-                        new MetaState(false, false),
+                        new MetaState(false, false, true),
                         new ComponentPreparation('state', 'request-state'),
                         [],
                         [],
                         null,
                     ),
                 ]),
-                'metaState' => new MetaState(true, true),
+                'metaState' => new MetaState(true, true, false),
                 'expected' => new Components([
                     'machine' => $endedSucceededMachine,
                 ]),
@@ -108,7 +108,7 @@ class ComponentsTest extends TestCase
                     'machine' => $endedSucceededMachine,
                     'worker-job' => $endedSucceededWorkerJob,
                 ]),
-                'metaState' => new MetaState(true, true),
+                'metaState' => new MetaState(true, true, false),
                 'expected' => new Components([
                     'machine' => $endedSucceededMachine,
                     'worker-job' => $endedSucceededWorkerJob,
@@ -121,7 +121,7 @@ class ComponentsTest extends TestCase
                     'machine' => $endedSucceededMachine,
                     'worker-job' => $endedSucceededWorkerJob,
                 ]),
-                'metaState' => new MetaState(true, true),
+                'metaState' => new MetaState(true, true, false),
                 'expected' => new Components([
                     'results-job' => $endedSucceededResultsJob,
                     'serialized-suite' => $endedSucceededSerializedSuite,
@@ -154,14 +154,14 @@ class ComponentsTest extends TestCase
             'state-category',
             null,
             null,
-            new MetaState(true, true),
+            new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
 
         $workerJob = new WorkerJob(
             'state',
-            new MetaState(true, true),
+            new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
             [],
@@ -171,14 +171,14 @@ class ComponentsTest extends TestCase
         $resultsJob = new ResultsJob(
             'state',
             'end-state',
-            new MetaState(true, true),
+            new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
         );
 
         $serializedSuite = new SerializedSuite(
             'state',
-            new MetaState(true, true),
+            new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
         );

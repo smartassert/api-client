@@ -497,22 +497,34 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                 'meta_state' => [
                     'ended' => false,
                     'succeeded' => false,
+                    'pending' => true,
                 ],
                 'preparation' => [
                     'state' => 'requesting',
                     'meta_state' => [
                         'ended' => false,
                         'succeeded' => false,
+                        'pending' => true,
                     ],
                 ],
                 'components' => [
                     'results-job' => [
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                            'pending' => true,
+                        ],
                         'preparation' => [
                             'state' => 'pending',
                             'request_state' => 'pending',
                         ],
                     ],
                     'serialized-suite' => [
+                        'meta_state' => [
+                            'ended' => false,
+                            'succeeded' => false,
+                            'pending' => true,
+                        ],
                         'preparation' => [
                             'state' => 'pending',
                             'request_state' => 'pending',
@@ -525,6 +537,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                         'meta_state' => [
                             'ended' => false,
                             'succeeded' => false,
+                            'pending' => true,
                         ],
                         'preparation' => [
                             'state' => 'pending',
@@ -534,8 +547,9 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                     'worker-job' => [
                         'state' => 'pending',
                         'meta_state' => [
-                            'ended' => true,
+                            'ended' => false,
                             'succeeded' => false,
+                            'pending' => true,
                         ],
                         'preparation' => [
                             'state' => 'pending',
@@ -555,6 +569,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                                 'meta_state' => [
                                     'ended' => false,
                                     'succeeded' => false,
+                                    'pending' => true,
                                 ],
                             ],
                             'execution' => [
@@ -562,6 +577,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                                 'meta_state' => [
                                     'ended' => false,
                                     'succeeded' => false,
+                                    'pending' => true,
                                 ],
                             ],
                             'event_delivery' => [
@@ -569,6 +585,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                                 'meta_state' => [
                                     'ended' => false,
                                     'succeeded' => false,
+                                    'pending' => true,
                                 ],
                             ],
                         ],
