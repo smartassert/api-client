@@ -35,7 +35,10 @@ readonly class ResourceReferenceCollectionFactory extends AbstractFactory
             try {
                 $references[] = $this->resourceReferenceFactory->create($referenceData);
             } catch (IncompleteDataException $e) {
-                throw new IncompleteDataException($data, 'related_reference[' . $referenceIndex . '].' . $e->missingKey);
+                throw new IncompleteDataException(
+                    $data,
+                    'related_reference[' . $referenceIndex . '].' . $e->missingKey
+                );
             }
         }
 
