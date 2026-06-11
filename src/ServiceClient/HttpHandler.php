@@ -90,18 +90,12 @@ readonly class HttpHandler
 
         $contentType = $response->getHeaderLine('content-type');
         if ('application/json' !== $contentType) {
-            throw new ClientException(
-                $requestSpecification,
-                new UnexpectedResponseFormatException($contentType, null)
-            );
+            throw new UnexpectedResponseFormatException($requestSpecification, $contentType, null);
         }
 
         $responseData = json_decode($response->getBody()->getContents(), true);
         if (!is_array($responseData)) {
-            throw new ClientException(
-                $requestSpecification,
-                new UnexpectedResponseFormatException($contentType, gettype($responseData))
-            );
+            throw new UnexpectedResponseFormatException($requestSpecification, $contentType, gettype($responseData));
         }
 
         return $responseData;

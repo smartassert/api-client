@@ -9,10 +9,10 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientExceptionInterface as Psr7ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\CommonNonSuccessResponseDataProviderTrait;
@@ -68,7 +68,7 @@ abstract class AbstractClientTestCase extends TestCase
      */
     #[DataProvider('clientActionThrowsExceptionDataProvider')]
     public function testClientActionThrowsException(
-        ClientExceptionInterface|ResponseInterface $httpFixture,
+        Psr7ClientExceptionInterface|ResponseInterface $httpFixture,
         string $expectedExceptionClass,
     ): void {
         $this->mockHandler->append($httpFixture);
@@ -80,7 +80,7 @@ abstract class AbstractClientTestCase extends TestCase
         } catch (\Throwable $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ClientExceptionInterface::class, $exception);
         self::assertInstanceOf($expectedExceptionClass, $exception->getInnerException());
     }
 
