@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Body\FormBody;
@@ -24,7 +25,7 @@ readonly class GitSourceClient
     /**
      * @param non-empty-string $apiKey
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function create(
         string $apiKey,
@@ -40,7 +41,7 @@ readonly class GitSourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function update(
         string $apiKey,
@@ -54,7 +55,7 @@ readonly class GitSourceClient
     }
 
     /**
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     private function doAction(
         string $method,

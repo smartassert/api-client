@@ -8,6 +8,7 @@ use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Data\User\Token;
 use SmartAssert\ApiClient\Data\User\User;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
@@ -32,7 +33,7 @@ readonly class UsersClient
     ) {}
 
     /**
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function createToken(string $userIdentifier, string $password): Token
     {
@@ -55,7 +56,7 @@ readonly class UsersClient
     /**
      * @param non-empty-string $token
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function verifyToken(string $token): User
     {
@@ -77,7 +78,7 @@ readonly class UsersClient
     /**
      * @param non-empty-string $refreshToken
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function refreshToken(string $refreshToken): Token
     {
@@ -102,7 +103,7 @@ readonly class UsersClient
      * @param non-empty-string $userIdentifier
      * @param non-empty-string $password
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
@@ -139,7 +140,7 @@ readonly class UsersClient
      * @param non-empty-string $adminToken
      * @param non-empty-string $userId
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
@@ -155,7 +156,7 @@ readonly class UsersClient
      * @param non-empty-string $token
      * @param non-empty-string $refreshToken
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
@@ -170,7 +171,7 @@ readonly class UsersClient
     /**
      * @param non-empty-string $token
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function getApiKey(string $token): ApiKey
     {
@@ -198,7 +199,7 @@ readonly class UsersClient
      *
      * @return ApiKey[]
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function getApiKeys(string $token): array
     {

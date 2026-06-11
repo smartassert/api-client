@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\ServiceClient;
 
 use GuzzleHttp\Psr7\Request;
-use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientExceptionInterface as Psr7ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
@@ -36,7 +37,7 @@ readonly class HttpHandler
     ) {}
 
     /**
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function sendRequest(RequestSpecification $requestSpecification): ResponseInterface
     {
@@ -44,7 +45,7 @@ readonly class HttpHandler
 
         try {
             $response = $this->httpClient->sendRequest($request);
-        } catch (ClientExceptionInterface $e) {
+        } catch (Psr7ClientExceptionInterface $e) {
             throw new ClientException($requestSpecification, $e);
         }
 
@@ -81,7 +82,7 @@ readonly class HttpHandler
     /**
      * @return array<mixed>
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function getJson(RequestSpecification $requestSpecification): array
     {

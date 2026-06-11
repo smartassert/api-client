@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -26,7 +27,7 @@ readonly class FileClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function create(string $apiKey, string $sourceId, string $filename, string $content): void
     {
@@ -42,7 +43,7 @@ readonly class FileClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function read(string $apiKey, string $sourceId, string $filename): string
     {
@@ -72,7 +73,7 @@ readonly class FileClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
@@ -98,7 +99,7 @@ readonly class FileClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function delete(string $apiKey, string $sourceId, string $filename): void
     {

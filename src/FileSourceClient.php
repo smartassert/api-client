@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient;
 use SmartAssert\ApiClient\Data\Source\File;
 use SmartAssert\ApiClient\Data\Source\FileSource;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Body\FormBody;
@@ -25,7 +26,7 @@ readonly class FileSourceClient
     /**
      * @param non-empty-string $apiKey
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function create(string $apiKey, string $label): FileSource
     {
@@ -36,7 +37,7 @@ readonly class FileSourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function update(string $apiKey, string $id, string $label): FileSource
     {
@@ -49,7 +50,7 @@ readonly class FileSourceClient
      *
      * @return File[]
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function list(string $apiKey, string $id): array
     {
@@ -79,7 +80,7 @@ readonly class FileSourceClient
     }
 
     /**
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     private function makeMutationRequest(string $method, string $apiKey, ?string $id, string $label): FileSource
     {
