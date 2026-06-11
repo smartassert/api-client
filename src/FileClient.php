@@ -56,7 +56,7 @@ readonly class FileClient
                     new AcceptableContentTypesHeader(['application/yaml', 'text/x-yaml']),
                 ]),
             ));
-        } catch (ClientException $e) {
+        } catch (ClientExceptionInterface $e) {
             $innerException = $e->getInnerException();
 
             if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {
@@ -84,7 +84,7 @@ readonly class FileClient
                 new ApiKeyAuthorizationHeader($apiKey),
                 new YamlBody($content),
             ));
-        } catch (ClientException $e) {
+        } catch (ClientExceptionInterface $e) {
             $innerException = $e->getInnerException();
 
             if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {
@@ -109,7 +109,7 @@ readonly class FileClient
                 $this->createRouteRequirements($sourceId, $filename),
                 new ApiKeyAuthorizationHeader($apiKey),
             ));
-        } catch (ClientException $e) {
+        } catch (ClientExceptionInterface $e) {
             $innerException = $e->getInnerException();
 
             if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {

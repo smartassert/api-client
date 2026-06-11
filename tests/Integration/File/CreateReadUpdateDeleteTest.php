@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
-use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 
 class CreateReadUpdateDeleteTest extends AbstractFileTestCase
@@ -40,10 +40,10 @@ class CreateReadUpdateDeleteTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->read($apiKey->key, $fileSource->id, $filename);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ClientExceptionInterface::class, $exception);
 
         $fileNotFoundException = $exception->getInnerException();
         self::assertInstanceOf(FileNotFoundException::class, $fileNotFoundException);

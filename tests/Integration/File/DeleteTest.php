@@ -25,7 +25,7 @@ class DeleteTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->delete(md5((string) rand()), md5((string) rand()), md5((string) rand()) . '.yaml');
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
         self::assertInstanceOf(ClientException::class, $exception);
