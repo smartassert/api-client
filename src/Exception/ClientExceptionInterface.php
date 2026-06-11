@@ -12,28 +12,9 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Request\RequestSpecification;
 
-class ClientException extends \Exception implements ClientExceptionInterface
+interface ClientExceptionInterface
 {
-    public function __construct(
-        private readonly RequestSpecification $requestSpecification,
-        private readonly AlreadyExistsException|
-        ErrorException|
-        FileNotFoundException|
-        ForbiddenException|
-        HttpException|
-        IncompleteDataException|
-        NotFoundException|
-        Psr7ClientInterface|
-        UnauthorizedException|
-        UnexpectedResponseFormatException $innerException,
-    ) {
-        parent::__construct();
-    }
-
-    public function getRequestSpecification(): RequestSpecification
-    {
-        return $this->requestSpecification;
-    }
+    public function getRequestSpecification(): RequestSpecification;
 
     public function getInnerException(): AlreadyExistsException|
     ErrorException|
@@ -44,8 +25,5 @@ class ClientException extends \Exception implements ClientExceptionInterface
     NotFoundException|
     Psr7ClientInterface|
     UnauthorizedException|
-    UnexpectedResponseFormatException
-    {
-        return $this->innerException;
-    }
+    UnexpectedResponseFormatException;
 }
