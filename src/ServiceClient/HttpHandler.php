@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\ServiceClient;
 
 use GuzzleHttp\Psr7\Request;
-use Psr\Http\Client\ClientExceptionInterface as Psr7ClientExceptionInterface;
+use Psr\Http\Client\ClientExceptionInterface as PsrClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
+use SmartAssert\ApiClient\Exception\HttpClientException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Request\Body\BodyInterface;
@@ -45,8 +45,8 @@ readonly class HttpHandler
 
         try {
             $response = $this->httpClient->sendRequest($request);
-        } catch (Psr7ClientExceptionInterface $e) {
-            throw new ClientException($requestSpecification, $e);
+        } catch (PsrClientExceptionInterface $e) {
+            throw new HttpClientException($requestSpecification, $e);
         }
 
         $statusCode = $response->getStatusCode();
