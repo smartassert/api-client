@@ -15,7 +15,7 @@ use SmartAssert\ApiClient\Request\RequestSpecification;
 class ClientException extends \Exception
 {
     public function __construct(
-        private readonly RequestSpecification           $requestSpecification,
+        private readonly RequestSpecification $requestSpecification,
         private readonly AlreadyExistsException|
         ErrorException|
         FileNotFoundException|
