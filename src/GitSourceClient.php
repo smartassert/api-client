@@ -82,7 +82,7 @@ readonly class GitSourceClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 }

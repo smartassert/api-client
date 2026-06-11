@@ -59,7 +59,7 @@ readonly class FileClient
             $innerException = $e->getInnerException();
 
             if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {
-                throw new ClientException($e->getRequestName(), new FileNotFoundException($filename));
+                throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
             }
 
             throw $e;
@@ -87,7 +87,7 @@ readonly class FileClient
             $innerException = $e->getInnerException();
 
             if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {
-                throw new ClientException($e->getRequestName(), new FileNotFoundException($filename));
+                throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
             }
 
             throw $e;
@@ -112,7 +112,7 @@ readonly class FileClient
             $innerException = $e->getInnerException();
 
             if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {
-                throw new ClientException($e->getRequestName(), new FileNotFoundException($filename));
+                throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
             }
 
             throw $e;

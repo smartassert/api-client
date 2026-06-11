@@ -41,25 +41,24 @@ readonly class HttpHandler
     public function sendRequest(RequestSpecification $requestSpecification): ResponseInterface
     {
         $request = $this->createRequest($requestSpecification);
-        $requestName = $requestSpecification->getName();
 
         try {
             $response = $this->httpClient->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
-            throw new ClientException($requestName, $e);
+            throw new ClientException($requestSpecification, $e);
         }
 
         $statusCode = $response->getStatusCode();
         if (401 === $statusCode) {
-            throw new ClientException($requestName, new UnauthorizedException());
+            throw new ClientException($requestSpecification, new UnauthorizedException());
         }
 
         if (403 === $statusCode) {
-            throw new ClientException($requestName, new ForbiddenException());
+            throw new ClientException($requestSpecification, new ForbiddenException());
         }
 
         if (404 === $statusCode) {
-            throw new ClientException($requestName, new NotFoundException());
+            throw new ClientException($requestSpecification, new NotFoundException());
         }
 
         if (200 !== $statusCode) {
@@ -73,7 +72,7 @@ readonly class HttpHandler
                 $exception = new HttpException($request, $response);
             }
 
-            throw new ClientException($requestName, $exception);
+            throw new ClientException($requestSpecification, $exception);
         }
 
         return $response;
@@ -86,14 +85,12 @@ readonly class HttpHandler
      */
     public function getJson(RequestSpecification $requestSpecification): array
     {
-        $requestName = $requestSpecification->getName();
-
         $response = $this->sendRequest($requestSpecification);
 
         $contentType = $response->getHeaderLine('content-type');
         if ('application/json' !== $contentType) {
             throw new ClientException(
-                $requestName,
+                $requestSpecification,
                 new UnexpectedResponseFormatException($contentType, null)
             );
         }
@@ -101,7 +98,7 @@ readonly class HttpHandler
         $responseData = json_decode($response->getBody()->getContents(), true);
         if (!is_array($responseData)) {
             throw new ClientException(
-                $requestName,
+                $requestSpecification,
                 new UnexpectedResponseFormatException($contentType, gettype($responseData))
             );
         }

@@ -33,7 +33,7 @@ trait ClientActionThrowsIncompleteDataExceptionTestTrait
         }
 
         self::assertInstanceOf(ClientException::class, $exception);
-        self::assertSame($expectedRequestName, $exception->getRequestName());
+        self::assertSame($expectedRequestName, $exception->getRequestSpecification());
 
         $innerException = $exception->getInnerException();
         self::assertInstanceOf(IncompleteDataException::class, $innerException);

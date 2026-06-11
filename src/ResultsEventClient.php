@@ -54,7 +54,7 @@ readonly class ResultsEventClient
                 $event = $this->eventFactory->create($eventData);
             } catch (IncompleteDataException $e) {
                 throw new ClientException(
-                    $requestSpecification->getName(),
+                    $requestSpecification,
                     new IncompleteDataException($data, $dataIndex . '.' . $e->missingKey)
                 );
             }
