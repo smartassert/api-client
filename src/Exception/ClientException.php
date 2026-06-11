@@ -6,16 +6,13 @@ namespace SmartAssert\ApiClient\Exception;
 
 use Psr\Http\Client\ClientExceptionInterface as Psr7ClientInterface;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
-use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Request\RequestSpecification;
 
 class ClientException extends \Exception implements ClientExceptionInterface
 {
     public function __construct(
         private readonly RequestSpecification $requestSpecification,
-        private readonly IncompleteDataException|
-        Psr7ClientInterface|
-        UnexpectedResponseFormatException $innerException,
+        private readonly IncompleteDataException|Psr7ClientInterface $innerException,
     ) {
         parent::__construct();
     }
@@ -25,9 +22,7 @@ class ClientException extends \Exception implements ClientExceptionInterface
         return $this->requestSpecification;
     }
 
-    public function getInnerException(): IncompleteDataException|
-    Psr7ClientInterface|
-    UnexpectedResponseFormatException
+    public function getInnerException(): IncompleteDataException|Psr7ClientInterface
     {
         return $this->innerException;
     }
