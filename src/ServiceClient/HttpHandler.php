@@ -66,14 +66,14 @@ readonly class HttpHandler
             try {
                 $error = $this->errorFactory->createFromResponse($response);
 
-                $exception = $error instanceof ErrorInterface
-                    ? new ErrorException($error)
-                    : new HttpException($request, $response);
-            } catch (ErrorDeserializationException | UnknownErrorClassException) {
-                $exception = new HttpException($request, $response);
-            }
+                if ($error instanceof ErrorInterface) {
+                    throw new ErrorException($requestSpecification, $error);
+                }
 
-            throw new ClientException($requestSpecification, $exception);
+                throw new HttpException($requestSpecification, $request, $response);
+            } catch (ErrorDeserializationException | UnknownErrorClassException) {
+                throw new HttpException($requestSpecification, $request, $response);
+            }
         }
 
         return $response;

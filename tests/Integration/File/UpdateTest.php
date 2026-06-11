@@ -49,15 +49,12 @@ class UpdateTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->update($apiKey->key, $source->getId(), '', md5((string) rand()));
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ErrorException::class, $exception);
 
-        $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorException::class, $errorException);
-
-        $error = $errorException->getError();
+        $error = $exception->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
 
         self::assertEquals(

@@ -101,11 +101,8 @@ abstract class AbstractClientTestCase extends TestCase
         } catch (\Throwable $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-
-        $httpException = $exception->getInnerException();
-        self::assertInstanceOf(HttpException::class, $httpException);
-        self::assertSame($httpFixture, $httpException->getResponse());
+        self::assertInstanceOf(HttpException::class, $exception);
+        self::assertSame($httpFixture, $exception->getResponse());
     }
 
     protected function getLastRequest(): RequestInterface

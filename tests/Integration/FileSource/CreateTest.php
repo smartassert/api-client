@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\FileSource;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -38,15 +37,12 @@ class CreateTest extends AbstractIntegrationTestCase
 
         try {
             self::$fileSourceClient->create($apiKey->key, $label);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ErrorException::class, $exception);
 
-        $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorException::class, $errorException);
-
-        $error = $errorException->getError();
+        $error = $exception->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
         self::assertEquals($expected, $error);
     }
