@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -26,11 +27,10 @@ class CreateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->create(md5((string) rand()), $source->id, md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testCreateSourceNotFound(): void
@@ -42,11 +42,10 @@ class CreateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->create($apiKey->key, md5((string) rand()), md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testCreateWithSourceNotAuthorized(): void
@@ -63,11 +62,10 @@ class CreateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->create($user1ApiKey->key, $source->id, md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     /**

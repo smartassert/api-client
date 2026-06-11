@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Data\Source\Suite;
 use SmartAssert\ApiClient\Data\User\ApiKey;
-use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\SuiteClient;
@@ -24,11 +24,10 @@ class ListTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->list(md5((string) rand()));
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testGetSuiteNotFound(): void
@@ -41,11 +40,10 @@ class ListTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->get($apiKey->key, $suiteId);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testGetSourceNotFound(): void

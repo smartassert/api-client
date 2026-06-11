@@ -15,7 +15,7 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
-use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use Symfony\Component\Uid\Ulid;
 
@@ -30,11 +30,10 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
 
         try {
             $this->jobCoordinatorClient->get(md5((string) rand()), $jobId);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     #[DataProvider('getSuccessDataProvider')]

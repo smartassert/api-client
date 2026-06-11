@@ -56,14 +56,8 @@ readonly class FileClient
                     new AcceptableContentTypesHeader(['application/yaml', 'text/x-yaml']),
                 ]),
             ));
-        } catch (ClientException $e) {
-            $innerException = $e->getInnerException();
-
-            if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {
-                throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
-            }
-
-            throw $e;
+        } catch (NotFoundException | UnauthorizedException $e) {
+            throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
         }
 
         return $response->getBody()->getContents();
@@ -84,14 +78,8 @@ readonly class FileClient
                 new ApiKeyAuthorizationHeader($apiKey),
                 new YamlBody($content),
             ));
-        } catch (ClientException $e) {
-            $innerException = $e->getInnerException();
-
-            if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {
-                throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
-            }
-
-            throw $e;
+        } catch (NotFoundException | UnauthorizedException $e) {
+            throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
         }
     }
 
@@ -109,14 +97,8 @@ readonly class FileClient
                 $this->createRouteRequirements($sourceId, $filename),
                 new ApiKeyAuthorizationHeader($apiKey),
             ));
-        } catch (ClientException $e) {
-            $innerException = $e->getInnerException();
-
-            if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {
-                throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
-            }
-
-            throw $e;
+        } catch (NotFoundException | UnauthorizedException $e) {
+            throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
         }
     }
 

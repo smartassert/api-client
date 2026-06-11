@@ -7,7 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\Source;
 use SmartAssert\ApiClient\Data\Source\FileSource;
 use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Data\User\ApiKey;
-use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Integration\AbstractIntegrationTestCase;
@@ -22,11 +22,10 @@ class GetTest extends AbstractIntegrationTestCase
 
         try {
             self::$sourceClient->get(md5((string) rand()), $id);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testGetNotFound(): void
@@ -39,11 +38,10 @@ class GetTest extends AbstractIntegrationTestCase
 
         try {
             self::$sourceClient->get($apiKey->key, $id);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testGetFileSourceSuccess(): void

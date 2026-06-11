@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -53,11 +54,10 @@ class UpdateTest extends AbstractIntegrationTestCase
                 md5((string) rand()),
                 null
             );
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     #[DataProvider('badRequestDataProvider')]
@@ -256,10 +256,9 @@ class UpdateTest extends AbstractIntegrationTestCase
                 md5((string) rand()),
                 null
             );
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 }

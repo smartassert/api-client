@@ -51,15 +51,15 @@ readonly class HttpHandler
 
         $statusCode = $response->getStatusCode();
         if (401 === $statusCode) {
-            throw new ClientException($requestSpecification, new UnauthorizedException());
+            throw new UnauthorizedException($requestSpecification);
         }
 
         if (403 === $statusCode) {
-            throw new ClientException($requestSpecification, new ForbiddenException());
+            throw new ForbiddenException($requestSpecification);
         }
 
         if (404 === $statusCode) {
-            throw new ClientException($requestSpecification, new NotFoundException());
+            throw new NotFoundException($requestSpecification);
         }
 
         if (200 !== $statusCode) {

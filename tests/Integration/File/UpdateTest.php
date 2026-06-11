@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
@@ -87,11 +88,10 @@ class UpdateTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->update($user1ApiKey->key, $source->id, $filename, md5((string) rand()));
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testUpdateSourceNotFound(): void
@@ -104,10 +104,9 @@ class UpdateTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->update($apiKey->key, $sourceId, md5((string) rand()) . '.yaml', md5((string) rand()));
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 }

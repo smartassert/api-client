@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Tests\Services\SourcesRepository;
@@ -25,11 +25,10 @@ class GetTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->get(md5((string) rand()), $suite->id);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testGetSuiteNotFound(): void
@@ -42,11 +41,10 @@ class GetTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->get($apiKey->key, $suiteId);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testGetSuiteForbidden(): void
@@ -64,11 +62,10 @@ class GetTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->get($user1ApiKey->key, $suite->id);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testGetSourceForbidden(): void
@@ -95,11 +92,10 @@ class GetTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->get($user1ApiKey->key, $suite->id);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testGetSourceNotFound(): void

@@ -20,12 +20,9 @@ class ClientException extends \Exception implements ClientExceptionInterface
         private readonly AlreadyExistsException|
         ErrorException|
         FileNotFoundException|
-        ForbiddenException|
         HttpException|
         IncompleteDataException|
-        NotFoundException|
         Psr7ClientInterface|
-        UnauthorizedException|
         UnexpectedResponseFormatException $innerException,
     ) {
         parent::__construct();
@@ -39,12 +36,9 @@ class ClientException extends \Exception implements ClientExceptionInterface
     public function getInnerException(): AlreadyExistsException|
     ErrorException|
     FileNotFoundException|
-    ForbiddenException|
     HttpException|
     IncompleteDataException|
-    NotFoundException|
     Psr7ClientInterface|
-    UnauthorizedException|
     UnexpectedResponseFormatException
     {
         return $this->innerException;

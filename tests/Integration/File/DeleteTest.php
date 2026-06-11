@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use Symfony\Component\Uid\Ulid;
@@ -24,7 +25,7 @@ class DeleteTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->delete(md5((string) rand()), md5((string) rand()), md5((string) rand()) . '.yaml');
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
         self::assertInstanceOf(ClientException::class, $exception);
@@ -60,11 +61,10 @@ class DeleteTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->delete($user1ApiKey->key, $source->getId(), $filename);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testDeleteSourceNotFound(): void
@@ -78,10 +78,9 @@ class DeleteTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->delete($apiKey->key, $sourceId, $filename);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 }
