@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;

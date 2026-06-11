@@ -15,7 +15,6 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use Symfony\Component\Uid\Ulid;
