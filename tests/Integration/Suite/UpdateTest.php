@@ -36,11 +36,10 @@ class UpdateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->update(md5((string) rand()), $suite->id, $source->id, md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testUpdateSourceNotFound(): void

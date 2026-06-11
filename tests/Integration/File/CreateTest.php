@@ -34,11 +34,10 @@ class CreateTest extends AbstractFileTestCase
                 md5((string) rand()) . '.yaml',
                 md5((string) rand())
             );
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testCreateEmptyFilename(): void

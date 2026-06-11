@@ -25,11 +25,10 @@ class ListTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->list(md5((string) rand()));
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testGetSuiteNotFound(): void

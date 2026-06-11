@@ -23,11 +23,10 @@ class DeleteTest extends AbstractIntegrationTestCase
 
         try {
             self::$sourceClient->delete(md5((string) rand()), $id);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testDeleteNotFound(): void

@@ -27,11 +27,10 @@ class CreateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->create(md5((string) rand()), $source->id, md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testCreateSourceNotFound(): void

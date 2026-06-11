@@ -25,11 +25,10 @@ class DeleteTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->delete(md5((string) rand()), $suite->id);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(UnauthorizedException::class, $exception->getInnerException());
+        self::assertInstanceOf(UnauthorizedException::class, $exception);
     }
 
     public function testDeleteSuiteNotFound(): void
