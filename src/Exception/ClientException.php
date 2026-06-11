@@ -10,14 +10,12 @@ use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundExcept
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
+use SmartAssert\ApiClient\Request\RequestSpecification;
 
 class ClientException extends \Exception
 {
-    /**
-     * @param non-empty-string $requestName
-     */
     public function __construct(
-        private readonly string $requestName,
+        private readonly RequestSpecification $requestSpecification,
         private readonly AlreadyExistsException|
         ErrorException|
         FileNotFoundException|
@@ -32,12 +30,9 @@ class ClientException extends \Exception
         parent::__construct();
     }
 
-    /**
-     * @return non-empty-string
-     */
-    public function getRequestName(): string
+    public function getRequestSpecification(): RequestSpecification
     {
-        return $this->requestName;
+        return $this->requestSpecification;
     }
 
     public function getInnerException(): AlreadyExistsException|

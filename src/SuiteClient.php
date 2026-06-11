@@ -45,7 +45,7 @@ readonly class SuiteClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 
@@ -68,7 +68,7 @@ readonly class SuiteClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 
@@ -96,7 +96,7 @@ readonly class SuiteClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 
@@ -119,7 +119,7 @@ readonly class SuiteClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 
@@ -147,7 +147,7 @@ readonly class SuiteClient
                     $suites[] = $this->suiteFactory->create($suiteData);
                 } catch (IncompleteDataException $e) {
                     throw new ClientException(
-                        $requestSpecification->getName(),
+                        $requestSpecification,
                         new IncompleteDataException($data, $dataIndex . '.' . $e->missingKey)
                     );
                 }

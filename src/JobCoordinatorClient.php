@@ -77,7 +77,7 @@ readonly class JobCoordinatorClient
                     $jobSummaries[] = $this->summaryFactory->create($jobSummaryData);
                 } catch (IncompleteDataException $e) {
                     throw new ClientException(
-                        $requestSpecification->getName(),
+                        $requestSpecification,
                         new IncompleteDataException(
                             $jobSummaryDataCollection,
                             $jobSummaryIndex . '.' . $e->missingKey
@@ -111,7 +111,7 @@ readonly class JobCoordinatorClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 }

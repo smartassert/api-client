@@ -48,7 +48,7 @@ readonly class UsersClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 
@@ -70,7 +70,7 @@ readonly class UsersClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 
@@ -93,7 +93,7 @@ readonly class UsersClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 
@@ -120,7 +120,7 @@ readonly class UsersClient
 
             if ($innerException instanceof HttpException && 409 === $innerException->getCode()) {
                 throw new ClientException(
-                    $e->getRequestName(),
+                    $e->getRequestSpecification(),
                     new AlreadyExistsException($userIdentifier, $innerException->getResponse())
                 );
             }
@@ -131,7 +131,7 @@ readonly class UsersClient
         try {
             return $this->userFactory->create($data);
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 
@@ -185,7 +185,7 @@ readonly class UsersClient
         $apiKey = $this->apiKeyFactory->create($data);
         if (null === $apiKey) {
             throw new ClientException(
-                $requestSpecification->getName(),
+                $requestSpecification,
                 new IncompleteDataException($data, 'key')
             );
         }

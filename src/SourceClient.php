@@ -44,7 +44,7 @@ readonly class SourceClient
                     $source = $this->sourceFactory->create($sourceData);
                 } catch (IncompleteDataException $e) {
                     throw new ClientException(
-                        $requestSpecification->getName(),
+                        $requestSpecification,
                         new IncompleteDataException($data, $dataIndex . '.' . $e->missingKey)
                     );
                 }
@@ -100,7 +100,7 @@ readonly class SourceClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification->getName(), $e);
+            throw new ClientException($requestSpecification, $e);
         }
     }
 }
