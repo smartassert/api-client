@@ -6,9 +6,15 @@ namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Summary;
-use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
+use SmartAssert\ApiClient\Exception\HttpClientException;
 use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Exception\NotFoundException;
+use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
 use SmartAssert\ApiClient\Request\Body\BodyInterface;
@@ -30,7 +36,14 @@ readonly class JobCoordinatorClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $suiteId
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function create(string $apiKey, string $suiteId, int $maximumDurationInSeconds): Job
     {
@@ -46,7 +59,14 @@ readonly class JobCoordinatorClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $jobId
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function get(string $apiKey, string $jobId): Job
     {
@@ -59,7 +79,14 @@ readonly class JobCoordinatorClient
      *
      * @return Summary[]
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws IncompleteResponseDataException
+     * @throws UnexpectedResponseFormatException
      */
     public function list(string $apiKey, string $suiteId): array
     {
@@ -96,7 +123,14 @@ readonly class JobCoordinatorClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $entityId
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     private function doJobAction(string $method, string $apiKey, string $entityId, ?BodyInterface $body = null): Job
     {

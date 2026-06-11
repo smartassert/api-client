@@ -6,9 +6,15 @@ namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\File;
 use SmartAssert\ApiClient\Data\Source\FileSource;
-use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
+use SmartAssert\ApiClient\Exception\HttpClientException;
 use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Exception\NotFoundException;
+use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Body\FormBody;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
@@ -26,7 +32,14 @@ readonly class FileSourceClient
     /**
      * @param non-empty-string $apiKey
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function create(string $apiKey, string $label): FileSource
     {
@@ -37,7 +50,14 @@ readonly class FileSourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function update(string $apiKey, string $id, string $label): FileSource
     {
@@ -50,7 +70,13 @@ readonly class FileSourceClient
      *
      * @return File[]
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function list(string $apiKey, string $id): array
     {
@@ -80,7 +106,14 @@ readonly class FileSourceClient
     }
 
     /**
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws IncompleteResponseDataException
+     * @throws UnexpectedResponseFormatException
      */
     private function makeMutationRequest(string $method, string $apiKey, ?string $id, string $label): FileSource
     {

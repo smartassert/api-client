@@ -7,10 +7,15 @@ namespace SmartAssert\ApiClient;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Data\User\Token;
 use SmartAssert\ApiClient\Data\User\User;
-use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
+use SmartAssert\ApiClient\Exception\HttpClientException;
 use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Exception\NotFoundException;
+use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
@@ -33,7 +38,14 @@ readonly class UsersClient
     ) {}
 
     /**
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function createToken(string $userIdentifier, string $password): Token
     {
@@ -56,7 +68,14 @@ readonly class UsersClient
     /**
      * @param non-empty-string $token
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function verifyToken(string $token): User
     {
@@ -78,7 +97,14 @@ readonly class UsersClient
     /**
      * @param non-empty-string $refreshToken
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function refreshToken(string $refreshToken): Token
     {
@@ -103,7 +129,15 @@ readonly class UsersClient
      * @param non-empty-string $userIdentifier
      * @param non-empty-string $password
      *
-     * @throws ClientExceptionInterface
+     * @throws AlreadyExistsException
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function create(string $adminToken, string $userIdentifier, string $password): User
     {
@@ -139,7 +173,12 @@ readonly class UsersClient
      * @param non-empty-string $adminToken
      * @param non-empty-string $userId
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
      */
     public function revokeAllRefreshTokensForUser(string $adminToken, string $userId): void
     {
@@ -155,7 +194,12 @@ readonly class UsersClient
      * @param non-empty-string $token
      * @param non-empty-string $refreshToken
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws HttpException
      */
     public function revokeRefreshToken(string $token, string $refreshToken): void
     {
@@ -170,7 +214,14 @@ readonly class UsersClient
     /**
      * @param non-empty-string $token
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function getApiKey(string $token): ApiKey
     {
@@ -198,7 +249,13 @@ readonly class UsersClient
      *
      * @return ApiKey[]
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function getApiKeys(string $token): array
     {
