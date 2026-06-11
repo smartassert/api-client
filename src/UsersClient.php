@@ -118,9 +118,10 @@ readonly class UsersClient
             $data = $this->httpHandler->getJson($requestSpecification);
         } catch (HttpException $httpException) {
             if (409 === $httpException->getCode()) {
-                throw new ClientException(
+                throw new AlreadyExistsException(
                     $httpException->getRequestSpecification(),
-                    new AlreadyExistsException($userIdentifier, $httpException->getResponse())
+                    $userIdentifier,
+                    $httpException->getResponse(),
                 );
             }
 

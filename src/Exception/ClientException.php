@@ -15,8 +15,7 @@ class ClientException extends \Exception implements ClientExceptionInterface
 {
     public function __construct(
         private readonly RequestSpecification $requestSpecification,
-        private readonly AlreadyExistsException|
-        FileNotFoundException|
+        private readonly FileNotFoundException|
         IncompleteDataException|
         Psr7ClientInterface|
         UnexpectedResponseFormatException $innerException,
@@ -29,8 +28,7 @@ class ClientException extends \Exception implements ClientExceptionInterface
         return $this->requestSpecification;
     }
 
-    public function getInnerException(): AlreadyExistsException|
-    FileNotFoundException|
+    public function getInnerException(): FileNotFoundException|
     IncompleteDataException|
     Psr7ClientInterface|
     UnexpectedResponseFormatException
