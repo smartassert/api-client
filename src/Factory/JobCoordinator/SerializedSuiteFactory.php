@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\SerializedSuite;
-use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
 readonly class SerializedSuiteFactory extends AbstractFactory

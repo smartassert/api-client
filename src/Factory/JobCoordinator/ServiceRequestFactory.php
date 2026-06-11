@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Factory\JobCoordinator;
 
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
-use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
 readonly class ServiceRequestFactory extends AbstractFactory
