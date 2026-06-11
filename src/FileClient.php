@@ -56,14 +56,8 @@ readonly class FileClient
                     new AcceptableContentTypesHeader(['application/yaml', 'text/x-yaml']),
                 ]),
             ));
-        } catch (ClientExceptionInterface $e) {
-            $innerException = $e->getInnerException();
-
-            if ($innerException instanceof NotFoundException || $innerException instanceof UnauthorizedException) {
-                throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
-            }
-
-            throw $e;
+        } catch (NotFoundException | UnauthorizedException $e) {
+            throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
         }
 
         return $response->getBody()->getContents();
