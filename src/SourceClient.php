@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
@@ -25,7 +26,7 @@ readonly class SourceClient
      *
      * @return SourceInterface[]
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function list(string $apiKey): array
     {
@@ -62,7 +63,7 @@ readonly class SourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function get(string $apiKey, string $id): ?SourceInterface
     {
@@ -73,7 +74,7 @@ readonly class SourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function delete(string $apiKey, string $id): ?SourceInterface
     {
@@ -85,7 +86,7 @@ readonly class SourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     private function doSourceAction(string $method, string $apiKey, string $id): ?SourceInterface
     {

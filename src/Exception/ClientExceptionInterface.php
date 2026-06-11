@@ -12,7 +12,7 @@ use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Request\RequestSpecification;
 
-interface ClientExceptionInterface
+interface ClientExceptionInterface extends \Throwable
 {
     public function getRequestSpecification(): RequestSpecification;
 

@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Job;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\Summary;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\JobCoordinator\JobFactory;
 use SmartAssert\ApiClient\Factory\JobCoordinator\SummaryFactory;
@@ -29,7 +30,7 @@ readonly class JobCoordinatorClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $suiteId
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function create(string $apiKey, string $suiteId, int $maximumDurationInSeconds): Job
     {
@@ -45,7 +46,7 @@ readonly class JobCoordinatorClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $jobId
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function get(string $apiKey, string $jobId): Job
     {
@@ -58,7 +59,7 @@ readonly class JobCoordinatorClient
      *
      * @return Summary[]
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function list(string $apiKey, string $suiteId): array
     {
@@ -95,7 +96,7 @@ readonly class JobCoordinatorClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $entityId
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     private function doJobAction(string $method, string $apiKey, string $entityId, ?BodyInterface $body = null): Job
     {

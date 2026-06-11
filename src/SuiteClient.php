@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\Suite;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Source\SuiteFactory;
 use SmartAssert\ApiClient\Request\Body\FormBody;
@@ -25,7 +26,7 @@ readonly class SuiteClient
      * @param non-empty-string $apiKey
      * @param string[]         $tests
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function create(string $apiKey, string $sourceId, string $label, array $tests): Suite
     {
@@ -53,7 +54,7 @@ readonly class SuiteClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function get(string $apiKey, string $id): Suite
     {
@@ -76,7 +77,7 @@ readonly class SuiteClient
      * @param non-empty-string $apiKey
      * @param string[]         $tests
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function update(string $apiKey, string $id, string $sourceId, string $label, array $tests): Suite
     {
@@ -104,7 +105,7 @@ readonly class SuiteClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function delete(string $apiKey, string $id): Suite
     {
@@ -128,7 +129,7 @@ readonly class SuiteClient
      *
      * @return Suite[]
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function list(string $apiKey): array
     {

@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Results\Event;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\Results\EventFactory;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
@@ -25,7 +26,7 @@ readonly class ResultsEventClient
      *
      * @return Event[]
      *
-     * @throws ClientException
+     * @throws ClientExceptionInterface
      */
     public function list(string $apiKey, string $label, ?string $reference, ?string $type): array
     {
