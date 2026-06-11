@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
@@ -57,7 +56,7 @@ readonly class FileClient
                 ]),
             ));
         } catch (NotFoundException | UnauthorizedException $e) {
-            throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
+            throw new FileNotFoundException($e->getRequestSpecification(), $filename);
         }
 
         return $response->getBody()->getContents();
@@ -79,7 +78,7 @@ readonly class FileClient
                 new YamlBody($content),
             ));
         } catch (NotFoundException | UnauthorizedException $e) {
-            throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
+            throw new FileNotFoundException($e->getRequestSpecification(), $filename);
         }
     }
 
@@ -98,7 +97,7 @@ readonly class FileClient
                 new ApiKeyAuthorizationHeader($apiKey),
             ));
         } catch (NotFoundException | UnauthorizedException $e) {
-            throw new ClientException($e->getRequestSpecification(), new FileNotFoundException($filename));
+            throw new FileNotFoundException($e->getRequestSpecification(), $filename);
         }
     }
 

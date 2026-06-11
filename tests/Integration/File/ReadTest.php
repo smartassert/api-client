@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
@@ -25,13 +24,10 @@ class ReadTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->read(md5((string) rand()), $source->getId(), $filename);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-
-        $fileNotFoundException = $exception->getInnerException();
-        self::assertInstanceOf(FileNotFoundException::class, $fileNotFoundException);
+        self::assertInstanceOf(FileNotFoundException::class, $exception);
     }
 
     public function testReadEmptyFilename(): void
@@ -44,11 +40,10 @@ class ReadTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->read($apiKey->key, $source->getId(), '');
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(FileNotFoundException::class, $exception->getInnerException());
+        self::assertInstanceOf(FileNotFoundException::class, $exception);
     }
 
     public function testReadSourceForbidden(): void

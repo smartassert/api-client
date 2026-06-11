@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
@@ -28,10 +27,7 @@ class DeleteTest extends AbstractFileTestCase
         } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-
-        $fileNotFoundException = $exception->getInnerException();
-        self::assertInstanceOf(FileNotFoundException::class, $fileNotFoundException);
+        self::assertInstanceOf(FileNotFoundException::class, $exception);
     }
 
     public function testDeleteEmptyFilename(): void
