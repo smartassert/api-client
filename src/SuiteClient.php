@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\Suite;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Factory\Source\SuiteFactory;
 use SmartAssert\ApiClient\Request\Body\FormBody;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
@@ -46,7 +46,7 @@ readonly class SuiteClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification, $e);
+            throw new IncompleteResponseDataException($requestSpecification, $e);
         }
     }
 
@@ -69,7 +69,7 @@ readonly class SuiteClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification, $e);
+            throw new IncompleteResponseDataException($requestSpecification, $e);
         }
     }
 
@@ -97,7 +97,7 @@ readonly class SuiteClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification, $e);
+            throw new IncompleteResponseDataException($requestSpecification, $e);
         }
     }
 
@@ -120,7 +120,7 @@ readonly class SuiteClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification, $e);
+            throw new IncompleteResponseDataException($requestSpecification, $e);
         }
     }
 
@@ -147,7 +147,7 @@ readonly class SuiteClient
                 try {
                     $suites[] = $this->suiteFactory->create($suiteData);
                 } catch (IncompleteDataException $e) {
-                    throw new ClientException(
+                    throw new IncompleteResponseDataException(
                         $requestSpecification,
                         new IncompleteDataException($data, $dataIndex . '.' . $e->missingKey)
                     );

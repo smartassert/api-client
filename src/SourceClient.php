@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\Request\RequestSpecification;
@@ -44,7 +44,7 @@ readonly class SourceClient
                 try {
                     $source = $this->sourceFactory->create($sourceData);
                 } catch (IncompleteDataException $e) {
-                    throw new ClientException(
+                    throw new IncompleteResponseDataException(
                         $requestSpecification,
                         new IncompleteDataException($data, $dataIndex . '.' . $e->missingKey)
                     );
@@ -101,7 +101,7 @@ readonly class SourceClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification, $e);
+            throw new IncompleteResponseDataException($requestSpecification, $e);
         }
     }
 }

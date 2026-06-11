@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Results\Event;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Factory\Results\EventFactory;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\Request\RequestSpecification;
@@ -54,7 +54,7 @@ readonly class ResultsEventClient
             try {
                 $event = $this->eventFactory->create($eventData);
             } catch (IncompleteDataException $e) {
-                throw new ClientException(
+                throw new IncompleteResponseDataException(
                     $requestSpecification,
                     new IncompleteDataException($data, $dataIndex . '.' . $e->missingKey)
                 );

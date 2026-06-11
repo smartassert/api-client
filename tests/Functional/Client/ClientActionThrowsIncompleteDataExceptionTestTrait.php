@@ -6,8 +6,8 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client;
 
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 
 trait ClientActionThrowsIncompleteDataExceptionTestTrait
 {
@@ -32,7 +32,7 @@ trait ClientActionThrowsIncompleteDataExceptionTestTrait
         } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(IncompleteResponseDataException::class, $exception);
         self::assertSame($expectedRequestName, $exception->getRequestSpecification()->getName());
 
         $innerException = $exception->getInnerException();
