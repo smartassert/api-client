@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Results\Event;
-use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
+use SmartAssert\ApiClient\Exception\HttpClientException;
 use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Exception\NotFoundException;
+use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Results\EventFactory;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
 use SmartAssert\ApiClient\Request\RequestSpecification;
@@ -26,7 +32,14 @@ readonly class ResultsEventClient
      *
      * @return Event[]
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws IncompleteResponseDataException
+     * @throws UnexpectedResponseFormatException
      */
     public function list(string $apiKey, string $label, ?string $reference, ?string $type): array
     {

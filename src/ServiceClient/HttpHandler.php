@@ -10,7 +10,6 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
@@ -37,7 +36,12 @@ readonly class HttpHandler
     ) {}
 
     /**
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
      */
     public function sendRequest(RequestSpecification $requestSpecification): ResponseInterface
     {
@@ -82,7 +86,13 @@ readonly class HttpHandler
     /**
      * @return array<mixed>
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function getJson(RequestSpecification $requestSpecification): array
     {

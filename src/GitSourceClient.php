@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient;
 
 use SmartAssert\ApiClient\Data\Source\GitSource;
-use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
+use SmartAssert\ApiClient\Exception\HttpClientException;
 use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
+use SmartAssert\ApiClient\Exception\NotFoundException;
+use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Factory\Source\SourceFactory;
 use SmartAssert\ApiClient\Request\Body\FormBody;
 use SmartAssert\ApiClient\Request\Header\ApiKeyAuthorizationHeader;
@@ -25,7 +31,14 @@ readonly class GitSourceClient
     /**
      * @param non-empty-string $apiKey
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function create(
         string $apiKey,
@@ -41,7 +54,14 @@ readonly class GitSourceClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $id
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws IncompleteResponseDataException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UnexpectedResponseFormatException
      */
     public function update(
         string $apiKey,
@@ -55,7 +75,14 @@ readonly class GitSourceClient
     }
 
     /**
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws IncompleteResponseDataException
+     * @throws UnexpectedResponseFormatException
      */
     private function doAction(
         string $method,

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
+use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
+use SmartAssert\ApiClient\Exception\ForbiddenException;
+use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\HttpClientException;
 use SmartAssert\ApiClient\Exception\NotFoundException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use SmartAssert\ApiClient\Request\Body\YamlBody;
@@ -26,7 +29,12 @@ readonly class FileClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
      */
     public function create(string $apiKey, string $sourceId, string $filename, string $content): void
     {
@@ -42,7 +50,11 @@ readonly class FileClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws FileNotFoundException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
      */
     public function read(string $apiKey, string $sourceId, string $filename): string
     {
@@ -66,7 +78,11 @@ readonly class FileClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws FileNotFoundException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
      */
     public function update(string $apiKey, string $sourceId, string $filename, string $content): void
     {
@@ -86,7 +102,11 @@ readonly class FileClient
      * @param non-empty-string $apiKey
      * @param non-empty-string $sourceId
      *
-     * @throws ClientExceptionInterface
+     * @throws ErrorException
+     * @throws FileNotFoundException
+     * @throws ForbiddenException
+     * @throws HttpClientException
+     * @throws HttpException
      */
     public function delete(string $apiKey, string $sourceId, string $filename): void
     {
