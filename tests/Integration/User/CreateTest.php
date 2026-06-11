@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\User;
 
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -61,11 +60,10 @@ class CreateTest extends AbstractIntegrationTestCase
 
         try {
             self::$usersClient->create('primary_admin_token', self::USER1_EMAIL, md5((string) rand()));
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(AlreadyExistsException::class, $exception->getInnerException());
+        self::assertInstanceOf(AlreadyExistsException::class, $exception);
     }
 
     public function testCreateUserSuccess(): void
