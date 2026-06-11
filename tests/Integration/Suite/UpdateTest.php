@@ -9,6 +9,7 @@ use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Data\Source\Suite;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -55,11 +56,10 @@ class UpdateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->update($apiKey->key, $suite->id, $sourceId, md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testUpdateSuiteNotFound(): void
@@ -74,11 +74,10 @@ class UpdateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->update($apiKey->key, $suiteId, $source->id, md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testUpdateDeletedSuite(): void
@@ -121,11 +120,10 @@ class UpdateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->update($user1ApiKey->key, $user2Suite->id, $user1Source->id, md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testUpdateSourceForbidden(): void
@@ -144,11 +142,10 @@ class UpdateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->update($user1ApiKey->key, $user1Suite->id, $user2Source->id, md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     /**

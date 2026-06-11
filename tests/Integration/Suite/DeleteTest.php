@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Tests\Integration\Suite;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Exception\ClientException;
+use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
 use Symfony\Component\Uid\Ulid;
@@ -41,11 +42,10 @@ class DeleteTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->delete($apiKey->key, $suiteId);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     public function testDeleteSuiteForbidden(): void
@@ -63,11 +63,10 @@ class DeleteTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->delete($user1ApiKey->key, $suite->id);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-        self::assertInstanceOf(ForbiddenException::class, $exception->getInnerException());
+        self::assertInstanceOf(ForbiddenException::class, $exception);
     }
 
     /**

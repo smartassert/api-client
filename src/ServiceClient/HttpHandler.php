@@ -55,7 +55,7 @@ readonly class HttpHandler
         }
 
         if (403 === $statusCode) {
-            throw new ClientException($requestSpecification, new ForbiddenException());
+            throw new ForbiddenException($requestSpecification);
         }
 
         if (404 === $statusCode) {
