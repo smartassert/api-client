@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Tests\Integration\File;
 
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
@@ -30,13 +29,10 @@ class UpdateTest extends AbstractFileTestCase
 
         try {
             self::$fileClient->update(md5((string) rand()), $source->getId(), $filename, md5((string) rand()));
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
-
-        $fileNotFoundException = $exception->getInnerException();
-        self::assertInstanceOf(FileNotFoundException::class, $fileNotFoundException);
+        self::assertInstanceOf(FileNotFoundException::class, $exception);
     }
 
     public function testUpdateEmptyFilename(): void
