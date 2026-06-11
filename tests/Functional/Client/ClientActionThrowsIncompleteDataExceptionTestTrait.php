@@ -7,7 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Exception\ClientException;
-use SmartAssert\ApiClient\Exception\IncompleteDataException;
+use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 
 trait ClientActionThrowsIncompleteDataExceptionTestTrait
 {

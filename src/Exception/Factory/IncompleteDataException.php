@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SmartAssert\ApiClient\Exception;
+namespace SmartAssert\ApiClient\Exception\Factory;
 
 class IncompleteDataException extends \Exception
 {

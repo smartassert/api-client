@@ -6,6 +6,7 @@ namespace SmartAssert\ApiClient\Exception;
 
 use Psr\Http\Client\ClientExceptionInterface as Psr7ClientInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
+use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\File\NotFoundException as FileNotFoundException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
 use SmartAssert\ApiClient\Exception\Http\UnexpectedResponseFormatException;
