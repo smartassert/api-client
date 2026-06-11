@@ -9,7 +9,6 @@ use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\Source\GitSource;
 use SmartAssert\ApiClient\Data\User\ApiKey;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Error\Factory as ExceptionFactory;
@@ -83,15 +82,12 @@ class UpdateTest extends AbstractIntegrationTestCase
 
         try {
             self::$gitSourceClient->update($apiKey->key, $source->id, $label, $hostUrl, $path, $credentials);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ErrorException::class, $exception);
 
-        $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorException::class, $errorException);
-
-        $error = $errorException->getError();
+        $error = $exception->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
         self::assertEquals($expected, $error);
     }
@@ -124,15 +120,12 @@ class UpdateTest extends AbstractIntegrationTestCase
                 md5((string) rand()),
                 null
             );
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ErrorException::class, $exception);
 
-        $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorException::class, $errorException);
-
-        $error = $errorException->getError();
+        $error = $exception->getError();
         self::assertInstanceOf(DuplicateObjectErrorInterface::class, $error);
         self::assertEquals(new DuplicateObjectError(new Parameter('label', $conflictLabel)), $error);
     }
@@ -172,15 +165,12 @@ class UpdateTest extends AbstractIntegrationTestCase
                 md5((string) rand()),
                 null
             );
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ErrorException::class, $exception);
 
-        $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorException::class, $errorException);
-
-        $error = $errorException->getError();
+        $error = $exception->getError();
         self::assertInstanceOf(ModifyReadOnlyEntityErrorInterface::class, $error);
         self::assertEquals(new ModifyReadOnlyEntityError($source->id, 'git-source'), $error);
     }

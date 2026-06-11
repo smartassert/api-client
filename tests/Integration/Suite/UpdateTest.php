@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use SmartAssert\ApiClient\Data\Source\SourceInterface;
 use SmartAssert\ApiClient\Data\Source\Suite;
 use SmartAssert\ApiClient\Data\User\ApiKey;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
@@ -93,14 +92,13 @@ class UpdateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->update($apiKey->key, $suite->id, $source->id, md5((string) rand()), []);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ErrorException::class, $exception);
 
-        $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorException::class, $errorException);
-        self::assertEquals(new ModifyReadOnlyEntityError($suite->id, 'suite'), $errorException->getError());
+        $error = $exception->getError();
+        self::assertEquals(new ModifyReadOnlyEntityError($suite->id, 'suite'), $error);
     }
 
     public function testUpdateSuiteForbidden(): void
@@ -166,15 +164,12 @@ class UpdateTest extends AbstractSuiteTestCase
 
         try {
             self::$suiteClient->update($apiKey->key, $suite->id, $source->id, $label, $tests);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ErrorException::class, $exception);
 
-        $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorException::class, $errorException);
-
-        $error = $errorException->getError();
+        $error = $exception->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
         self::assertEquals($expected, $error);
     }

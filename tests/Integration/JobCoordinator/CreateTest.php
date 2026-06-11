@@ -14,7 +14,6 @@ use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequest;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\ServiceRequestAttempt;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJob;
 use SmartAssert\ApiClient\Data\JobCoordinator\Job\WorkerJobComponent;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\UnauthorizedException;
@@ -51,15 +50,12 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
 
         try {
             $this->jobCoordinatorClient->create($apiKey->key, $suiteId, $maximumDurationInSeconds);
-        } catch (ClientException $exception) {
+        } catch (ClientExceptionInterface $exception) {
         }
 
-        self::assertInstanceOf(ClientException::class, $exception);
+        self::assertInstanceOf(ErrorException::class, $exception);
 
-        $errorException = $exception->getInnerException();
-        self::assertInstanceOf(ErrorException::class, $errorException);
-
-        $error = $errorException->getError();
+        $error = $exception->getError();
         self::assertInstanceOf(BadRequestErrorInterface::class, $error);
         self::assertEquals($expected, $error);
     }
