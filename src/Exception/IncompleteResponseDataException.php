@@ -7,7 +7,7 @@ namespace SmartAssert\ApiClient\Exception;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Request\RequestSpecification;
 
-class ClientException extends \Exception implements ClientExceptionInterface
+class IncompleteResponseDataException extends \Exception implements ClientExceptionInterface
 {
     public function __construct(
         private readonly RequestSpecification $requestSpecification,

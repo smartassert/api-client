@@ -7,10 +7,10 @@ namespace SmartAssert\ApiClient;
 use SmartAssert\ApiClient\Data\User\ApiKey;
 use SmartAssert\ApiClient\Data\User\Token;
 use SmartAssert\ApiClient\Data\User\User;
-use SmartAssert\ApiClient\Exception\ClientException;
 use SmartAssert\ApiClient\Exception\ClientExceptionInterface;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\Http\HttpException;
+use SmartAssert\ApiClient\Exception\IncompleteResponseDataException;
 use SmartAssert\ApiClient\Exception\User\AlreadyExistsException;
 use SmartAssert\ApiClient\Factory\User\ApiKeyFactory;
 use SmartAssert\ApiClient\Factory\User\TokenFactory;
@@ -49,7 +49,7 @@ readonly class UsersClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification, $e);
+            throw new IncompleteResponseDataException($requestSpecification, $e);
         }
     }
 
@@ -71,7 +71,7 @@ readonly class UsersClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification, $e);
+            throw new IncompleteResponseDataException($requestSpecification, $e);
         }
     }
 
@@ -94,7 +94,7 @@ readonly class UsersClient
                 $this->httpHandler->getJson($requestSpecification)
             );
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification, $e);
+            throw new IncompleteResponseDataException($requestSpecification, $e);
         }
     }
 
@@ -131,7 +131,7 @@ readonly class UsersClient
         try {
             return $this->userFactory->create($data);
         } catch (IncompleteDataException $e) {
-            throw new ClientException($requestSpecification, $e);
+            throw new IncompleteResponseDataException($requestSpecification, $e);
         }
     }
 
@@ -184,7 +184,7 @@ readonly class UsersClient
 
         $apiKey = $this->apiKeyFactory->create($data);
         if (null === $apiKey) {
-            throw new ClientException(
+            throw new IncompleteResponseDataException(
                 $requestSpecification,
                 new IncompleteDataException($data, 'key')
             );
