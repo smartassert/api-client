@@ -19,5 +19,6 @@ readonly class ResultsJob implements HasMetastateInterface, IsComponentInterface
         public MetaState $metaState,
         public ComponentPreparation $preparation,
         public array $serviceRequests,
+        public bool $hasEvents,
     ) {}
 }

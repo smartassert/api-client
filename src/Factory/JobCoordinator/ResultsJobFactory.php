@@ -29,12 +29,16 @@ readonly class ResultsJobFactory extends AbstractFactory
         $preparationData = $data['preparation'] ?? [];
         $preparationData = is_array($preparationData) ? $preparationData : [];
 
+        $hasEvents = $data['has_events'] ?? false;
+        $hasEvents = is_bool($hasEvents) ? $hasEvents : false;
+
         return new ResultsJob(
             $this->getNullableNonEmptyString($data, 'state'),
             $this->getNullableNonEmptyString($data, 'end_state'),
             $this->metaStateFactory->create($data),
             $this->componentPreparationFactory->create($preparationData),
             $this->serviceRequestFactory->createCollection($serviceRequestData),
+            $hasEvents,
         );
     }
 }

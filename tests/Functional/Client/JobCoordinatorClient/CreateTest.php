@@ -84,6 +84,7 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
                             'state' => 'pending',
                             'request_state' => 'pending',
                         ],
+                        'has_events' => false,
                     ],
                     'serialized-suite' => [
                         'meta_state' => [

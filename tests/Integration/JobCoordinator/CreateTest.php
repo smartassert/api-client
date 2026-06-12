@@ -125,6 +125,7 @@ class CreateTest extends AbstractJobCoordinatorClientTestCase
             ],
             $resultsJob->serviceRequests,
         );
+        self::assertFalse($resultsJob->hasEvents);
 
         $serializedSuite = $job->components->get('serialized-suite');
         self::assertInstanceOf(SerializedSuite::class, $serializedSuite);

@@ -78,6 +78,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
                             'state' => 'pending',
                             'request_state' => 'pending',
                         ],
+                        'has_events' => false,
                     ],
                     'serialized-suite' => [
                         'preparation' => [
