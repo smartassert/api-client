@@ -36,6 +36,7 @@ class JobTest extends TestCase
             new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
+            false,
         );
 
         $machine = new Machine(
@@ -110,6 +111,7 @@ class JobTest extends TestCase
             new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
+            false,
         );
 
         $serializedSuite = new SerializedSuite(
@@ -182,6 +184,7 @@ class JobTest extends TestCase
             new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
+            false,
         );
 
         $machine = new Machine(
@@ -256,6 +259,7 @@ class JobTest extends TestCase
             new MetaState(false, false, true),
             new ComponentPreparation('state', 'request-state'),
             [],
+            false,
         );
 
         $workerJob = new WorkerJob(

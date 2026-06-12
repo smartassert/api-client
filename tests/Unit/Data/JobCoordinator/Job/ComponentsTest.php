@@ -54,6 +54,7 @@ class ComponentsTest extends TestCase
             new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
+            true,
         );
 
         $endedSucceededSerializedSuite = new SerializedSuite(
@@ -174,6 +175,7 @@ class ComponentsTest extends TestCase
             new MetaState(true, true, false),
             new ComponentPreparation('state', 'request-state'),
             [],
+            true,
         );
 
         $serializedSuite = new SerializedSuite(

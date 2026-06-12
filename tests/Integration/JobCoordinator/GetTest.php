@@ -72,6 +72,7 @@ class GetTest extends AbstractJobCoordinatorClientTestCase
         ));
         self::assertNull($resultsJob->endState);
         self::assertEquals(new ComponentPreparation('succeeded', 'succeeded'), $resultsJob->preparation);
+        self::assertFalse($resultsJob->hasEvents);
 
         $serializedSuite = $job->components->get('serialized-suite');
         self::assertInstanceOf(SerializedSuite::class, $serializedSuite);
