@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient;
 
-use SmartAssert\ApiClient\Data\Results\Event;
+use SmartAssert\ApiClient\Data\Results\EventInterface;
 use SmartAssert\ApiClient\Exception\Error\ErrorException;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Exception\ForbiddenException;
@@ -30,7 +30,7 @@ readonly class ResultsEventClient
     /**
      * @param non-empty-string $apiKey
      *
-     * @return Event[]
+     * @return EventInterface[]
      *
      * @throws ErrorException
      * @throws ForbiddenException
