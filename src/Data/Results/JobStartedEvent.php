@@ -6,6 +6,11 @@ namespace SmartAssert\ApiClient\Data\Results;
 
 readonly class JobStartedEvent extends AbstractEncapsulatingEvent implements EventInterface
 {
+    public function getJob(): JobInterface
+    {
+        return new Job($this->getResourceReference());
+    }
+
     /**
      * @return TestInterface[]
      */
