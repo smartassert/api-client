@@ -5,7 +5,13 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Tests\Functional\Client\ResultsEventClient;
 
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Data\Results\Event;
+use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
+use SmartAssert\ApiClient\Data\Results\ResourceReference;
+use SmartAssert\ApiClient\Data\Results\ResourceReferenceCollection;
+use SmartAssert\ApiClient\Data\Results\TestInterface;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
@@ -112,6 +118,103 @@ class ListTest extends AbstractResultsEventClientTestCase
                 ],
                 'expectedRequestName' => 'get_results-event-list',
                 'expectedMissingKey' => '0.related_reference[0].reference',
+            ],
+        ];
+    }
+
+    /**
+     * @param array<mixed>    $responseData
+     * @param TestInterface[] $expected
+     */
+    #[DataProvider('listSuccessDataProvider')]
+    public function testListSuccess(array $responseData, array $expected): void
+    {
+        $this->mockHandler->append(
+            new Response(
+                200,
+                ['content-type' => 'application/json'],
+                (string) json_encode($responseData)
+            ),
+        );
+
+        $list = $this->client->list('api-key', 'job-label', null, null);
+
+        self::assertEquals($expected, $list);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function listSuccessDataProvider(): array
+    {
+        return [
+            'empty' => [
+                'responseData' => [],
+                'expected' => [],
+            ],
+            'single unmodelled event' => [
+                'responseData' => [
+                    [
+                        'sequence_number' => 1,
+                        'type' => 'unmodelled-type',
+                        'label' => 'label',
+                        'reference' => 'reference',
+                    ],
+                ],
+                'expected' => [
+                    new Event(
+                        1,
+                        'unmodelled-type',
+                        new ResourceReference('label', 'reference'),
+                        [],
+                        null,
+                    ),
+                ],
+            ],
+            'job/started' => [
+                'responseData' => [
+                    [
+                        'sequence_number' => 1,
+                        'type' => 'job/started',
+                        'label' => 'label',
+                        'reference' => 'reference',
+                        'body' => [
+                            'tests' => [
+                                'test1.yaml',
+                                'test2.yaml',
+                            ],
+                        ],
+                        'related_references' => [
+                            [
+                                'label' => 'test1.yaml',
+                                'reference' => 'test1_reference',
+                            ],
+                            [
+                                'label' => 'test2.yaml',
+                                'reference' => 'test2_reference',
+                            ],
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    new JobStartedEvent(
+                        new Event(
+                            1,
+                            'job/started',
+                            new ResourceReference('label', 'reference'),
+                            [
+                                'tests' => [
+                                    'test1.yaml',
+                                    'test2.yaml',
+                                ],
+                            ],
+                            new ResourceReferenceCollection([
+                                new ResourceReference('test1.yaml', 'test1_reference'),
+                                new ResourceReference('test2.yaml', 'test2_reference'),
+                            ]),
+                        )
+                    ),
+                ],
             ],
         ];
     }
