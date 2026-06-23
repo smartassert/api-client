@@ -12,4 +12,12 @@ readonly class ResourceReferenceCollection
     public function __construct(
         public array $resourceReferences = [],
     ) {}
+
+    public function getForLabel(string $label): ?ResourceReference
+    {
+        return array_find(
+            $this->resourceReferences,
+            fn ($resourceReference) => $resourceReference->label === $label,
+        );
+    }
 }
