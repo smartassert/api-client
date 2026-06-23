@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Factory\Results;
 
 use SmartAssert\ApiClient\Data\Results\Event;
+use SmartAssert\ApiClient\Data\Results\EventInterface;
+use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
@@ -20,7 +22,7 @@ readonly class EventFactory extends AbstractFactory
      *
      * @throws IncompleteDataException
      */
-    public function create(array $data): Event
+    public function create(array $data): EventInterface
     {
         $sequenceNumber = $data['sequence_number'] ?? null;
         $sequenceNumber = is_int($sequenceNumber) ? $sequenceNumber : null;
@@ -36,12 +38,20 @@ readonly class EventFactory extends AbstractFactory
         $relatedReferencesData = $data['related_references'] ?? [];
         $relatedReferencesData = is_array($relatedReferencesData) ? $relatedReferencesData : [];
 
-        return new Event(
+        $type = $this->getNonEmptyString($data, 'type');
+
+        $event = new Event(
             $sequenceNumber,
-            $this->getNonEmptyString($data, 'type'),
+            $type,
             $this->resourceReferenceFactory->create($data),
             $body,
             $this->resourceReferenceCollectionFactory->create($relatedReferencesData),
         );
+
+        if ('job/started' === $type) {
+            $event = new JobStartedEvent($event);
+        }
+
+        return $event;
     }
 }
