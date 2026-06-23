@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Unit\Data\Results;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SmartAssert\ApiClient\Data\Results\Event;
+use SmartAssert\ApiClient\Data\Results\Job;
 use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
 use SmartAssert\ApiClient\Data\Results\ResourceReference;
 use SmartAssert\ApiClient\Data\Results\ResourceReferenceCollection;
@@ -15,6 +16,33 @@ use SmartAssert\ApiClient\Data\Results\TestInterface;
 
 class JobStartedEventTest extends TestCase
 {
+    public function testGetJob(): void
+    {
+        $eventResourceReference = new ResourceReference(
+            'job-label',
+            'job-reference',
+        );
+
+        $event = new JobStartedEvent(
+            new Event(
+                1,
+                'job/started',
+                new ResourceReference(
+                    'job-label',
+                    'job-reference',
+                ),
+                [],
+                null,
+            ),
+        );
+
+        $job = $event->getJob();
+
+        self::assertEquals(new Job($eventResourceReference), $job);
+        self::assertEquals('job-label', $job->getLabel());
+        self::assertEquals($eventResourceReference, $job->getResourceReference());
+    }
+
     /**
      * @param TestInterface[] $expected
      */
