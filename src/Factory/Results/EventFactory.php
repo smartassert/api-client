@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Factory\Results;
 
+use SmartAssert\ApiClient\Data\Results\CompilationPassedEvent;
 use SmartAssert\ApiClient\Data\Results\CompilationStartedEvent;
 use SmartAssert\ApiClient\Data\Results\Event;
 use SmartAssert\ApiClient\Data\Results\EventInterface;
@@ -65,6 +66,10 @@ readonly class EventFactory extends AbstractFactory
 
         if ('compilation/started' === $type) {
             $event = new CompilationStartedEvent($event);
+        }
+
+        if ('compilation/passed' === $type) {
+            $event = new CompilationPassedEvent($event);
         }
 
         return $event;

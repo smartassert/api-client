@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Tests\Functional\Client\ResultsEventClient;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
+use SmartAssert\ApiClient\Data\Results\CompilationPassedEvent;
 use SmartAssert\ApiClient\Data\Results\CompilationStartedEvent;
 use SmartAssert\ApiClient\Data\Results\Event;
 use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
@@ -176,6 +177,7 @@ class ListTest extends AbstractResultsEventClientTestCase
             'job/started, 
             lifecycle/compilation-started, 
             compilation/started,
+            compilation/passed,
             lifecycle/compilation-completed,
             lifecycle/execution-started,
             lifecycle/execution-completed' => [
@@ -222,6 +224,25 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ],
                     [
                         'sequence_number' => 4,
+                        'type' => 'compilation/passed',
+                        'label' => 'test1.yaml',
+                        'reference' => 'test1_reference',
+                        'body' => [
+                            'source' => 'test1.yaml',
+                        ],
+                        'related_references' => [
+                            [
+                                'label' => 'step one',
+                                'reference' => 'step_one_reference',
+                            ],
+                            [
+                                'label' => 'step two',
+                                'reference' => 'step_two_reference',
+                            ],
+                        ],
+                    ],
+                    [
+                        'sequence_number' => 5,
                         'type' => 'compilation/started',
                         'label' => 'test2.yaml',
                         'reference' => 'test2_reference',
@@ -231,7 +252,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                         'related_references' => [],
                     ],
                     [
-                        'sequence_number' => 5,
+                        'sequence_number' => 6,
                         'type' => 'lifecycle/execution-started',
                         'label' => 'label',
                         'reference' => 'reference',
@@ -239,7 +260,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                         'related_references' => [],
                     ],
                     [
-                        'sequence_number' => 6,
+                        'sequence_number' => 7,
                         'type' => 'lifecycle/execution-completed',
                         'label' => 'label',
                         'reference' => 'reference',
@@ -285,9 +306,23 @@ class ListTest extends AbstractResultsEventClientTestCase
                             null,
                         )
                     ),
-                    new CompilationStartedEvent(
+                    new CompilationPassedEvent(
                         new Event(
                             4,
+                            'compilation/passed',
+                            new ResourceReference('test1.yaml', 'test1_reference'),
+                            [
+                                'source' => 'test1.yaml',
+                            ],
+                            new ResourceReferenceCollection([
+                                new ResourceReference('step one', 'step_one_reference'),
+                                new ResourceReference('step two', 'step_two_reference'),
+                            ]),
+                        )
+                    ),
+                    new CompilationStartedEvent(
+                        new Event(
+                            5,
                             'compilation/started',
                             new ResourceReference('test2.yaml', 'test2_reference'),
                             [
@@ -298,7 +333,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ),
                     new LifecycleEvent(
                         new Event(
-                            5,
+                            6,
                             'lifecycle/execution-started',
                             new ResourceReference('label', 'reference'),
                             [],
@@ -307,7 +342,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ),
                     new LifecycleEvent(
                         new Event(
-                            6,
+                            7,
                             'lifecycle/execution-completed',
                             new ResourceReference('label', 'reference'),
                             [],
