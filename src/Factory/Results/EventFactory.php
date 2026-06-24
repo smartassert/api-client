@@ -7,6 +7,7 @@ namespace SmartAssert\ApiClient\Factory\Results;
 use SmartAssert\ApiClient\Data\Results\Event;
 use SmartAssert\ApiClient\Data\Results\EventInterface;
 use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
+use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
@@ -50,6 +51,15 @@ readonly class EventFactory extends AbstractFactory
 
         if ('job/started' === $type) {
             $event = new JobStartedEvent($event);
+        }
+
+        if (
+            'lifecycle/compilation-started' === $type
+            || 'lifecycle/compilation-completed' === $type
+            || 'lifecycle/execution-started' === $type
+            || 'lifecycle/execution-completed' === $type
+        ) {
+            $event = new LifecycleEvent($event);
         }
 
         return $event;

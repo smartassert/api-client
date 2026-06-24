@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use SmartAssert\ApiClient\Data\Results\Event;
 use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
+use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Data\Results\ResourceReference;
 use SmartAssert\ApiClient\Data\Results\ResourceReferenceCollection;
 use SmartAssert\ApiClient\Data\Results\TestInterface;
@@ -171,7 +172,11 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ),
                 ],
             ],
-            'job/started' => [
+            'job/started, 
+            lifecycle/compilation-started, 
+            lifecycle/compilation-completed,
+            lifecycle/execution-started,
+            lifecycle/execution-completed' => [
                 'responseData' => [
                     [
                         'sequence_number' => 1,
@@ -195,6 +200,38 @@ class ListTest extends AbstractResultsEventClientTestCase
                             ],
                         ],
                     ],
+                    [
+                        'sequence_number' => 2,
+                        'type' => 'lifecycle/compilation-started',
+                        'label' => 'label',
+                        'reference' => 'reference',
+                        'body' => [],
+                        'related_references' => [],
+                    ],
+                    [
+                        'sequence_number' => 3,
+                        'type' => 'lifecycle/compilation-completed',
+                        'label' => 'label',
+                        'reference' => 'reference',
+                        'body' => [],
+                        'related_references' => [],
+                    ],
+                    [
+                        'sequence_number' => 4,
+                        'type' => 'lifecycle/execution-started',
+                        'label' => 'label',
+                        'reference' => 'reference',
+                        'body' => [],
+                        'related_references' => [],
+                    ],
+                    [
+                        'sequence_number' => 5,
+                        'type' => 'lifecycle/execution-completed',
+                        'label' => 'label',
+                        'reference' => 'reference',
+                        'body' => [],
+                        'related_references' => [],
+                    ],
                 ],
                 'expected' => [
                     new JobStartedEvent(
@@ -212,6 +249,42 @@ class ListTest extends AbstractResultsEventClientTestCase
                                 new ResourceReference('test1.yaml', 'test1_reference'),
                                 new ResourceReference('test2.yaml', 'test2_reference'),
                             ]),
+                        )
+                    ),
+                    new LifecycleEvent(
+                        new Event(
+                            2,
+                            'lifecycle/compilation-started',
+                            new ResourceReference('label', 'reference'),
+                            [],
+                            null,
+                        )
+                    ),
+                    new LifecycleEvent(
+                        new Event(
+                            3,
+                            'lifecycle/compilation-completed',
+                            new ResourceReference('label', 'reference'),
+                            [],
+                            null,
+                        )
+                    ),
+                    new LifecycleEvent(
+                        new Event(
+                            4,
+                            'lifecycle/execution-started',
+                            new ResourceReference('label', 'reference'),
+                            [],
+                            null,
+                        )
+                    ),
+                    new LifecycleEvent(
+                        new Event(
+                            5,
+                            'lifecycle/execution-completed',
+                            new ResourceReference('label', 'reference'),
+                            [],
+                            null,
                         )
                     ),
                 ],
