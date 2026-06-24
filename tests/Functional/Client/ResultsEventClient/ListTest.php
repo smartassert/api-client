@@ -15,6 +15,7 @@ use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Data\Results\ResourceReference;
 use SmartAssert\ApiClient\Data\Results\ResourceReferenceCollection;
 use SmartAssert\ApiClient\Data\Results\TestInterface;
+use SmartAssert\ApiClient\Data\Results\TestStartedEvent;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
@@ -180,6 +181,7 @@ class ListTest extends AbstractResultsEventClientTestCase
             compilation/passed,
             lifecycle/compilation-completed,
             lifecycle/execution-started,
+            test/started,
             lifecycle/execution-completed' => [
                 'responseData' => [
                     [
@@ -253,7 +255,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ],
                     [
                         'sequence_number' => 6,
-                        'type' => 'lifecycle/execution-started',
+                        'type' => 'lifecycle/compilation-completed',
                         'label' => 'label',
                         'reference' => 'reference',
                         'body' => [],
@@ -261,6 +263,47 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ],
                     [
                         'sequence_number' => 7,
+                        'type' => 'lifecycle/execution-started',
+                        'label' => 'label',
+                        'reference' => 'reference',
+                        'body' => [],
+                        'related_references' => [],
+                    ],
+                    [
+                        'sequence_number' => 8,
+                        'type' => 'test/started',
+                        'label' => 'test1.yaml',
+                        'reference' => 'test1_reference',
+                        'body' => [
+                            'source' => 'test1.yaml',
+                            'document' => [
+                                'type' => 'test',
+                                'payload' => [
+                                    'path' => 'test1.yaml',
+                                    'config' => [
+                                        'browser' => 'chrome',
+                                        'url' => 'https://example.com/',
+                                    ],
+                                ],
+                            ],
+                            'step_names' => [
+                                'step one',
+                                'step two',
+                            ],
+                        ],
+                        'related_references' => [
+                            [
+                                'label' => 'step one',
+                                'reference' => 'step_one_reference',
+                            ],
+                            [
+                                'label' => 'step two',
+                                'reference' => 'step_two_reference',
+                            ],
+                        ],
+                    ],
+                    [
+                        'sequence_number' => 9,
                         'type' => 'lifecycle/execution-completed',
                         'label' => 'label',
                         'reference' => 'reference',
@@ -334,7 +377,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                     new LifecycleEvent(
                         new Event(
                             6,
-                            'lifecycle/execution-started',
+                            'lifecycle/compilation-completed',
                             new ResourceReference('label', 'reference'),
                             [],
                             null,
@@ -343,6 +386,43 @@ class ListTest extends AbstractResultsEventClientTestCase
                     new LifecycleEvent(
                         new Event(
                             7,
+                            'lifecycle/execution-started',
+                            new ResourceReference('label', 'reference'),
+                            [],
+                            null,
+                        )
+                    ),
+                    new TestStartedEvent(
+                        new Event(
+                            8,
+                            'test/started',
+                            new ResourceReference('test1.yaml', 'test1_reference'),
+                            [
+                                'source' => 'test1.yaml',
+                                'document' => [
+                                    'type' => 'test',
+                                    'payload' => [
+                                        'path' => 'test1.yaml',
+                                        'config' => [
+                                            'browser' => 'chrome',
+                                            'url' => 'https://example.com/',
+                                        ],
+                                    ],
+                                ],
+                                'step_names' => [
+                                    'step one',
+                                    'step two',
+                                ],
+                            ],
+                            new ResourceReferenceCollection([
+                                new ResourceReference('step one', 'step_one_reference'),
+                                new ResourceReference('step two', 'step_two_reference'),
+                            ]),
+                        )
+                    ),
+                    new LifecycleEvent(
+                        new Event(
+                            9,
                             'lifecycle/execution-completed',
                             new ResourceReference('label', 'reference'),
                             [],

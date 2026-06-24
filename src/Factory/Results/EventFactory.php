@@ -10,6 +10,7 @@ use SmartAssert\ApiClient\Data\Results\Event;
 use SmartAssert\ApiClient\Data\Results\EventInterface;
 use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
 use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
+use SmartAssert\ApiClient\Data\Results\TestStartedEvent;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 
@@ -70,6 +71,10 @@ readonly class EventFactory extends AbstractFactory
 
         if ('compilation/passed' === $type) {
             $event = new CompilationPassedEvent($event);
+        }
+
+        if ('test/started' === $type) {
+            $event = new TestStartedEvent($event);
         }
 
         return $event;
