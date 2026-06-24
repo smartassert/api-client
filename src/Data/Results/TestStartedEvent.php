@@ -37,7 +37,7 @@ readonly class TestStartedEvent extends AbstractEncapsulatingEvent implements Ev
         $payloadData = $documentData['payload'] ?? [];
         $payloadData = is_array($payloadData) ? $payloadData : [];
 
-        $configurationData = $payloadData['configuration'] ?? [];
+        $configurationData = $payloadData['config'] ?? [];
         $configurationData = is_array($configurationData) ? $configurationData : [];
 
         $browser = $configurationData['browser'] ?? '';
