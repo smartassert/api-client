@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-readonly class ResourceReferenceCollection
+/**
+ * @implements \IteratorAggregate<ResourceReference>
+ */
+readonly class ResourceReferenceCollection implements \IteratorAggregate
 {
     /**
      * @param ResourceReference[] $resourceReferences
@@ -19,5 +22,10 @@ readonly class ResourceReferenceCollection
             $this->resourceReferences,
             fn ($resourceReference) => $resourceReference->label === $label,
         );
+    }
+
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->resourceReferences);
     }
 }
