@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-readonly class LifecycleEvent extends AbstractEncapsulatingEvent implements EventInterface
+readonly class LifecycleEvent extends AbstractEncapsulatingEvent implements EventInterface, HasJobReferenceInterface
 {
-    public function getJobMetadata(): JobMetadataInterface
+    public function getJobReference(): ResourceReference
     {
-        return new JobMetadata($this->getResourceReference());
+        return $this->getResourceReference();
     }
 }
