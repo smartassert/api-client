@@ -11,20 +11,9 @@ readonly class TestStartedEvent extends AbstractEncapsulatingEvent implements Ev
         return $this->getResourceReference();
     }
 
-    /**
-     * @return StepMetadataInterface[]
-     */
-    public function getStepMetadataCollection(): array
+    public function getStepReferences(): ResourceReferenceCollection
     {
-        $steps = [];
-
-        $relatedReferences = $this->getRelatedReferences() ?? [];
-
-        foreach ($relatedReferences as $relatedReference) {
-            $steps[] = new StepMetadata($relatedReference);
-        }
-
-        return $steps;
+        return $this->getRelatedReferences() ?? new ResourceReferenceCollection();
     }
 
     public function getConfiguration(): TestConfigurationInterface
