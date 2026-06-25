@@ -11,23 +11,20 @@ readonly class JobStartedEvent extends AbstractEncapsulatingEvent implements Eve
         return new JobMetadata($this->getResourceReference());
     }
 
-    /**
-     * @return TestMetadataInterface[]
-     */
-    public function getTestMetadataCollection(): array
+    public function getTestReferences(): ResourceReferenceCollection
     {
         $testNames = $this->createTestNameList();
-        $tests = [];
+        $resourceReferences = [];
 
         foreach ($testNames as $testName) {
             $resourceReference = $this->getRelatedReferences()?->getForLabel($testName);
 
             if (null !== $resourceReference) {
-                $tests[] = new TestMetadata($resourceReference);
+                $resourceReferences[] = $resourceReference;
             }
         }
 
-        return $tests;
+        return new ResourceReferenceCollection($resourceReferences);
     }
 
     /**
