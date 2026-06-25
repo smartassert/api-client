@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-readonly class CompilationStartedEvent extends AbstractEncapsulatingEvent implements EventInterface
+use SmartAssert\ApiClient\Data\Results\AbstractEncapsulatingEvent as BaseEvent;
+
+readonly class CompilationStartedEvent extends BaseEvent implements EventInterface, HasTestReferenceInterface
 {
-    public function getTestMetadata(): TestMetadataInterface
+    public function getTestReference(): ResourceReference
     {
-        return new TestMetadata($this->getResourceReference());
+        return $this->getResourceReference();
     }
 }

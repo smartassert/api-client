@@ -4,27 +4,16 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-readonly class TestStartedEvent extends AbstractEncapsulatingEvent implements EventInterface
+readonly class TestStartedEvent extends AbstractEncapsulatingEvent implements EventInterface, HasTestReferenceInterface
 {
-    public function getTestMetadata(): TestMetadataInterface
+    public function getTestReference(): ResourceReference
     {
-        return new TestMetadata($this->getResourceReference());
+        return $this->getResourceReference();
     }
 
-    /**
-     * @return StepMetadataInterface[]
-     */
-    public function getStepMetadataCollection(): array
+    public function getStepReferences(): ResourceReferenceCollection
     {
-        $steps = [];
-
-        $relatedReferences = $this->getRelatedReferences() ?? [];
-
-        foreach ($relatedReferences as $relatedReference) {
-            $steps[] = new StepMetadata($relatedReference);
-        }
-
-        return $steps;
+        return $this->getRelatedReferences() ?? new ResourceReferenceCollection();
     }
 
     public function getConfiguration(): TestConfigurationInterface
