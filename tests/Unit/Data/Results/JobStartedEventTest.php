@@ -11,8 +11,8 @@ use SmartAssert\ApiClient\Data\Results\JobMetadata;
 use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
 use SmartAssert\ApiClient\Data\Results\ResourceReference;
 use SmartAssert\ApiClient\Data\Results\ResourceReferenceCollection;
-use SmartAssert\ApiClient\Data\Results\Test;
-use SmartAssert\ApiClient\Data\Results\TestInterface;
+use SmartAssert\ApiClient\Data\Results\TestMetadata;
+use SmartAssert\ApiClient\Data\Results\TestMetadataInterface;
 
 class JobStartedEventTest extends TestCase
 {
@@ -44,12 +44,12 @@ class JobStartedEventTest extends TestCase
     }
 
     /**
-     * @param TestInterface[] $expected
+     * @param TestMetadataInterface[] $expected
      */
     #[DataProvider('getTestsDataProvider')]
     public function testGetTests(JobStartedEvent $event, array $expected): void
     {
-        self::assertEquals($expected, $event->getTests());
+        self::assertEquals($expected, $event->getTestMetadataCollection());
     }
 
     /**
@@ -129,7 +129,7 @@ class JobStartedEventTest extends TestCase
                     ),
                 ),
                 'expected' => [
-                    new Test(
+                    new TestMetadata(
                         new ResourceReference('test1.yaml', 'test1-reference'),
                     ),
                 ],
@@ -157,10 +157,10 @@ class JobStartedEventTest extends TestCase
                     ),
                 ),
                 'expected' => [
-                    new Test(
+                    new TestMetadata(
                         new ResourceReference('test1.yaml', 'test1-reference'),
                     ),
-                    new Test(
+                    new TestMetadata(
                         new ResourceReference('test3.yaml', 'test3-reference'),
                     ),
                 ],

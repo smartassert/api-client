@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-readonly class Test implements TestInterface
+readonly class TestMetadata implements TestMetadataInterface
 {
     public function __construct(
         private ResourceReference $resourceReference,

@@ -12,9 +12,9 @@ readonly class JobStartedEvent extends AbstractEncapsulatingEvent implements Eve
     }
 
     /**
-     * @return TestInterface[]
+     * @return TestMetadataInterface[]
      */
-    public function getTests(): array
+    public function getTestMetadataCollection(): array
     {
         $testNames = $this->createTestNameList();
         $tests = [];
@@ -23,7 +23,7 @@ readonly class JobStartedEvent extends AbstractEncapsulatingEvent implements Eve
             $resourceReference = $this->getRelatedReferences()?->getForLabel($testName);
 
             if (null !== $resourceReference) {
-                $tests[] = new Test($resourceReference);
+                $tests[] = new TestMetadata($resourceReference);
             }
         }
 
