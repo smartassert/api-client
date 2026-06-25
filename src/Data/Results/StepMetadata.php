@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-readonly class Job implements JobInterface
+readonly class StepMetadata implements StepMetadataInterface
 {
     public function __construct(
         private ResourceReference $resourceReference,
     ) {}
 
-    public function getLabel(): string
+    public function getName(): string
     {
         return $this->resourceReference->label;
     }

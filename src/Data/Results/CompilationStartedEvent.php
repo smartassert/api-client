@@ -6,8 +6,8 @@ namespace SmartAssert\ApiClient\Data\Results;
 
 readonly class CompilationStartedEvent extends AbstractEncapsulatingEvent implements EventInterface
 {
-    public function getTest(): TestInterface
+    public function getTestMetadata(): TestMetadataInterface
     {
-        return new Test($this->getResourceReference());
+        return new TestMetadata($this->getResourceReference());
     }
 }

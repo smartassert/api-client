@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-interface StepInterface
+interface JobMetadataInterface
 {
     /**
      * @return non-empty-string
      */
-    public function getName(): string;
+    public function getLabel(): string;
 
     public function getResourceReference(): ResourceReference;
 }

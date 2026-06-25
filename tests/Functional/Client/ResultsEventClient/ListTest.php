@@ -14,7 +14,7 @@ use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
 use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Data\Results\ResourceReference;
 use SmartAssert\ApiClient\Data\Results\ResourceReferenceCollection;
-use SmartAssert\ApiClient\Data\Results\TestInterface;
+use SmartAssert\ApiClient\Data\Results\TestMetadataInterface;
 use SmartAssert\ApiClient\Data\Results\TestStartedEvent;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
@@ -127,8 +127,8 @@ class ListTest extends AbstractResultsEventClientTestCase
     }
 
     /**
-     * @param array<mixed>    $responseData
-     * @param TestInterface[] $expected
+     * @param array<mixed>            $responseData
+     * @param TestMetadataInterface[] $expected
      */
     #[DataProvider('listSuccessDataProvider')]
     public function testListSuccess(array $responseData, array $expected): void

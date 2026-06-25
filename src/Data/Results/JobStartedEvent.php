@@ -6,15 +6,15 @@ namespace SmartAssert\ApiClient\Data\Results;
 
 readonly class JobStartedEvent extends AbstractEncapsulatingEvent implements EventInterface
 {
-    public function getJob(): JobInterface
+    public function getJobMetadata(): JobMetadataInterface
     {
-        return new Job($this->getResourceReference());
+        return new JobMetadata($this->getResourceReference());
     }
 
     /**
-     * @return TestInterface[]
+     * @return TestMetadataInterface[]
      */
-    public function getTests(): array
+    public function getTestMetadataCollection(): array
     {
         $testNames = $this->createTestNameList();
         $tests = [];
@@ -23,7 +23,7 @@ readonly class JobStartedEvent extends AbstractEncapsulatingEvent implements Eve
             $resourceReference = $this->getRelatedReferences()?->getForLabel($testName);
 
             if (null !== $resourceReference) {
-                $tests[] = new Test($resourceReference);
+                $tests[] = new TestMetadata($resourceReference);
             }
         }
 
