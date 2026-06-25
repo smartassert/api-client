@@ -12,16 +12,16 @@ readonly class CompilationPassedEvent extends AbstractEncapsulatingEvent impleme
     }
 
     /**
-     * @return StepInterface[]
+     * @return StepMetadataInterface[]
      */
-    public function getSteps(): array
+    public function getStepMetadataCollection(): array
     {
         $steps = [];
 
         $relatedReferences = $this->getRelatedReferences() ?? [];
 
         foreach ($relatedReferences as $relatedReference) {
-            $steps[] = new Step($relatedReference);
+            $steps[] = new StepMetadata($relatedReference);
         }
 
         return $steps;

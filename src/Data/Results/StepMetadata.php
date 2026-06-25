@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-readonly class Step implements StepInterface
+readonly class StepMetadata implements StepMetadataInterface
 {
     public function __construct(
         private ResourceReference $resourceReference,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-interface StepInterface
+interface StepMetadataInterface
 {
     /**
      * @return non-empty-string
