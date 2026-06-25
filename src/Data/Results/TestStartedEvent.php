@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-readonly class TestStartedEvent extends AbstractEncapsulatingEvent implements EventInterface, HasTestMetadataInterface
+readonly class TestStartedEvent extends AbstractEncapsulatingEvent implements EventInterface, HasTestReferenceInterface
 {
     public function getTestReference(): ResourceReference
     {

@@ -6,7 +6,7 @@ namespace SmartAssert\ApiClient\Data\Results;
 
 use SmartAssert\ApiClient\Data\Results\AbstractEncapsulatingEvent as BaseEvent;
 
-readonly class CompilationStartedEvent extends BaseEvent implements EventInterface, HasTestMetadataInterface
+readonly class CompilationStartedEvent extends BaseEvent implements EventInterface, HasTestReferenceInterface
 {
     public function getTestReference(): ResourceReference
     {
