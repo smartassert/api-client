@@ -22,6 +22,8 @@ use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
+use webignition\BasilModels\Model\Step\StepCollection;
+use webignition\BasilModels\Model\Test\Test;
 
 class ListTest extends AbstractResultsEventClientTestCase
 {
@@ -428,7 +430,8 @@ class ListTest extends AbstractResultsEventClientTestCase
                                 new ResourceReference('step one', 'step_one_reference'),
                                 new ResourceReference('step two', 'step_two_reference'),
                             ]),
-                        )
+                        ),
+                        new Test('chrome', 'https://example.com/', new StepCollection([])),
                     ),
                     new LifecycleEvent(
                         new Event(

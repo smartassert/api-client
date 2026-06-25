@@ -13,18 +13,24 @@ use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Data\Results\TestStartedEvent;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
+use webignition\BasilModels\Parser\Exception\InvalidTestException;
+use webignition\BasilModels\Parser\Exception\UnparseableTestException;
+use webignition\BasilModels\Parser\Test\TestParser;
 
 readonly class EventFactory extends AbstractFactory
 {
     public function __construct(
         private ResourceReferenceFactory $resourceReferenceFactory,
         private ResourceReferenceCollectionFactory $resourceReferenceCollectionFactory,
+        private TestParser $testParser,
     ) {}
 
     /**
      * @param array<mixed> $data
      *
      * @throws IncompleteDataException
+     * @throws InvalidTestException
+     * @throws UnparseableTestException
      */
     public function create(array $data): EventInterface
     {
@@ -74,7 +80,15 @@ readonly class EventFactory extends AbstractFactory
         }
 
         if ('test/started' === $type) {
-            $event = new TestStartedEvent($event);
+            $bodyData = $event->getBody();
+            $documentData = $bodyData['document'] ?? [];
+            $documentData = is_array($documentData) ? $documentData : [];
+
+            $testModelData = $documentData['payload'] ?? [];
+            $testModelData = is_array($testModelData) ? $testModelData : [];
+
+            $test = $this->testParser->parse($testModelData);
+            $event = new TestStartedEvent($event, $test);
         }
 
         return $event;
