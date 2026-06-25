@@ -95,7 +95,8 @@
         "psr/http-factory": "^1.0",
         "psr/http-message": "^1.0",
         "smartassert/service-request": "^1.0",
-        "symfony/routing": "^8"
+        "symfony/routing": "^8",
+        "webignition/basil-models": "^15.2"
     },
     "require-dev": {
         "ext-pdo": "*",

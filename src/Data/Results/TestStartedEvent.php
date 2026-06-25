@@ -4,8 +4,17 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
+use webignition\BasilModels\Model\Test\TestInterface;
+
 readonly class TestStartedEvent extends AbstractEncapsulatingEvent implements EventInterface, HasTestReferenceInterface
 {
+    public function __construct(
+        EventInterface $source,
+        private TestInterface $test
+    ) {
+        parent::__construct($source);
+    }
+
     public function getTestReference(): ResourceReference
     {
         return $this->getResourceReference();
@@ -16,25 +25,8 @@ readonly class TestStartedEvent extends AbstractEncapsulatingEvent implements Ev
         return $this->getRelatedReferences() ?? new ResourceReferenceCollection();
     }
 
-    public function getConfiguration(): TestConfigurationInterface
+    public function getTest(): TestInterface
     {
-        $bodyData = $this->getBody();
-
-        $documentData = $bodyData['document'] ?? [];
-        $documentData = is_array($documentData) ? $documentData : [];
-
-        $payloadData = $documentData['payload'] ?? [];
-        $payloadData = is_array($payloadData) ? $payloadData : [];
-
-        $configurationData = $payloadData['config'] ?? [];
-        $configurationData = is_array($configurationData) ? $configurationData : [];
-
-        $browser = $configurationData['browser'] ?? '';
-        $browser = is_string($browser) ? $browser : '';
-
-        $url = $configurationData['url'] ?? '';
-        $url = is_string($url) ? $url : '';
-
-        return new TestConfiguration($browser, $url);
+        return $this->test;
     }
 }
