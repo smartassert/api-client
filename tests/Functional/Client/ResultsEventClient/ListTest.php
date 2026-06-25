@@ -175,14 +175,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ),
                 ],
             ],
-            'job/started, 
-            lifecycle/compilation-started, 
-            compilation/started,
-            compilation/passed,
-            lifecycle/compilation-completed,
-            lifecycle/execution-started,
-            test/started,
-            lifecycle/execution-completed' => [
+            'job/started' => [
                 'responseData' => [
                     [
                         'sequence_number' => 1,
@@ -206,8 +199,34 @@ class ListTest extends AbstractResultsEventClientTestCase
                             ],
                         ],
                     ],
+                ],
+                'expected' => [
+                    new JobStartedEvent(
+                        new Event(
+                            1,
+                            'job/started',
+                            new ResourceReference('label', 'reference'),
+                            [
+                                'tests' => [
+                                    'test1.yaml',
+                                    'test2.yaml',
+                                ],
+                            ],
+                            new ResourceReferenceCollection([
+                                new ResourceReference('test1.yaml', 'test1_reference'),
+                                new ResourceReference('test2.yaml', 'test2_reference'),
+                            ]),
+                        )
+                    ),
+                ],
+            ],
+            'lifecycle/compilation-started,
+            compilation/started,            
+            compilation/passed,
+            lifecycle/compilation-completed' => [
+                'responseData' => [
                     [
-                        'sequence_number' => 2,
+                        'sequence_number' => 1,
                         'type' => 'lifecycle/compilation-started',
                         'label' => 'label',
                         'reference' => 'reference',
@@ -215,7 +234,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                         'related_references' => [],
                     ],
                     [
-                        'sequence_number' => 3,
+                        'sequence_number' => 2,
                         'type' => 'compilation/started',
                         'label' => 'test1.yaml',
                         'reference' => 'test1_reference',
@@ -225,7 +244,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                         'related_references' => [],
                     ],
                     [
-                        'sequence_number' => 4,
+                        'sequence_number' => 3,
                         'type' => 'compilation/passed',
                         'label' => 'test1.yaml',
                         'reference' => 'test1_reference',
@@ -244,7 +263,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                         ],
                     ],
                     [
-                        'sequence_number' => 5,
+                        'sequence_number' => 4,
                         'type' => 'compilation/started',
                         'label' => 'test2.yaml',
                         'reference' => 'test2_reference',
@@ -254,15 +273,77 @@ class ListTest extends AbstractResultsEventClientTestCase
                         'related_references' => [],
                     ],
                     [
-                        'sequence_number' => 6,
+                        'sequence_number' => 5,
                         'type' => 'lifecycle/compilation-completed',
                         'label' => 'label',
                         'reference' => 'reference',
                         'body' => [],
                         'related_references' => [],
                     ],
+                ],
+                'expected' => [
+                    new LifecycleEvent(
+                        new Event(
+                            1,
+                            'lifecycle/compilation-started',
+                            new ResourceReference('label', 'reference'),
+                            [],
+                            null,
+                        )
+                    ),
+                    new CompilationStartedEvent(
+                        new Event(
+                            2,
+                            'compilation/started',
+                            new ResourceReference('test1.yaml', 'test1_reference'),
+                            [
+                                'source' => 'test1.yaml',
+                            ],
+                            null,
+                        )
+                    ),
+                    new CompilationPassedEvent(
+                        new Event(
+                            3,
+                            'compilation/passed',
+                            new ResourceReference('test1.yaml', 'test1_reference'),
+                            [
+                                'source' => 'test1.yaml',
+                            ],
+                            new ResourceReferenceCollection([
+                                new ResourceReference('step one', 'step_one_reference'),
+                                new ResourceReference('step two', 'step_two_reference'),
+                            ]),
+                        )
+                    ),
+                    new CompilationStartedEvent(
+                        new Event(
+                            4,
+                            'compilation/started',
+                            new ResourceReference('test2.yaml', 'test2_reference'),
+                            [
+                                'source' => 'test2.yaml',
+                            ],
+                            null,
+                        )
+                    ),
+                    new LifecycleEvent(
+                        new Event(
+                            5,
+                            'lifecycle/compilation-completed',
+                            new ResourceReference('label', 'reference'),
+                            [],
+                            null,
+                        )
+                    ),
+                ],
+            ],
+            'lifecycle/execution-started,
+            test/started,
+            lifecycle/execution-completed' => [
+                'responseData' => [
                     [
-                        'sequence_number' => 7,
+                        'sequence_number' => 1,
                         'type' => 'lifecycle/execution-started',
                         'label' => 'label',
                         'reference' => 'reference',
@@ -270,7 +351,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                         'related_references' => [],
                     ],
                     [
-                        'sequence_number' => 8,
+                        'sequence_number' => 2,
                         'type' => 'test/started',
                         'label' => 'test1.yaml',
                         'reference' => 'test1_reference',
@@ -303,7 +384,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                         ],
                     ],
                     [
-                        'sequence_number' => 9,
+                        'sequence_number' => 3,
                         'type' => 'lifecycle/execution-completed',
                         'label' => 'label',
                         'reference' => 'reference',
@@ -312,80 +393,9 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ],
                 ],
                 'expected' => [
-                    new JobStartedEvent(
+                    new LifecycleEvent(
                         new Event(
                             1,
-                            'job/started',
-                            new ResourceReference('label', 'reference'),
-                            [
-                                'tests' => [
-                                    'test1.yaml',
-                                    'test2.yaml',
-                                ],
-                            ],
-                            new ResourceReferenceCollection([
-                                new ResourceReference('test1.yaml', 'test1_reference'),
-                                new ResourceReference('test2.yaml', 'test2_reference'),
-                            ]),
-                        )
-                    ),
-                    new LifecycleEvent(
-                        new Event(
-                            2,
-                            'lifecycle/compilation-started',
-                            new ResourceReference('label', 'reference'),
-                            [],
-                            null,
-                        )
-                    ),
-                    new CompilationStartedEvent(
-                        new Event(
-                            3,
-                            'compilation/started',
-                            new ResourceReference('test1.yaml', 'test1_reference'),
-                            [
-                                'source' => 'test1.yaml',
-                            ],
-                            null,
-                        )
-                    ),
-                    new CompilationPassedEvent(
-                        new Event(
-                            4,
-                            'compilation/passed',
-                            new ResourceReference('test1.yaml', 'test1_reference'),
-                            [
-                                'source' => 'test1.yaml',
-                            ],
-                            new ResourceReferenceCollection([
-                                new ResourceReference('step one', 'step_one_reference'),
-                                new ResourceReference('step two', 'step_two_reference'),
-                            ]),
-                        )
-                    ),
-                    new CompilationStartedEvent(
-                        new Event(
-                            5,
-                            'compilation/started',
-                            new ResourceReference('test2.yaml', 'test2_reference'),
-                            [
-                                'source' => 'test2.yaml',
-                            ],
-                            null,
-                        )
-                    ),
-                    new LifecycleEvent(
-                        new Event(
-                            6,
-                            'lifecycle/compilation-completed',
-                            new ResourceReference('label', 'reference'),
-                            [],
-                            null,
-                        )
-                    ),
-                    new LifecycleEvent(
-                        new Event(
-                            7,
                             'lifecycle/execution-started',
                             new ResourceReference('label', 'reference'),
                             [],
@@ -394,7 +404,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ),
                     new TestStartedEvent(
                         new Event(
-                            8,
+                            2,
                             'test/started',
                             new ResourceReference('test1.yaml', 'test1_reference'),
                             [
@@ -422,7 +432,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                     ),
                     new LifecycleEvent(
                         new Event(
-                            9,
+                            3,
                             'lifecycle/execution-completed',
                             new ResourceReference('label', 'reference'),
                             [],
