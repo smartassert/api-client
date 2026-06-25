@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-readonly class Job implements JobInterface
+readonly class JobMetadata implements JobMetadataInterface
 {
     public function __construct(
         private ResourceReference $resourceReference,

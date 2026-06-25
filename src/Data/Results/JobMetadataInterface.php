@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-interface JobInterface
+interface JobMetadataInterface
 {
     /**
      * @return non-empty-string
