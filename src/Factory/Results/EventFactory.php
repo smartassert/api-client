@@ -13,6 +13,7 @@ use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 use webignition\BasilModels\Parser\Exception\InvalidTestException;
+use webignition\BasilModels\Parser\Exception\UnparseableStepException;
 use webignition\BasilModels\Parser\Exception\UnparseableTestException;
 
 readonly class EventFactory extends AbstractFactory
@@ -21,6 +22,7 @@ readonly class EventFactory extends AbstractFactory
         private ResourceReferenceFactory $resourceReferenceFactory,
         private ResourceReferenceCollectionFactory $resourceReferenceCollectionFactory,
         private TestStartedEventFactory $testStartedEventFactory,
+        private StepPassedEventFactory $stepPassedEventFactory,
     ) {}
 
     /**
@@ -29,6 +31,7 @@ readonly class EventFactory extends AbstractFactory
      * @throws IncompleteDataException
      * @throws InvalidTestException
      * @throws UnparseableTestException
+     * @throws UnparseableStepException
      */
     public function create(array $data): EventInterface
     {
@@ -79,6 +82,10 @@ readonly class EventFactory extends AbstractFactory
 
         if ('test/started' === $type) {
             $event = $this->testStartedEventFactory->create($event);
+        }
+
+        if ('step/passed' === $type) {
+            $event = $this->stepPassedEventFactory->create($event);
         }
 
         return $event;

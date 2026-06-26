@@ -15,6 +15,10 @@ use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
 use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Data\Results\ResourceReference;
 use SmartAssert\ApiClient\Data\Results\ResourceReferenceCollection;
+use SmartAssert\ApiClient\Data\Results\Statement;
+use SmartAssert\ApiClient\Data\Results\StatementCollection;
+use SmartAssert\ApiClient\Data\Results\Step;
+use SmartAssert\ApiClient\Data\Results\StepPassedEvent;
 use SmartAssert\ApiClient\Data\Results\Test;
 use SmartAssert\ApiClient\Data\Results\TestStartedEvent;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
@@ -222,7 +226,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                 ],
             ],
             'lifecycle/compilation-started,
-            compilation/started,            
+            compilation/started,
             compilation/passed,
             lifecycle/compilation-completed' => [
                 'responseData' => [
@@ -440,6 +444,78 @@ class ListTest extends AbstractResultsEventClientTestCase
                             [],
                             null,
                         )
+                    ),
+                ],
+            ],
+            'step/passed' => [
+                'responseData' => [
+                    [
+                        'sequence_number' => 1,
+                        'type' => 'step/passed',
+                        'label' => 'step name',
+                        'reference' => 'step_reference',
+                        'body' => [
+                            'source' => 'test1.yaml',
+                            'document' => [
+                                'type' => 'step',
+                                'payload' => [
+                                    'name' => 'step name',
+                                    'status' => 'passed',
+                                    'statements' => [
+                                        [
+                                            'type' => 'assertion',
+                                            'source' => 'assertion source 1',
+                                            'status' => 'passed',
+                                        ],
+                                        [
+                                            'type' => 'assertion',
+                                            'source' => 'assertion source 2',
+                                            'status' => 'passed',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    new StepPassedEvent(
+                        new Event(
+                            1,
+                            'step/passed',
+                            new ResourceReference('step name', 'step_reference'),
+                            [
+                                'source' => 'test1.yaml',
+                                'document' => [
+                                    'type' => 'step',
+                                    'payload' => [
+                                        'name' => 'step name',
+                                        'status' => 'passed',
+                                        'statements' => [
+                                            [
+                                                'type' => 'assertion',
+                                                'source' => 'assertion source 1',
+                                                'status' => 'passed',
+                                            ],
+                                            [
+                                                'type' => 'assertion',
+                                                'source' => 'assertion source 2',
+                                                'status' => 'passed',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            null,
+                        ),
+                        new Step(
+                            'step name',
+                            'passed',
+                            new StatementCollection([
+                                new Statement('assertion', 'assertion source 1', 'passed'),
+                                new Statement('assertion', 'assertion source 2', 'passed'),
+                            ]),
+                        ),
                     ),
                 ],
             ],
