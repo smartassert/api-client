@@ -18,6 +18,7 @@ readonly class FactoryFactory
             new TestStartedEventFactory(
                 TestParser::create(),
             ),
+            new StepPassedEventFactory()
         );
     }
 }
