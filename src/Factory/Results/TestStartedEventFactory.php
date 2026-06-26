@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmartAssert\ApiClient\Factory\Results;
 
 use SmartAssert\ApiClient\Data\Results\EventInterface;
+use SmartAssert\ApiClient\Data\Results\Test;
 use SmartAssert\ApiClient\Data\Results\TestStartedEvent;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 use webignition\BasilModels\Parser\Exception\InvalidTestException;
@@ -30,6 +31,12 @@ readonly class TestStartedEventFactory extends AbstractFactory
         $modelData = $documentData['payload'] ?? [];
         $modelData = is_array($modelData) ? $modelData : [];
 
-        return new TestStartedEvent($event, $this->testParser->parse($modelData));
+        $path = $modelData['path'] ?? '';
+        $path = is_string($path) ? $path : '';
+
+        $testModel = $this->testParser->parse($modelData);
+        $test = new Test($path, $testModel->getBrowser(), $testModel->getUrl());
+
+        return new TestStartedEvent($event, $test);
     }
 }

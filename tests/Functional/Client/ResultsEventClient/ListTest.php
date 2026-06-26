@@ -15,6 +15,7 @@ use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
 use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Data\Results\ResourceReference;
 use SmartAssert\ApiClient\Data\Results\ResourceReferenceCollection;
+use SmartAssert\ApiClient\Data\Results\Test;
 use SmartAssert\ApiClient\Data\Results\TestStartedEvent;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
@@ -22,8 +23,6 @@ use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestPropertiesTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\InvalidJsonResponseExceptionDataProviderTrait;
 use SmartAssert\ApiClient\Tests\Functional\DataProvider\NetworkErrorExceptionDataProviderTrait;
-use webignition\BasilModels\Model\Step\StepCollection;
-use webignition\BasilModels\Model\Test\Test;
 
 class ListTest extends AbstractResultsEventClientTestCase
 {
@@ -431,7 +430,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                                 new ResourceReference('step two', 'step_two_reference'),
                             ]),
                         ),
-                        new Test('chrome', 'https://example.com/', new StepCollection([])),
+                        new Test('test1.yaml', 'chrome', 'https://example.com/'),
                     ),
                     new LifecycleEvent(
                         new Event(

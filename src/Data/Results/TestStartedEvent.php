@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace SmartAssert\ApiClient\Data\Results;
 
-use webignition\BasilModels\Model\Test\TestInterface;
-
 readonly class TestStartedEvent extends AbstractEncapsulatingEvent implements EventInterface, HasTestReferenceInterface
 {
     public function __construct(
