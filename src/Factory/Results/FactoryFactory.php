@@ -15,7 +15,9 @@ readonly class FactoryFactory
         return new EventFactory(
             $resourceReferenceFactory,
             new ResourceReferenceCollectionFactory($resourceReferenceFactory),
-            TestParser::create(),
+            new TestStartedEventFactory(
+                TestParser::create(),
+            ),
         );
     }
 }
