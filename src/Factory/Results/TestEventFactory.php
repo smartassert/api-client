@@ -6,13 +6,13 @@ namespace SmartAssert\ApiClient\Factory\Results;
 
 use SmartAssert\ApiClient\Data\Results\EventInterface;
 use SmartAssert\ApiClient\Data\Results\Test;
-use SmartAssert\ApiClient\Data\Results\TestStartedEvent;
+use SmartAssert\ApiClient\Data\Results\TestEvent;
 use SmartAssert\ApiClient\Factory\AbstractFactory;
 use webignition\BasilModels\Parser\Exception\InvalidTestException;
 use webignition\BasilModels\Parser\Exception\UnparseableTestException;
 use webignition\BasilModels\Parser\Test\TestParser;
 
-readonly class TestStartedEventFactory extends AbstractFactory
+readonly class TestEventFactory extends AbstractFactory
 {
     public function __construct(
         private TestParser $testParser,
@@ -22,7 +22,7 @@ readonly class TestStartedEventFactory extends AbstractFactory
      * @throws InvalidTestException
      * @throws UnparseableTestException
      */
-    public function create(EventInterface $event): TestStartedEvent
+    public function create(EventInterface $event): TestEvent
     {
         $bodyData = $event->getBody();
         $documentData = $bodyData['document'] ?? [];
@@ -37,6 +37,6 @@ readonly class TestStartedEventFactory extends AbstractFactory
         $testModel = $this->testParser->parse($modelData);
         $test = new Test($path, $testModel->getBrowser(), $testModel->getUrl());
 
-        return new TestStartedEvent($event, $test);
+        return new TestEvent($event, $test);
     }
 }

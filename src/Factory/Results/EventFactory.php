@@ -21,7 +21,7 @@ readonly class EventFactory extends AbstractFactory
     public function __construct(
         private ResourceReferenceFactory $resourceReferenceFactory,
         private ResourceReferenceCollectionFactory $resourceReferenceCollectionFactory,
-        private TestStartedEventFactory $testStartedEventFactory,
+        private TestEventFactory $testEventFactory,
         private StepPassedEventFactory $stepPassedEventFactory,
     ) {}
 
@@ -80,8 +80,8 @@ readonly class EventFactory extends AbstractFactory
             $event = new CompilationPassedEvent($event);
         }
 
-        if ('test/started' === $type) {
-            $event = $this->testStartedEventFactory->create($event);
+        if ('test/started' === $type || 'test/passed' === $type) {
+            $event = $this->testEventFactory->create($event);
         }
 
         if ('step/passed' === $type) {

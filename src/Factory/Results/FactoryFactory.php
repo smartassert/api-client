@@ -15,7 +15,7 @@ readonly class FactoryFactory
         return new EventFactory(
             $resourceReferenceFactory,
             new ResourceReferenceCollectionFactory($resourceReferenceFactory),
-            new TestStartedEventFactory(
+            new TestEventFactory(
                 TestParser::create(),
             ),
             new StepPassedEventFactory()
