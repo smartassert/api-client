@@ -8,6 +8,7 @@ use SmartAssert\ApiClient\Data\Results\CompilationPassedEvent;
 use SmartAssert\ApiClient\Data\Results\CompilationStartedEvent;
 use SmartAssert\ApiClient\Data\Results\Event;
 use SmartAssert\ApiClient\Data\Results\EventInterface;
+use SmartAssert\ApiClient\Data\Results\JobEndedEvent;
 use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
 use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Exception\Factory\IncompleteDataException;
@@ -86,6 +87,10 @@ readonly class EventFactory extends AbstractFactory
 
         if ('step/passed' === $type) {
             $event = $this->stepPassedEventFactory->create($event);
+        }
+
+        if ('job/ended' === $type) {
+            $event = new JobEndedEvent($event);
         }
 
         return $event;
