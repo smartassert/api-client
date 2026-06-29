@@ -11,6 +11,7 @@ use SmartAssert\ApiClient\Data\Results\CompilationPassedEvent;
 use SmartAssert\ApiClient\Data\Results\CompilationStartedEvent;
 use SmartAssert\ApiClient\Data\Results\Event;
 use SmartAssert\ApiClient\Data\Results\EventInterface;
+use SmartAssert\ApiClient\Data\Results\JobEndedEvent;
 use SmartAssert\ApiClient\Data\Results\JobStartedEvent;
 use SmartAssert\ApiClient\Data\Results\LifecycleEvent;
 use SmartAssert\ApiClient\Data\Results\ResourceReference;
@@ -584,6 +585,36 @@ class ListTest extends AbstractResultsEventClientTestCase
                             ]),
                         ),
                         new Test('test1.yaml', 'chrome', 'https://example.com/'),
+                    ),
+                ],
+            ],
+            'job/ended' => [
+                'responseData' => [
+                    [
+                        'sequence_number' => 1,
+                        'type' => 'job/ended',
+                        'label' => 'label',
+                        'reference' => 'reference',
+                        'body' => [
+                            'end_state' => 'complete',
+                            'success' => true,
+                            'event_count' => 3,
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    new JobEndedEvent(
+                        new Event(
+                            1,
+                            'job/ended',
+                            new ResourceReference('label', 'reference'),
+                            [
+                                'end_state' => 'complete',
+                                'success' => true,
+                                'event_count' => 3,
+                            ],
+                            null,
+                        )
                     ),
                 ],
             ],
