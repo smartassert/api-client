@@ -20,7 +20,7 @@ use SmartAssert\ApiClient\Data\Results\StatementCollection;
 use SmartAssert\ApiClient\Data\Results\Step;
 use SmartAssert\ApiClient\Data\Results\StepPassedEvent;
 use SmartAssert\ApiClient\Data\Results\Test;
-use SmartAssert\ApiClient\Data\Results\TestStartedEvent;
+use SmartAssert\ApiClient\Data\Results\TestEvent;
 use SmartAssert\ApiClient\Tests\Functional\Client\ClientActionThrowsIncompleteDataExceptionTestTrait;
 use SmartAssert\ApiClient\Tests\Functional\Client\ExpectedRequestProperties;
 use SmartAssert\ApiClient\Tests\Functional\Client\RequestAuthenticationTestTrait;
@@ -407,7 +407,7 @@ class ListTest extends AbstractResultsEventClientTestCase
                             null,
                         )
                     ),
-                    new TestStartedEvent(
+                    new TestEvent(
                         new Event(
                             2,
                             'test/started',
@@ -516,6 +516,74 @@ class ListTest extends AbstractResultsEventClientTestCase
                                 new Statement('assertion', 'assertion source 2', 'passed'),
                             ]),
                         ),
+                    ),
+                ],
+            ],
+            'test/passed' => [
+                'responseData' => [
+                    [
+                        'sequence_number' => 1,
+                        'type' => 'test/passed',
+                        'label' => 'test1.yaml',
+                        'reference' => 'test1_reference',
+                        'body' => [
+                            'source' => 'test1.yaml',
+                            'document' => [
+                                'type' => 'test',
+                                'payload' => [
+                                    'path' => 'test1.yaml',
+                                    'config' => [
+                                        'browser' => 'chrome',
+                                        'url' => 'https://example.com/',
+                                    ],
+                                ],
+                            ],
+                            'step_names' => [
+                                'step one',
+                                'step two',
+                            ],
+                        ],
+                        'related_references' => [
+                            [
+                                'label' => 'step one',
+                                'reference' => 'step_one_reference',
+                            ],
+                            [
+                                'label' => 'step two',
+                                'reference' => 'step_two_reference',
+                            ],
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    new TestEvent(
+                        new Event(
+                            1,
+                            'test/passed',
+                            new ResourceReference('test1.yaml', 'test1_reference'),
+                            [
+                                'source' => 'test1.yaml',
+                                'document' => [
+                                    'type' => 'test',
+                                    'payload' => [
+                                        'path' => 'test1.yaml',
+                                        'config' => [
+                                            'browser' => 'chrome',
+                                            'url' => 'https://example.com/',
+                                        ],
+                                    ],
+                                ],
+                                'step_names' => [
+                                    'step one',
+                                    'step two',
+                                ],
+                            ],
+                            new ResourceReferenceCollection([
+                                new ResourceReference('step one', 'step_one_reference'),
+                                new ResourceReference('step two', 'step_two_reference'),
+                            ]),
+                        ),
+                        new Test('test1.yaml', 'chrome', 'https://example.com/'),
                     ),
                 ],
             ],
